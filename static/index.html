@@ -774,14 +774,14 @@
             });
         }
         
-        // Add power grid overlay
+        // Add power grid overlay using styled SVG
         function loadGridOverlay() {
             // Bounds calibrated to align the APG grid map with the base map
-            // The image includes margins and legend, so bounds are adjusted
             const bounds = [[46.15, 9.2], [49.15, 17.45]];
-            const imageOverlay = L.imageOverlay('/power_grid.png', bounds, {
-                opacity: 0.85,
-                interactive: false
+            const imageOverlay = L.imageOverlay('/static/power_grid_styled.svg', bounds, {
+                opacity: 0.9,
+                interactive: false,
+                className: 'power-grid-overlay'
             });
             imageOverlay.addTo(gridLayer);
         }
