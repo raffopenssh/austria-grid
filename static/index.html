@@ -316,11 +316,11 @@
             <div class="panel" id="turbine-ranking">
                 <h3><i class="fas fa-trophy"></i> Windkraftanlagen im Blickfeld</h3>
                 <div class="ranking-section">
-                    <h4 style="color: #00d4aa; font-size: 0.85rem; margin: 10px 0 5px 0;">Top 10 (höchste Leistung)</h4>
+                    <h4 style="color: #00d4aa; font-size: 0.85rem; margin: 10px 0 5px 0;">Top 10 (beste Netzkapazität)</h4>
                     <div id="top-turbines" class="ranking-list"></div>
                 </div>
                 <div class="ranking-section">
-                    <h4 style="color: #ff6b6b; font-size: 0.85rem; margin: 10px 0 5px 0;">Letzte 10 (niedrigste Leistung)</h4>
+                    <h4 style="color: #ff6b6b; font-size: 0.85rem; margin: 10px 0 5px 0;">Letzte 10 (schlechteste Netzkapazität)</h4>
                     <div id="bottom-turbines" class="ranking-list"></div>
                 </div>
             </div>
@@ -567,7 +567,7 @@
                     
                     marker.bindTooltip(`
                         <div class="tooltip-custom">
-                            <div class="title">${t.name}</div>
+                            <div class="title">${t.display_name || t.name}</div>
                             <div>Geschätzte Leistung: ${t.estimated_mw} MW</div>
                             <div>Höhe: ${t.height_m}m</div>
                             <div>Bezirk: ${t.bezirk}</div>
@@ -594,40 +594,79 @@
             map.setView([turbine.lat, turbine.lon], 12);
         }
         
-        // Update the turbine ranking based on current view
+        // Calculate grid capacity score for a turbine based on its district
+        function getGridCapacityScore(turbine) {
+            // Find the district this turbine is in
+            for (const [iso, data] of Object.entries(districtData)) {
+                const [minLon, minLat, maxLon, maxLat] = data.bbox || [0, 0, 0, 0];
+                if (turbine.lon >= minLon && turbine.lon <= maxLon && 
+                    turbine.lat >= minLat && turbine.lat <= maxLat) {
+                    // Return a combined score: turbine capacity weighted by grid availability
+                    // Higher capacity_score means more room for new producers
+                    const gridScore = data.capacity_score || 50;
+                    const estimatedAvailable = data.estimated_available_mw || 0;
+                    // Score = turbine MW * (grid availability factor)
+                    // Turbines in areas with high available capacity score higher
+                    return {
+                        score: (turbine.estimated_mw || 1) * (gridScore / 50) * (1 + estimatedAvailable / 100),
+                        gridScore: gridScore,
+                        districtName: data.name,
+                        availableMW: estimatedAvailable
+                    };
+                }
+            }
+            // Default if no district found
+            return {
+                score: turbine.estimated_mw || 1,
+                gridScore: 50,
+                districtName: 'Unbekannt',
+                availableMW: 0
+            };
+        }
+        
+        // Update the turbine ranking based on current view and grid capacity
         function updateTurbineRanking() {
             const bounds = map.getBounds();
             
-            // Filter turbines in current view
+            // Filter turbines in current view and calculate grid scores
             const visibleTurbines = turbinesData.filter(t => {
                 if (!t.lat || !t.lon) return false;
                 return bounds.contains([t.lat, t.lon]);
+            }).map(t => {
+                const gridInfo = getGridCapacityScore(t);
+                return {
+                    ...t,
+                    gridScore: gridInfo.score,
+                    gridCapacity: gridInfo.gridScore,
+                    districtName: gridInfo.districtName,
+                    availableMW: gridInfo.availableMW
+                };
             });
             
-            // Sort by estimated capacity
-            const sorted = [...visibleTurbines].sort((a, b) => (b.estimated_mw || 0) - (a.estimated_mw || 0));
+            // Sort by grid capacity score (higher = better for new installations)
+            const sorted = [...visibleTurbines].sort((a, b) => (b.gridScore || 0) - (a.gridScore || 0));
             
             // Get top 10 and bottom 10
             const top10 = sorted.slice(0, 10);
             const bottom10 = sorted.slice(-10).reverse();
             
-            // Render top 10
+            // Render top 10 (best grid capacity)
             const topContainer = document.getElementById('top-turbines');
             topContainer.innerHTML = top10.map((t, i) => `
-                <div class="ranking-item" onclick="highlightTurbine(turbinesData[${t.id}])">
+                <div class="ranking-item" onclick="highlightTurbine(turbinesData[${t.id}])" title="${t.districtName}: ${t.gridCapacity}% Kapazität">
                     <span class="rank">${i + 1}.</span>
-                    <span class="name" title="${t.name}">${t.name}</span>
-                    <span class="value">${t.estimated_mw} MW</span>
+                    <span class="name" title="${t.display_name || t.name}">${t.display_name || t.name}</span>
+                    <span class="value">${t.gridCapacity}%</span>
                 </div>
             `).join('');
             
-            // Render bottom 10
+            // Render bottom 10 (worst grid capacity)
             const bottomContainer = document.getElementById('bottom-turbines');
             bottomContainer.innerHTML = bottom10.map((t, i) => `
-                <div class="ranking-item bottom" onclick="highlightTurbine(turbinesData[${t.id}])">
+                <div class="ranking-item bottom" onclick="highlightTurbine(turbinesData[${t.id}])" title="${t.districtName}: ${t.gridCapacity}% Kapazität">
                     <span class="rank">${sorted.length - 9 + i}.</span>
-                    <span class="name" title="${t.name}">${t.name}</span>
-                    <span class="value">${t.estimated_mw} MW</span>
+                    <span class="name" title="${t.display_name || t.name}">${t.display_name || t.name}</span>
+                    <span class="value">${t.gridCapacity}%</span>
                 </div>
             `).join('');
             
@@ -737,9 +776,12 @@
         
         // Add power grid overlay
         function loadGridOverlay() {
-            const bounds = [[46.3, 9.5], [49.0, 17.2]];
+            // Bounds calibrated to align the APG grid map with the base map
+            // The image includes margins and legend, so bounds are adjusted
+            const bounds = [[46.15, 9.2], [49.15, 17.45]];
             const imageOverlay = L.imageOverlay('/power_grid.png', bounds, {
-                opacity: 0.7
+                opacity: 0.85,
+                interactive: false
             });
             imageOverlay.addTo(gridLayer);
         }
