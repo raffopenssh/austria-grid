@@ -212,6 +212,50 @@
             margin-bottom: 5px;
         }
         
+        .ranking-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 8px;
+            margin: 2px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .ranking-item:hover {
+            background: rgba(0, 212, 170, 0.2);
+        }
+        
+        .ranking-item .rank {
+            color: #888;
+            width: 20px;
+        }
+        
+        .ranking-item .name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 0 8px;
+        }
+        
+        .ranking-item .value {
+            color: #00d4aa;
+            font-weight: bold;
+        }
+        
+        .ranking-item.bottom .value {
+            color: #ff6b6b;
+        }
+        
         @media (max-width: 900px) {
             .main-container {
                 flex-direction: column;
@@ -245,12 +289,12 @@
                     <span class="stat-value" id="total-capacity">-</span>
                 </div>
                 <div class="stat-row">
-                    <span class="stat-label">Windparks</span>
-                    <span class="stat-value" id="total-windparks">-</span>
+                    <span class="stat-label">Windkraftanlagen</span>
+                    <span class="stat-value" id="total-turbines">-</span>
                 </div>
                 <div class="stat-row">
-                    <span class="stat-label">Turbinen</span>
-                    <span class="stat-value" id="total-turbines">-</span>
+                    <span class="stat-label">Geschätzte Leistung</span>
+                    <span class="stat-value" id="total-estimated-mw">-</span>
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">Umspannwerke</span>
@@ -266,6 +310,18 @@
                 </div>
                 <div class="chart-container">
                     <canvas id="production-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="panel" id="turbine-ranking">
+                <h3><i class="fas fa-trophy"></i> Windkraftanlagen im Blickfeld</h3>
+                <div class="ranking-section">
+                    <h4 style="color: #00d4aa; font-size: 0.85rem; margin: 10px 0 5px 0;">Top 10 (höchste Leistung)</h4>
+                    <div id="top-turbines" class="ranking-list"></div>
+                </div>
+                <div class="ranking-section">
+                    <h4 style="color: #ff6b6b; font-size: 0.85rem; margin: 10px 0 5px 0;">Letzte 10 (niedrigste Leistung)</h4>
+                    <div id="bottom-turbines" class="ranking-list"></div>
                 </div>
             </div>
             
@@ -308,7 +364,7 @@
                     </label>
                     <label class="layer-toggle">
                         <input type="checkbox" id="layer-windparks" checked>
-                        Windparks
+                        Windkraftanlagen
                     </label>
                     <label class="layer-toggle">
                         <input type="checkbox" id="layer-transformers">
@@ -339,8 +395,8 @@
                     Niedrig (<30%)
                 </div>
                 <div class="legend-item" style="margin-top: 10px;">
-                    <div class="legend-color" style="background: #4a90d9; border-radius: 50%;"></div>
-                    Windpark
+                    <div class="legend-color" style="background: rgba(74, 144, 217, 0.6); border-radius: 50%;"></div>
+                    Windkraftanlage
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background: #f39c12; border-radius: 50%;"></div>
@@ -369,7 +425,8 @@
         
         // Data storage
         let districtData = {};
-        let windparksData = [];
+        let turbinesData = [];
+        let turbineMarkers = [];
         let transformersData = [];
         let bezirkeGeoJSON = null;
         
@@ -413,8 +470,6 @@
             });
             
             document.getElementById('total-capacity').textContent = formatNumber(Math.round(totalCapacity)) + ' MW';
-            document.getElementById('total-windparks').textContent = formatNumber(totalWindparks);
-            document.getElementById('total-turbines').textContent = formatNumber(totalTurbines);
             document.getElementById('total-transformers').textContent = formatNumber(totalTransformers);
             
             // Add GeoJSON layer
@@ -484,37 +539,110 @@
             capacityBar.style.background = getCapacityColor(score);
         }
         
-        // Load windparks
-        async function loadWindparks() {
-            const response = await fetch('/api/windparks');
-            windparksData = await response.json();
+        // Load wind turbines
+        async function loadTurbines() {
+            const response = await fetch('/api/wind-turbines');
+            turbinesData = await response.json();
             
-            windparksData.forEach(wp => {
-                if (wp.lat && wp.lon) {
-                    const radius = Math.max(3, Math.sqrt(wp.total_mw) * 2);
-                    const marker = L.circleMarker([wp.lat, wp.lon], {
-                        radius: radius,
+            // Update stats
+            document.getElementById('total-turbines').textContent = formatNumber(turbinesData.length);
+            const totalEstimatedMW = turbinesData.reduce((sum, t) => sum + (t.estimated_mw || 0), 0);
+            document.getElementById('total-estimated-mw').textContent = formatNumber(Math.round(totalEstimatedMW)) + ' MW';
+            
+            // Create markers for each turbine
+            turbinesData.forEach((t, index) => {
+                if (t.lat && t.lon) {
+                    // Use transparent, fixed-size dots
+                    const marker = L.circleMarker([t.lat, t.lon], {
+                        radius: 6,
                         fillColor: '#4a90d9',
                         color: '#fff',
-                        weight: 1,
-                        opacity: 0.8,
-                        fillOpacity: 0.6
+                        weight: 0.5,
+                        opacity: 0.7,
+                        fillOpacity: 0.4
                     });
+                    
+                    marker.turbineData = t;
+                    marker.turbineIndex = index;
                     
                     marker.bindTooltip(`
                         <div class="tooltip-custom">
-                            <div class="title">${wp.name}</div>
-                            <div>Leistung: ${formatNumber(wp.total_mw)} MW</div>
-                            <div>Turbinen: ${wp.turbines}</div>
-                            <div>Baujahr: ${wp.year || 'k.A.'}</div>
-                            <div>${wp.info || ''}</div>
+                            <div class="title">${t.name}</div>
+                            <div>Geschätzte Leistung: ${t.estimated_mw} MW</div>
+                            <div>Höhe: ${t.height_m}m</div>
+                            <div>Bezirk: ${t.bezirk}</div>
+                            <div>Bundesland: ${t.bundesland}</div>
                         </div>
                     `, { className: 'tooltip-custom' });
                     
+                    marker.on('click', function() {
+                        highlightTurbine(t);
+                    });
+                    
                     marker.addTo(windparksLayer);
+                    turbineMarkers.push(marker);
                 }
             });
+            
+            // Update ranking when map moves
+            map.on('moveend', updateTurbineRanking);
+            updateTurbineRanking();
         }
+        
+        // Highlight a turbine on the map
+        function highlightTurbine(turbine) {
+            map.setView([turbine.lat, turbine.lon], 12);
+        }
+        
+        // Update the turbine ranking based on current view
+        function updateTurbineRanking() {
+            const bounds = map.getBounds();
+            
+            // Filter turbines in current view
+            const visibleTurbines = turbinesData.filter(t => {
+                if (!t.lat || !t.lon) return false;
+                return bounds.contains([t.lat, t.lon]);
+            });
+            
+            // Sort by estimated capacity
+            const sorted = [...visibleTurbines].sort((a, b) => (b.estimated_mw || 0) - (a.estimated_mw || 0));
+            
+            // Get top 10 and bottom 10
+            const top10 = sorted.slice(0, 10);
+            const bottom10 = sorted.slice(-10).reverse();
+            
+            // Render top 10
+            const topContainer = document.getElementById('top-turbines');
+            topContainer.innerHTML = top10.map((t, i) => `
+                <div class="ranking-item" onclick="highlightTurbine(turbinesData[${t.id}])">
+                    <span class="rank">${i + 1}.</span>
+                    <span class="name" title="${t.name}">${t.name}</span>
+                    <span class="value">${t.estimated_mw} MW</span>
+                </div>
+            `).join('');
+            
+            // Render bottom 10
+            const bottomContainer = document.getElementById('bottom-turbines');
+            bottomContainer.innerHTML = bottom10.map((t, i) => `
+                <div class="ranking-item bottom" onclick="highlightTurbine(turbinesData[${t.id}])">
+                    <span class="rank">${sorted.length - 9 + i}.</span>
+                    <span class="name" title="${t.name}">${t.name}</span>
+                    <span class="value">${t.estimated_mw} MW</span>
+                </div>
+            `).join('');
+            
+            if (visibleTurbines.length === 0) {
+                topContainer.innerHTML = '<div style="color: #888; font-size: 0.8rem; padding: 10px;">Keine Anlagen im Blickfeld</div>';
+                bottomContainer.innerHTML = '';
+            }
+        }
+        
+        // Make highlightTurbine available globally
+        window.highlightTurbine = function(turbine) {
+            if (turbine) {
+                map.setView([turbine.lat, turbine.lon], 13);
+            }
+        };
         
         // Load transformer stations
         async function loadTransformers() {
@@ -653,7 +781,7 @@
         async function init() {
             await Promise.all([
                 loadDistrictHeatmap(),
-                loadWindparks(),
+                loadTurbines(),
                 loadTransformers(),
                 loadProduction()
             ]);

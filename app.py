@@ -19,7 +19,7 @@ def index():
 
 @app.route('/api/wind-turbines')
 def wind_turbines():
-    data = load_json('wind_turbines.json')
+    data = load_json('wind_turbines_enhanced.json')
     return jsonify(data)
 
 @app.route('/api/transformer-stations')
