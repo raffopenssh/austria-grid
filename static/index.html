@@ -532,11 +532,11 @@
                     Niedrig (<30%)
                 </div>
                 <div class="legend-item" style="margin-top: 10px;">
-                    <div class="legend-color" style="background: rgba(74, 144, 217, 0.6); border-radius: 50%;"></div>
+                    <div class="legend-color" style="background: #2196F3; border-radius: 50%; border: 2px solid #fff; width: 14px; height: 14px;"></div>
                     Windkraftanlage
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background: #f39c12; border-radius: 50%;"></div>
+                    <div class="legend-color" style="background: linear-gradient(to right, #ff3c3c, #ffffff); border-radius: 2px; border: 2px solid #fff; width: 14px; height: 14px;"></div>
                     Umspannwerk
                 </div>
             </div>
@@ -689,12 +689,12 @@
             // Create markers for each turbine
             turbinesData.forEach((t, index) => {
                 if (t.lat && t.lon) {
-                    // Use transparent, fixed-size dots with stronger blue
+                    // Use transparent, fixed-size dots with stronger blue and white border
                     const marker = L.circleMarker([t.lat, t.lon], {
                         radius: 5,
                         fillColor: '#2196F3',
-                        color: '#1565C0',
-                        weight: 1,
+                        color: '#ffffff',
+                        weight: 1.5,
                         opacity: 0.9,
                         fillOpacity: 0.7
                     });
@@ -957,12 +957,12 @@
                     const booked = parseFloat(t.bookedCapacity) || 0;
                     const color = getTransformerColor(available, booked);
                     
-                    // Create rectangular icon for transformer
+                    // Create square icon for transformer
                     const icon = L.divIcon({
                         className: 'transformer-icon',
-                        html: `<div style="width: 10px; height: 6px; background: ${color}; border: 1px solid rgba(255,255,255,0.8); border-radius: 1px;"></div>`,
-                        iconSize: [10, 6],
-                        iconAnchor: [5, 3]
+                        html: `<div style="width: 10px; height: 10px; background: ${color}; border: 1.5px solid rgba(255,255,255,0.9); border-radius: 2px;"></div>`,
+                        iconSize: [10, 10],
+                        iconAnchor: [5, 5]
                     });
                     
                     const marker = L.marker([t.latitude, t.longitude], {
