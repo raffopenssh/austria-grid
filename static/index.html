@@ -460,10 +460,6 @@
                     <h4 style="color: #00d4aa; font-size: 0.85rem; margin: 10px 0 5px 0;">Top 10 (beste Netzkapazität)</h4>
                     <div id="top-turbines" class="ranking-list"></div>
                 </div>
-                <div class="ranking-section">
-                    <h4 style="color: #ff6b6b; font-size: 0.85rem; margin: 10px 0 5px 0;">Letzte 10 (schlechteste Netzkapazität)</h4>
-                    <div id="bottom-turbines" class="ranking-list"></div>
-                </div>
             </div>
             
             <div class="panel district-info" id="district-panel">
@@ -801,19 +797,8 @@
                 </div>
             `).join('');
             
-            // Render bottom 10 (worst grid capacity)
-            const bottomContainer = document.getElementById('bottom-turbines');
-            bottomContainer.innerHTML = bottom10.map((t, i) => `
-                <div class="ranking-item bottom" onclick="highlightTurbine(turbinesData[${t.id}])" title="${t.districtName}: ${t.gridCapacity}% Kapazität">
-                    <span class="rank">${sorted.length - 9 + i}.</span>
-                    <span class="name" title="${t.display_name || t.name}">${t.display_name || t.name}</span>
-                    <span class="value">${t.gridCapacity}%</span>
-                </div>
-            `).join('');
-            
             if (visibleTurbines.length === 0) {
                 topContainer.innerHTML = '<div style="color: #888; font-size: 0.8rem; padding: 10px;">Keine Anlagen im Blickfeld</div>';
-                bottomContainer.innerHTML = '';
             }
         }
         
@@ -945,26 +930,20 @@
             }
         };
         
-        // Get color for transformer based on capacity (green = good, red = bad)
+        // Get color for transformer based on capacity (white = available, red = no capacity)
         function getTransformerColor(available, booked) {
             const total = available + booked;
-            if (total === 0) return '#888888'; // Unknown
+            if (total === 0) return 'rgba(150, 150, 150, 0.6)'; // Unknown - gray
             
             const availableRatio = available / Math.max(total, 1);
             
-            // Color scale: red (0%) -> yellow (50%) -> green (100%)
-            if (availableRatio >= 0.5) {
-                // Green range
-                const t = (availableRatio - 0.5) * 2;
-                return `rgb(${Math.round(255 * (1-t))}, ${Math.round(200 + 55*t)}, ${Math.round(100 * (1-t))})`;
-            } else if (availableRatio > 0) {
-                // Yellow to red range
-                const t = availableRatio * 2;
-                return `rgb(255, ${Math.round(200 * t)}, ${Math.round(50 * t)})`;
-            } else {
-                // No availability - red
-                return '#ff4757';
-            }
+            // Continuous scale: white (100% available) to red (0% available)
+            // White: rgb(255, 255, 255) -> Red: rgb(255, 60, 60)
+            const r = 255;
+            const g = Math.round(60 + 195 * availableRatio); // 60 to 255
+            const b = Math.round(60 + 195 * availableRatio); // 60 to 255
+            
+            return `rgba(${r}, ${g}, ${b}, 0.7)`;
         }
         
         // Load transformer stations
