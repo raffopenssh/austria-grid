@@ -212,6 +212,134 @@
             margin-bottom: 5px;
         }
         
+        /* Modal styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: #16213e;
+            border: 2px solid #00d4aa;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 20px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            color: #00d4aa;
+            font-size: 1.2rem;
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: color 0.2s;
+        }
+        
+        .modal-close:hover {
+            color: #ff6b6b;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-section {
+            margin-bottom: 20px;
+        }
+        
+        .modal-section h3 {
+            color: #00d4aa;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .modal-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .modal-row:last-child {
+            border-bottom: none;
+        }
+        
+        .modal-label {
+            color: #888;
+        }
+        
+        .modal-value {
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        .modal-value.positive {
+            color: #00d4aa;
+        }
+        
+        .modal-value.negative {
+            color: #ff6b6b;
+        }
+        
+        .modal-value.warning {
+            color: #ffd93d;
+        }
+        
+        .capacity-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .capacity-bar-modal {
+            flex: 1;
+            height: 12px;
+            background: #333;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .capacity-bar-modal-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.3s;
+        }
+        
         .ranking-list {
             max-height: 150px;
             overflow-y: auto;
@@ -268,6 +396,19 @@
     </style>
 </head>
 <body>
+    <!-- Modal for details -->
+    <div class="modal-overlay" id="detail-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modal-title">Details</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </div>
+    
     <div class="header">
         <h1><i class="fas fa-wind"></i> Netzkapazität für Windenergie in Österreich</h1>
         <p>Bezirksweise Analyse der verfügbaren Einspeisekapazitäten für neue Windkraftanlagen</p>
@@ -576,7 +717,7 @@
                     `, { className: 'tooltip-custom' });
                     
                     marker.on('click', function() {
-                        highlightTurbine(t);
+                        showTurbineModal(t);
                     });
                     
                     marker.addTo(windparksLayer);
@@ -676,6 +817,127 @@
             }
         }
         
+        // Show modal for wind turbine
+        function showTurbineModal(t) {
+            // Find district info
+            const gridInfo = getGridCapacityScore(t);
+            
+            // Find nearest transformer
+            let nearestTransformer = null;
+            let minDist = Infinity;
+            transformersData.forEach(trans => {
+                if (!trans.latitude || !trans.longitude) return;
+                const dist = Math.sqrt(Math.pow(t.lat - trans.latitude, 2) + Math.pow(t.lon - trans.longitude, 2));
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearestTransformer = trans;
+                }
+            });
+            const distKm = (minDist * 111).toFixed(1); // Rough conversion to km
+            
+            document.getElementById('modal-title').innerHTML = `<i class="fas fa-wind"></i> ${t.display_name || t.name}`;
+            document.getElementById('modal-body').innerHTML = `
+                <div class="modal-section">
+                    <h3><i class="fas fa-info-circle"></i> Grunddaten</h3>
+                    <div class="modal-row">
+                        <span class="modal-label">Standort</span>
+                        <span class="modal-value">${t.standort}</span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">Bezirk</span>
+                        <span class="modal-value">${t.bezirk}</span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">Bundesland</span>
+                        <span class="modal-value">${t.bundesland}</span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">Typ</span>
+                        <span class="modal-value">${t.art}</span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">Koordinaten</span>
+                        <span class="modal-value">${t.lat.toFixed(5)}, ${t.lon.toFixed(5)}</span>
+                    </div>
+                </div>
+                
+                <div class="modal-section">
+                    <h3><i class="fas fa-tachometer-alt"></i> Technische Daten</h3>
+                    <div class="modal-row">
+                        <span class="modal-label">Nabenhöhe</span>
+                        <span class="modal-value">${t.height_m} m</span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">Geschätzte Leistung</span>
+                        <span class="modal-value positive">${t.estimated_mw} MW</span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">Leistungsklasse</span>
+                        <span class="modal-value">${t.height_m >= 200 ? 'Großanlage (modern)' : t.height_m >= 150 ? 'Mittelgroß' : t.height_m >= 100 ? 'Kleinanlage' : 'Altanlage'}</span>
+                    </div>
+                </div>
+                
+                <div class="modal-section">
+                    <h3><i class="fas fa-plug"></i> Netzanbindung</h3>
+                    <div class="modal-row">
+                        <span class="modal-label">Bezirk-Netzkapazität</span>
+                        <span class="modal-value ${gridInfo.gridScore >= 70 ? 'positive' : gridInfo.gridScore >= 30 ? 'warning' : 'negative'}">${gridInfo.gridScore}%</span>
+                    </div>
+                    ${nearestTransformer ? `
+                    <div class="modal-row">
+                        <span class="modal-label">Nächstes Umspannwerk</span>
+                        <span class="modal-value">${nearestTransformer.substationName}</span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">Entfernung</span>
+                        <span class="modal-value">~${distKm} km</span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">UW Verfügbar</span>
+                        <span class="modal-value ${parseFloat(nearestTransformer.availableCapacity) > 0 ? 'positive' : 'negative'}">${nearestTransformer.availableCapacity || 0} MW</span>
+                    </div>
+                    ` : ''}
+                </div>
+                
+                <div class="modal-section">
+                    <h3><i class="fas fa-calculator"></i> Potenzialanalyse</h3>
+                    <div class="modal-row">
+                        <span class="modal-label">Jahresertrag (gesch.)</span>
+                        <span class="modal-value">${(t.estimated_mw * 2200).toFixed(0)} MWh</span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">Haushalte versorgt</span>
+                        <span class="modal-value">${Math.round(t.estimated_mw * 2200 / 4)}</span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">CO₂-Einsparung/Jahr</span>
+                        <span class="modal-value positive">${(t.estimated_mw * 2200 * 0.4).toFixed(0)} t</span>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('detail-modal').classList.add('active');
+        }
+        
+        // Close modal
+        function closeModal() {
+            document.getElementById('detail-modal').classList.remove('active');
+        }
+        
+        // Close modal on overlay click
+        document.getElementById('detail-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
         // Make highlightTurbine available globally
         window.highlightTurbine = function(turbine) {
             if (turbine) {
@@ -683,39 +945,151 @@
             }
         };
         
+        // Get color for transformer based on capacity (green = good, red = bad)
+        function getTransformerColor(available, booked) {
+            const total = available + booked;
+            if (total === 0) return '#888888'; // Unknown
+            
+            const availableRatio = available / Math.max(total, 1);
+            
+            // Color scale: red (0%) -> yellow (50%) -> green (100%)
+            if (availableRatio >= 0.5) {
+                // Green range
+                const t = (availableRatio - 0.5) * 2;
+                return `rgb(${Math.round(255 * (1-t))}, ${Math.round(200 + 55*t)}, ${Math.round(100 * (1-t))})`;
+            } else if (availableRatio > 0) {
+                // Yellow to red range
+                const t = availableRatio * 2;
+                return `rgb(255, ${Math.round(200 * t)}, ${Math.round(50 * t)})`;
+            } else {
+                // No availability - red
+                return '#ff4757';
+            }
+        }
+        
         // Load transformer stations
         async function loadTransformers() {
             const response = await fetch('/api/transformer-stations');
             transformersData = await response.json();
             
-            transformersData.forEach(t => {
+            transformersData.forEach((t, index) => {
                 if (t.latitude && t.longitude) {
                     const available = parseFloat(t.availableCapacity) || 0;
                     const booked = parseFloat(t.bookedCapacity) || 0;
-                    const color = available > 0 ? '#00d4aa' : '#f39c12';
+                    const color = getTransformerColor(available, booked);
                     
                     const marker = L.circleMarker([t.latitude, t.longitude], {
-                        radius: 6,
+                        radius: 7,
                         fillColor: color,
                         color: '#fff',
                         weight: 1,
-                        opacity: 0.8,
-                        fillOpacity: 0.7
+                        opacity: 0.9,
+                        fillOpacity: 0.8
                     });
+                    
+                    marker.transformerData = t;
+                    marker.transformerIndex = index;
                     
                     marker.bindTooltip(`
                         <div class="tooltip-custom">
                             <div class="title">${t.substationName}</div>
-                            <div>Netzbetreiber: ${t.networkOperator}</div>
-                            <div>Gebucht: ${booked} MW</div>
-                            <div>Offiziell verfügbar: ${available} MW</div>
-                            <div>Bundesland: ${t.state}</div>
+                            <div>Verfügbar: ${available} MW / Gebucht: ${booked} MW</div>
+                            <div>${t.state}</div>
                         </div>
                     `, { className: 'tooltip-custom' });
+                    
+                    marker.on('click', function() {
+                        showTransformerModal(t);
+                    });
                     
                     marker.addTo(transformersLayer);
                 }
             });
+        }
+        
+        // Show modal for transformer station
+        function showTransformerModal(t) {
+            const available = parseFloat(t.availableCapacity) || 0;
+            const booked = parseFloat(t.bookedCapacity) || 0;
+            const total = available + booked;
+            const availablePercent = total > 0 ? Math.round((available / total) * 100) : 0;
+            const color = getTransformerColor(available, booked);
+            
+            // Find nearby turbines
+            const nearbyTurbines = turbinesData.filter(turb => {
+                if (!turb.lat || !turb.lon) return false;
+                const dist = Math.sqrt(Math.pow(turb.lat - t.latitude, 2) + Math.pow(turb.lon - t.longitude, 2));
+                return dist < 0.15; // Roughly 15km
+            });
+            const nearbyCapacity = nearbyTurbines.reduce((sum, turb) => sum + (turb.estimated_mw || 0), 0);
+            
+            document.getElementById('modal-title').innerHTML = `<i class="fas fa-bolt"></i> ${t.substationName}`;
+            document.getElementById('modal-body').innerHTML = `
+                <div class="modal-section">
+                    <h3><i class="fas fa-info-circle"></i> Grunddaten</h3>
+                    <div class="modal-row">
+                        <span class="modal-label">Netzbetreiber</span>
+                        <span class="modal-value">${t.networkOperator}</span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">Bundesland</span>
+                        <span class="modal-value">${t.state}</span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">Koordinaten</span>
+                        <span class="modal-value">${t.latitude.toFixed(4)}, ${t.longitude.toFixed(4)}</span>
+                    </div>
+                </div>
+                
+                <div class="modal-section">
+                    <h3><i class="fas fa-plug"></i> Kapazität</h3>
+                    <div class="modal-row">
+                        <span class="modal-label">Gebuchte Kapazität</span>
+                        <span class="modal-value">${booked} MW</span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">Offiziell verfügbar</span>
+                        <span class="modal-value ${available > 0 ? 'positive' : 'negative'}">${available} MW</span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">Gesamtkapazität</span>
+                        <span class="modal-value">${total} MW</span>
+                    </div>
+                    <div class="capacity-indicator">
+                        <span style="color: #888; font-size: 0.85rem;">Auslastung:</span>
+                        <div class="capacity-bar-modal">
+                            <div class="capacity-bar-modal-fill" style="width: ${100 - availablePercent}%; background: ${color};"></div>
+                        </div>
+                        <span style="color: ${color}; font-weight: bold;">${100 - availablePercent}%</span>
+                    </div>
+                </div>
+                
+                <div class="modal-section">
+                    <h3><i class="fas fa-wind"></i> Windkraft im Umkreis (~15km)</h3>
+                    <div class="modal-row">
+                        <span class="modal-label">Anzahl Anlagen</span>
+                        <span class="modal-value">${nearbyTurbines.length}</span>
+                    </div>
+                    <div class="modal-row">
+                        <span class="modal-label">Installierte Leistung</span>
+                        <span class="modal-value">${nearbyCapacity.toFixed(1)} MW</span>
+                    </div>
+                </div>
+                
+                <div class="modal-section">
+                    <h3><i class="fas fa-phone"></i> Kontakt</h3>
+                    <div class="modal-row">
+                        <span class="modal-label">Kontakt</span>
+                        <span class="modal-value" style="font-size: 0.85rem;">${t.contact || 'k.A.'}</span>
+                    </div>
+                    ${t.website ? `<div class="modal-row">
+                        <span class="modal-label">Website</span>
+                        <a href="${t.website}" target="_blank" style="color: #00d4aa;">Öffnen</a>
+                    </div>` : ''}
+                </div>
+            `;
+            
+            document.getElementById('detail-modal').classList.add('active');
         }
         
         // Load production data
