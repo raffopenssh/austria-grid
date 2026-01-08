@@ -689,14 +689,14 @@
             // Create markers for each turbine
             turbinesData.forEach((t, index) => {
                 if (t.lat && t.lon) {
-                    // Use transparent, fixed-size dots
+                    // Use transparent, fixed-size dots with stronger blue
                     const marker = L.circleMarker([t.lat, t.lon], {
-                        radius: 6,
-                        fillColor: '#4a90d9',
-                        color: '#fff',
-                        weight: 0.5,
-                        opacity: 0.7,
-                        fillOpacity: 0.4
+                        radius: 5,
+                        fillColor: '#2196F3',
+                        color: '#1565C0',
+                        weight: 1,
+                        opacity: 0.9,
+                        fillOpacity: 0.7
                     });
                     
                     marker.turbineData = t;
@@ -957,13 +957,16 @@
                     const booked = parseFloat(t.bookedCapacity) || 0;
                     const color = getTransformerColor(available, booked);
                     
-                    const marker = L.circleMarker([t.latitude, t.longitude], {
-                        radius: 7,
-                        fillColor: color,
-                        color: '#fff',
-                        weight: 1,
-                        opacity: 0.9,
-                        fillOpacity: 0.8
+                    // Create rectangular icon for transformer
+                    const icon = L.divIcon({
+                        className: 'transformer-icon',
+                        html: `<div style="width: 10px; height: 6px; background: ${color}; border: 1px solid rgba(255,255,255,0.8); border-radius: 1px;"></div>`,
+                        iconSize: [10, 6],
+                        iconAnchor: [5, 3]
+                    });
+                    
+                    const marker = L.marker([t.latitude, t.longitude], {
+                        icon: icon
                     });
                     
                     marker.transformerData = t;
