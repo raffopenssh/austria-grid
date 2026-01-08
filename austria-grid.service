@@ -1,0 +1,15 @@
+[Unit]
+Description=Austrian Wind Power Grid Capacity App
+After=network.target
+
+[Service]
+Type=simple
+User=exedev
+WorkingDirectory=/home/exedev/austria-grid
+ExecStart=/usr/bin/python3 /home/exedev/austria-grid/app.py
+Restart=always
+RestartSec=3
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

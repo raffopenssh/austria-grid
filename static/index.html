@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Österreichische Windenergie-Netzkapazität</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eaeaea;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #00d4aa;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            color: #00d4aa;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .main-container {
+            display: flex;
+            height: calc(100vh - 100px);
+        }
+        
+        .sidebar {
+            width: 350px;
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid #333;
+        }
+        
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        .panel {
+            background: #1a1a2e;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+        }
+        
+        .panel h3 {
+            color: #00d4aa;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            color: #888;
+        }
+        
+        .stat-value {
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        .stat-value.positive {
+            color: #00d4aa;
+        }
+        
+        .stat-value.negative {
+            color: #ff6b6b;
+        }
+        
+        .stat-value.warning {
+            color: #ffd93d;
+        }
+        
+        .legend {
+            position: absolute;
+            bottom: 30px;
+            right: 10px;
+            background: rgba(26, 26, 46, 0.95);
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 1000;
+            border: 1px solid #333;
+        }
+        
+        .legend h4 {
+            color: #00d4aa;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 0.8rem;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            border-radius: 3px;
+        }
+        
+        .layer-controls {
+            margin-top: 15px;
+        }
+        
+        .layer-toggle {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            cursor: pointer;
+        }
+        
+        .layer-toggle input {
+            margin-right: 10px;
+            accent-color: #00d4aa;
+        }
+        
+        .district-info {
+            display: none;
+        }
+        
+        .district-info.active {
+            display: block;
+        }
+        
+        .capacity-bar {
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .capacity-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin-top: 10px;
+        }
+        
+        .info-banner {
+            background: linear-gradient(135deg, #ff6b6b 0%, #c23616 100%);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+        }
+        
+        .info-banner strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .tooltip-custom {
+            background: rgba(26, 26, 46, 0.95) !important;
+            border: 1px solid #00d4aa !important;
+            border-radius: 8px !important;
+            padding: 10px !important;
+            color: #fff !important;
+        }
+        
+        .tooltip-custom .title {
+            color: #00d4aa;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        @media (max-width: 900px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-wind"></i> Netzkapazität für Windenergie in Österreich</h1>
+        <p>Bezirksweise Analyse der verfügbaren Einspeisekapazitäten für neue Windkraftanlagen</p>
+    </div>
+    
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="info-banner">
+                <strong><i class="fas fa-exclamation-triangle"></i> Hinweis zur Datenqualität</strong>
+                Die offiziellen Kapazitätsangaben der Netzbetreiber sind oft pessimistisch. 
+                Diese Analyse schätzt realistische verfügbare Kapazitäten basierend auf 
+                tatsächlicher Auslastung und internationalen Erfahrungswerten.
+            </div>
+            
+            <div class="panel">
+                <h3><i class="fas fa-chart-pie"></i> Österreich Gesamt</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Installierte Leistung</span>
+                    <span class="stat-value" id="total-capacity">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Windparks</span>
+                    <span class="stat-value" id="total-windparks">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Turbinen</span>
+                    <span class="stat-value" id="total-turbines">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Umspannwerke</span>
+                    <span class="stat-value" id="total-transformers">-</span>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3><i class="fas fa-bolt"></i> Erzeugung 2024</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Windstrom gesamt</span>
+                    <span class="stat-value positive" id="production-2024">-</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="production-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="panel district-info" id="district-panel">
+                <h3><i class="fas fa-map-marker-alt"></i> <span id="district-name">-</span></h3>
+                <div class="stat-row">
+                    <span class="stat-label">Installierte Leistung</span>
+                    <span class="stat-value" id="district-installed">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Windparks</span>
+                    <span class="stat-value" id="district-windparks">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Umspannwerke</span>
+                    <span class="stat-value" id="district-transformers">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Offiz. verfügbar</span>
+                    <span class="stat-value warning" id="district-official">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Geschätzt verfügbar</span>
+                    <span class="stat-value positive" id="district-estimated">-</span>
+                </div>
+                <div>
+                    <small style="color: #888;">Kapazitätsauslastung</small>
+                    <div class="capacity-bar">
+                        <div class="capacity-bar-fill" id="capacity-bar"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3><i class="fas fa-layer-group"></i> Kartenebenen</h3>
+                <div class="layer-controls">
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-heatmap" checked>
+                        Kapazitäts-Heatmap
+                    </label>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-windparks" checked>
+                        Windparks
+                    </label>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-transformers">
+                        Umspannwerke
+                    </label>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-grid">
+                        Hochspannungsnetz (APG)
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="legend">
+                <h4>Kapazität für Zubau</h4>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #00d4aa;"></div>
+                    Hoch (>70%)
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ffd93d;"></div>
+                    Mittel (30-70%)
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ff6b6b;"></div>
+                    Niedrig (<30%)
+                </div>
+                <div class="legend-item" style="margin-top: 10px;">
+                    <div class="legend-color" style="background: #4a90d9; border-radius: 50%;"></div>
+                    Windpark
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f39c12; border-radius: 50%;"></div>
+                    Umspannwerk
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize map centered on Austria
+        const map = L.map('map').setView([47.5, 14.5], 7);
+        
+        // Dark tile layer
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(map);
+        
+        // Layer groups
+        const heatmapLayer = L.layerGroup().addTo(map);
+        const windparksLayer = L.layerGroup().addTo(map);
+        const transformersLayer = L.layerGroup();
+        const gridLayer = L.layerGroup();
+        
+        // Data storage
+        let districtData = {};
+        let windparksData = [];
+        let transformersData = [];
+        let bezirkeGeoJSON = null;
+        
+        // Color scale for capacity
+        function getCapacityColor(score) {
+            if (score >= 70) return '#00d4aa';
+            if (score >= 30) return '#ffd93d';
+            return '#ff6b6b';
+        }
+        
+        function getCapacityOpacity(score) {
+            return 0.4 + (score / 100) * 0.4;
+        }
+        
+        // Format numbers
+        function formatNumber(num) {
+            return num.toLocaleString('de-AT');
+        }
+        
+        // Load and display district heatmap
+        async function loadDistrictHeatmap() {
+            const [bezirkeResponse, capacityResponse] = await Promise.all([
+                fetch('/api/bezirke'),
+                fetch('/api/district-capacity')
+            ]);
+            
+            bezirkeGeoJSON = await bezirkeResponse.json();
+            districtData = await capacityResponse.json();
+            
+            // Calculate totals
+            let totalCapacity = 0;
+            let totalWindparks = 0;
+            let totalTurbines = 0;
+            let totalTransformers = 0;
+            
+            Object.values(districtData).forEach(d => {
+                totalCapacity += d.installed_mw;
+                totalWindparks += d.windparks;
+                totalTurbines += d.turbines;
+                totalTransformers += d.transformers;
+            });
+            
+            document.getElementById('total-capacity').textContent = formatNumber(Math.round(totalCapacity)) + ' MW';
+            document.getElementById('total-windparks').textContent = formatNumber(totalWindparks);
+            document.getElementById('total-turbines').textContent = formatNumber(totalTurbines);
+            document.getElementById('total-transformers').textContent = formatNumber(totalTransformers);
+            
+            // Add GeoJSON layer
+            L.geoJSON(bezirkeGeoJSON, {
+                style: function(feature) {
+                    const iso = feature.properties.iso;
+                    const data = districtData[iso] || { capacity_score: 50 };
+                    return {
+                        fillColor: getCapacityColor(data.capacity_score),
+                        weight: 1,
+                        opacity: 0.8,
+                        color: '#444',
+                        fillOpacity: getCapacityOpacity(data.capacity_score)
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    const iso = feature.properties.iso;
+                    const data = districtData[iso] || {};
+                    
+                    layer.on({
+                        mouseover: function(e) {
+                            e.target.setStyle({
+                                weight: 3,
+                                color: '#00d4aa'
+                            });
+                        },
+                        mouseout: function(e) {
+                            e.target.setStyle({
+                                weight: 1,
+                                color: '#444'
+                            });
+                        },
+                        click: function(e) {
+                            showDistrictInfo(data);
+                        }
+                    });
+                    
+                    // Tooltip
+                    const tooltipContent = `
+                        <div class="tooltip-custom">
+                            <div class="title">${data.name || feature.properties.name}</div>
+                            <div>Installiert: ${formatNumber(data.installed_mw || 0)} MW</div>
+                            <div>Windparks: ${data.windparks || 0}</div>
+                            <div>Geschätzt verfügbar: ${formatNumber(data.estimated_available_mw || 0)} MW</div>
+                        </div>
+                    `;
+                    layer.bindTooltip(tooltipContent, { className: 'tooltip-custom' });
+                }
+            }).addTo(heatmapLayer);
+        }
+        
+        // Show district details
+        function showDistrictInfo(data) {
+            const panel = document.getElementById('district-panel');
+            panel.classList.add('active');
+            
+            document.getElementById('district-name').textContent = data.name || '-';
+            document.getElementById('district-installed').textContent = formatNumber(data.installed_mw || 0) + ' MW';
+            document.getElementById('district-windparks').textContent = data.windparks || 0;
+            document.getElementById('district-transformers').textContent = data.transformers || 0;
+            document.getElementById('district-official').textContent = formatNumber(data.official_available_mw || 0) + ' MW';
+            document.getElementById('district-estimated').textContent = formatNumber(data.estimated_available_mw || 0) + ' MW';
+            
+            const capacityBar = document.getElementById('capacity-bar');
+            const score = data.capacity_score || 50;
+            capacityBar.style.width = score + '%';
+            capacityBar.style.background = getCapacityColor(score);
+        }
+        
+        // Load windparks
+        async function loadWindparks() {
+            const response = await fetch('/api/windparks');
+            windparksData = await response.json();
+            
+            windparksData.forEach(wp => {
+                if (wp.lat && wp.lon) {
+                    const radius = Math.max(3, Math.sqrt(wp.total_mw) * 2);
+                    const marker = L.circleMarker([wp.lat, wp.lon], {
+                        radius: radius,
+                        fillColor: '#4a90d9',
+                        color: '#fff',
+                        weight: 1,
+                        opacity: 0.8,
+                        fillOpacity: 0.6
+                    });
+                    
+                    marker.bindTooltip(`
+                        <div class="tooltip-custom">
+                            <div class="title">${wp.name}</div>
+                            <div>Leistung: ${formatNumber(wp.total_mw)} MW</div>
+                            <div>Turbinen: ${wp.turbines}</div>
+                            <div>Baujahr: ${wp.year || 'k.A.'}</div>
+                            <div>${wp.info || ''}</div>
+                        </div>
+                    `, { className: 'tooltip-custom' });
+                    
+                    marker.addTo(windparksLayer);
+                }
+            });
+        }
+        
+        // Load transformer stations
+        async function loadTransformers() {
+            const response = await fetch('/api/transformer-stations');
+            transformersData = await response.json();
+            
+            transformersData.forEach(t => {
+                if (t.latitude && t.longitude) {
+                    const available = parseFloat(t.availableCapacity) || 0;
+                    const booked = parseFloat(t.bookedCapacity) || 0;
+                    const color = available > 0 ? '#00d4aa' : '#f39c12';
+                    
+                    const marker = L.circleMarker([t.latitude, t.longitude], {
+                        radius: 6,
+                        fillColor: color,
+                        color: '#fff',
+                        weight: 1,
+                        opacity: 0.8,
+                        fillOpacity: 0.7
+                    });
+                    
+                    marker.bindTooltip(`
+                        <div class="tooltip-custom">
+                            <div class="title">${t.substationName}</div>
+                            <div>Netzbetreiber: ${t.networkOperator}</div>
+                            <div>Gebucht: ${booked} MW</div>
+                            <div>Offiziell verfügbar: ${available} MW</div>
+                            <div>Bundesland: ${t.state}</div>
+                        </div>
+                    `, { className: 'tooltip-custom' });
+                    
+                    marker.addTo(transformersLayer);
+                }
+            });
+        }
+        
+        // Load production data
+        async function loadProduction() {
+            const response = await fetch('/api/production');
+            const data = await response.json();
+            
+            // Update 2024 production
+            const prod2024 = data.production.find(p => p.Jahr === 2024);
+            if (prod2024) {
+                document.getElementById('production-2024').textContent = 
+                    formatNumber(Math.round(prod2024['Österreich in GWh'])) + ' GWh';
+            }
+            
+            // Create chart
+            const ctx = document.getElementById('production-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.production.map(p => p.Jahr),
+                    datasets: [{
+                        label: 'Erzeugung (GWh)',
+                        data: data.production.map(p => p['Österreich in GWh']),
+                        backgroundColor: '#00d4aa',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#333'
+                            },
+                            ticks: {
+                                color: '#888'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#888'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Add power grid overlay
+        function loadGridOverlay() {
+            const bounds = [[46.3, 9.5], [49.0, 17.2]];
+            const imageOverlay = L.imageOverlay('/power_grid.png', bounds, {
+                opacity: 0.7
+            });
+            imageOverlay.addTo(gridLayer);
+        }
+        
+        // Layer toggle handlers
+        document.getElementById('layer-heatmap').addEventListener('change', function() {
+            if (this.checked) {
+                map.addLayer(heatmapLayer);
+            } else {
+                map.removeLayer(heatmapLayer);
+            }
+        });
+        
+        document.getElementById('layer-windparks').addEventListener('change', function() {
+            if (this.checked) {
+                map.addLayer(windparksLayer);
+            } else {
+                map.removeLayer(windparksLayer);
+            }
+        });
+        
+        document.getElementById('layer-transformers').addEventListener('change', function() {
+            if (this.checked) {
+                map.addLayer(transformersLayer);
+            } else {
+                map.removeLayer(transformersLayer);
+            }
+        });
+        
+        document.getElementById('layer-grid').addEventListener('change', function() {
+            if (this.checked) {
+                map.addLayer(gridLayer);
+            } else {
+                map.removeLayer(gridLayer);
+            }
+        });
+        
+        // Initialize
+        async function init() {
+            await Promise.all([
+                loadDistrictHeatmap(),
+                loadWindparks(),
+                loadTransformers(),
+                loadProduction()
+            ]);
+            loadGridOverlay();
+        }
+        
+        init();
+    </script>
+</body>
+</html>
