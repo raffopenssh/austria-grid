@@ -430,80 +430,7 @@
             color: #ff6b6b;
         }
         
-        /* Night mode toggle styling */
-        .night-mode-toggle {
-            background: linear-gradient(135deg, #1a0a1a 0%, #0a0a15 100%);
-            border-radius: 6px;
-            padding: 8px 10px !important;
-            margin-top: 8px;
-        }
-        
-        .night-mode-toggle i {
-            color: #ffd93d;
-            margin-right: 5px;
-        }
-        
-        /* Night mode active state */
-        body.night-mode {
-            background: #0a0a0f;
-        }
-        
-        body.night-mode .header {
-            background: linear-gradient(135deg, #0a0a15 0%, #050508 100%);
-            border-bottom-color: #ff3333;
-        }
-        
-        body.night-mode .header h1 {
-            color: #ff4444;
-        }
-        
-        body.night-mode .sidebar {
-            background: #0a0a12;
-        }
-        
-        body.night-mode .panel {
-            background: #050508;
-            border-color: #222;
-        }
-        
-        body.night-mode .panel h3 {
-            color: #ff4444;
-        }
-        
-        /* Red glow effect for lighted turbines in night mode */
-        .leaflet-nightLightsPane-pane path {
-            filter: drop-shadow(0 0 4px rgba(255, 50, 50, 0.9)) drop-shadow(0 0 10px rgba(255, 0, 0, 0.7));
-        }
-        
-        @keyframes red-pulse {
-            0%, 100% {
-                filter: drop-shadow(0 0 4px rgba(255, 50, 50, 0.8)) drop-shadow(0 0 8px rgba(255, 0, 0, 0.5));
-                opacity: 0.85;
-            }
-            50% {
-                filter: drop-shadow(0 0 8px rgba(255, 50, 50, 1)) drop-shadow(0 0 16px rgba(255, 0, 0, 0.9));
-                opacity: 1;
-            }
-        }
-        
-        body.night-mode .leaflet-nightLightsPane-pane path {
-            animation: red-pulse 2s ease-in-out infinite;
-        }
-        
-        /* Night mode map styling */
-        body.night-mode .leaflet-tile-pane {
-            filter: brightness(0.35) saturate(0.5);
-        }
-        
-        body.night-mode .leaflet-heatmapPane-pane {
-            opacity: 0.25;
-        }
-        
-        body.night-mode .leaflet-turbinePane-pane path {
-            opacity: 0.4;
-        }
-        
-        @media (max-width: 900px) {
+@media (max-width: 900px) {
             .main-container {
                 flex-direction: column;
             }
@@ -630,10 +557,6 @@
                         <input type="checkbox" id="layer-grid">
                         Hochspannungsnetz (APG)
                     </label>
-                    <label class="layer-toggle night-mode-toggle">
-                        <input type="checkbox" id="layer-nightmode">
-                        <i class="fas fa-moon"></i> Nachtmodus
-                    </label>
                 </div>
             </div>
         </div>
@@ -667,10 +590,6 @@
                     <div class="legend-color" style="background: linear-gradient(to right, #ff3c3c, #ffffff); border-radius: 2px; border: 2px solid #fff; width: 14px; height: 14px;"></div>
                     Umspannwerk
                 </div>
-                <div class="legend-item night-mode-legend" style="display: none;">
-                    <div class="legend-color" style="background: #ff2222; border-radius: 50%; border: 2px solid #ff0000; box-shadow: 0 0 8px rgba(255,0,0,0.8); width: 12px; height: 12px;"></div>
-                    Befeuerung (Nacht)
-                </div>
                 <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #333;">
                     <a href="#" onclick="showSourcesModal(); return false;" style="color: #666; font-size: 0.7rem; text-decoration: none;">
                         <i class="fas fa-info-circle"></i> Quellen & Methodik
@@ -702,7 +621,7 @@
                 <a href="https://www.data.gv.at" target="_blank" style="color: #4a9eff;">data.gv.at</a> – Open Government Data Austria</p>
                 
                 <p style="margin-bottom: 10px;"><strong>Hindernisbefeuerung:</strong><br>
-                <a href="https://sdimd-free.austrocontrol.at/" target="_blank" style="color: #4a9eff;">Austro Control</a> – Hindernisdatenbank Österreich (Nachtmodus)</p>
+                <a href="https://sdimd-free.austrocontrol.at/" target="_blank" style="color: #4a9eff;">Austro Control</a> – Hindernisdatenbank Österreich</p>
             </div>
             
             <h2 style="color: #00d4aa; margin: 20px 0 15px 0;"><i class="fas fa-cogs"></i> Methodik</h2>
@@ -749,20 +668,13 @@
         const heatmapLayer = L.layerGroup().addTo(map);
         const windparksLayer = L.layerGroup().addTo(map);
         const transformersLayer = L.layerGroup();
-        const nightLightsLayer = L.layerGroup();
-        
-        // Create pane for night lights (above turbines)
-        map.createPane('nightLightsPane');
-        map.getPane('nightLightsPane').style.zIndex = 460;
         
         // Data storage
         let districtData = {};
         let turbinesData = [];
         let turbineMarkers = [];
-        let nightLightMarkers = [];
         let transformersData = [];
         let bezirkeGeoJSON = null;
-        let nightModeActive = false;
         
         // Color scale for capacity
         function getCapacityColor(score) {
@@ -960,22 +872,6 @@
                     
                     marker.addTo(windparksLayer);
                     turbineMarkers.push(marker);
-                    
-                    // Create night light marker for lighted turbines
-                    if (t.lighted) {
-                        const lightMarker = L.circleMarker([t.lat, t.lon], {
-                            pane: 'nightLightsPane',
-                            radius: 3,
-                            fillColor: '#ff2222',
-                            color: '#ff0000',
-                            weight: 2,
-                            opacity: 1,
-                            fillOpacity: 1,
-                            className: 'night-light-marker'
-                        });
-                        lightMarker.addTo(nightLightsLayer);
-                        nightLightMarkers.push(lightMarker);
-                    }
                 }
             });
             
@@ -1120,7 +1016,7 @@
                     </div>
                     <div class="modal-row">
                         <span class="modal-label">Hindernisbefeuerung</span>
-                        <span class="modal-value ${t.lighted ? 'negative' : ''}">${t.lighted ? '<i class="fas fa-lightbulb" style="color:#ff4444;"></i> Ja (Nachtmodus)' : 'Nein'}</span>
+                        <span class="modal-value">${t.lighted ? '<i class="fas fa-lightbulb" style="color:#ff4444;"></i> Ja' : 'Nein'}</span>
                     </div>
                 </div>
                 
@@ -1451,21 +1347,6 @@
                 map.addLayer(gridLayer);
             } else {
                 map.removeLayer(gridLayer);
-            }
-        });
-        
-        // Night mode toggle
-        document.getElementById('layer-nightmode').addEventListener('change', function() {
-            nightModeActive = this.checked;
-            const nightLegend = document.querySelector('.night-mode-legend');
-            if (nightModeActive) {
-                document.body.classList.add('night-mode');
-                map.addLayer(nightLightsLayer);
-                if (nightLegend) nightLegend.style.display = 'flex';
-            } else {
-                document.body.classList.remove('night-mode');
-                map.removeLayer(nightLightsLayer);
-                if (nightLegend) nightLegend.style.display = 'none';
             }
         });
         
