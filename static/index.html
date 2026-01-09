@@ -544,6 +544,48 @@
                     <div class="legend-color" style="background: linear-gradient(to right, #ff3c3c, #ffffff); border-radius: 2px; border: 2px solid #fff; width: 14px; height: 14px;"></div>
                     Umspannwerk
                 </div>
+                <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #333;">
+                    <a href="#" onclick="showSourcesModal(); return false;" style="color: #666; font-size: 0.7rem; text-decoration: none;">
+                        <i class="fas fa-info-circle"></i> Quellen & Methodik
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sources Modal -->
+    <div id="sources-modal" class="modal-overlay">
+        <div class="modal" style="max-width: 500px; padding: 20px;">
+            <span class="modal-close" onclick="closeSourcesModal()">&times;</span>
+            <h2 style="color: #00d4aa; margin-bottom: 15px;"><i class="fas fa-database"></i> Datenquellen</h2>
+            <div style="font-size: 0.85rem; line-height: 1.6;">
+                <p style="margin-bottom: 10px;"><strong>Windkraftanlagen:</strong><br>
+                <a href="https://www.igwindkraft.at" target="_blank" style="color: #4a9eff;">IG Windkraft</a> – Standortdaten österreichischer Windkraftanlagen</p>
+                
+                <p style="margin-bottom: 10px;"><strong>Netzkapazitäten:</strong><br>
+                <a href="https://www.e-control.at" target="_blank" style="color: #4a9eff;">E-Control Austria</a> – Einspeisekapazitäten der Netzbetreiber</p>
+                
+                <p style="margin-bottom: 10px;"><strong>Umspannwerke:</strong><br>
+                <a href="https://www.apg.at" target="_blank" style="color: #4a9eff;">APG (Austrian Power Grid)</a> – Transformatorstationen und Netzinfrastruktur</p>
+                
+                <p style="margin-bottom: 10px;"><strong>Erzeugungsdaten:</strong><br>
+                <a href="https://www.apg.at/de/markt/Markttransparenz" target="_blank" style="color: #4a9eff;">APG Markttransparenz</a> – Windstromerzeugung 2024</p>
+                
+                <p style="margin-bottom: 10px;"><strong>Bezirksgrenzen:</strong><br>
+                <a href="https://www.data.gv.at" target="_blank" style="color: #4a9eff;">data.gv.at</a> – Open Government Data Austria</p>
+            </div>
+            
+            <h2 style="color: #00d4aa; margin: 20px 0 15px 0;"><i class="fas fa-cogs"></i> Methodik</h2>
+            <div style="font-size: 0.85rem; line-height: 1.6; color: #aaa;">
+                <p style="margin-bottom: 10px;"><strong>Kapazitätsschätzung:</strong> Die verfügbare Netzkapazität wird aus den offiziellen Netzbetreiber-Angaben abgeleitet. Da diese oft konservativ sind, werden zusätzliche Faktoren wie internationale Erfahrungswerte berücksichtigt.</p>
+                
+                <p style="margin-bottom: 10px;"><strong>Turbinenleistung:</strong> Die geschätzte Leistung (MW) basiert auf der Nabenhöhe und typischen Leistungskurven moderner Windkraftanlagen.</p>
+                
+                <p><strong>Visualisierung:</strong> Farbskalen verwenden Viridis (Turbinen) und einen Rot-Weiß-Gradienten (Umspannwerke) für optimale Unterscheidbarkeit.</p>
+            </div>
+            
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #333; font-size: 0.75rem; color: #666;">
+                Stand: Januar 2025 · Keine Gewähr für Vollständigkeit oder Richtigkeit
             </div>
         </div>
     </div>
@@ -971,6 +1013,14 @@
             document.getElementById('detail-modal').classList.remove('active');
         }
         
+        function showSourcesModal() {
+            document.getElementById('sources-modal').classList.add('active');
+        }
+        
+        function closeSourcesModal() {
+            document.getElementById('sources-modal').classList.remove('active');
+        }
+        
         // Close modal on overlay click
         document.getElementById('detail-modal').addEventListener('click', function(e) {
             if (e.target === this) {
@@ -978,10 +1028,17 @@
             }
         });
         
+        document.getElementById('sources-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSourcesModal();
+            }
+        });
+        
         // Close modal on Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeModal();
+                closeSourcesModal();
             }
         });
         
