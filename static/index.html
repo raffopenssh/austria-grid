@@ -532,8 +532,13 @@
                     Niedrig (<30%)
                 </div>
                 <div class="legend-item" style="margin-top: 10px;">
-                    <div class="legend-color" style="background: #2196F3; border-radius: 50%; border: 2px solid #fff; width: 14px; height: 14px;"></div>
+                    <div class="legend-color" style="background: linear-gradient(to right, rgb(68,1,84), rgb(49,104,142), rgb(53,183,121), rgb(253,231,37)); border-radius: 50%; border: 2px solid #fff; width: 14px; height: 14px;"></div>
                     Windkraftanlage
+                </div>
+                <div style="display: flex; align-items: center; font-size: 0.7rem; color: #888; margin-left: 22px; margin-top: 2px;">
+                    <span>1 MW</span>
+                    <div style="flex: 1; height: 6px; margin: 0 5px; background: linear-gradient(to right, rgb(68,1,84), rgb(49,104,142), rgb(53,183,121), rgb(253,231,37)); border-radius: 3px;"></div>
+                    <span>7 MW</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background: linear-gradient(to right, #ff3c3c, #ffffff); border-radius: 2px; border: 2px solid #fff; width: 14px; height: 14px;"></div>
@@ -585,6 +590,47 @@
             if (score >= 70) return '#00d4aa';
             if (score >= 30) return '#ffd93d';
             return '#ff6b6b';
+        }
+        
+        // Viridis color scale for turbine power (MW)
+        // Turbine power ranges from ~1 MW to ~7 MW
+        const TURBINE_MW_MIN = 1.0;
+        const TURBINE_MW_MAX = 7.0;
+        
+        function getTurbinePowerColor(mw) {
+            // Normalize to 0-1 range
+            const t = Math.max(0, Math.min(1, (mw - TURBINE_MW_MIN) / (TURBINE_MW_MAX - TURBINE_MW_MIN)));
+            
+            // Viridis color scale (approximation)
+            // From dark purple (low) to yellow (high)
+            const viridis = [
+                [68, 1, 84],      // 0.0 - dark purple
+                [72, 40, 120],    // 0.125
+                [62, 74, 137],    // 0.25
+                [49, 104, 142],   // 0.375
+                [38, 130, 142],   // 0.5 - teal
+                [31, 158, 137],   // 0.625
+                [53, 183, 121],   // 0.75
+                [109, 205, 89],   // 0.875
+                [253, 231, 37]    // 1.0 - yellow
+            ];
+            
+            // Interpolate between colors
+            const idx = t * (viridis.length - 1);
+            const i = Math.floor(idx);
+            const f = idx - i;
+            
+            if (i >= viridis.length - 1) {
+                return 'rgb(' + viridis[viridis.length - 1].join(',') + ')';
+            }
+            
+            const c1 = viridis[i];
+            const c2 = viridis[i + 1];
+            const r = Math.round(c1[0] + f * (c2[0] - c1[0]));
+            const g = Math.round(c1[1] + f * (c2[1] - c1[1]));
+            const b = Math.round(c1[2] + f * (c2[2] - c1[2]));
+            
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
         }
         
         function getCapacityOpacity(score) {
@@ -703,15 +749,16 @@
             // Create markers for each turbine
             turbinesData.forEach((t, index) => {
                 if (t.lat && t.lon) {
-                    // Use transparent, fixed-size dots with stronger blue and white border
+                    // Use viridis color scale based on estimated power
+                    const turbineColor = getTurbinePowerColor(t.estimated_mw || 3);
                     const marker = L.circleMarker([t.lat, t.lon], {
                         pane: 'turbinePane',
                         radius: 5,
-                        fillColor: '#2196F3',
+                        fillColor: turbineColor,
                         color: '#ffffff',
                         weight: 1.5,
                         opacity: 0.9,
-                        fillOpacity: 0.7
+                        fillOpacity: 0.85
                     });
                     
                     marker.turbineData = t;
