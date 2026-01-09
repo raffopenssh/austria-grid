@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """Austrian Wind Power Grid Capacity Visualization"""
 
-from flask import Flask, jsonify, send_from_directory, send_file
+from flask import Flask, jsonify, send_from_directory, send_file, render_template_string, Response, request
 import json
 import os
+from datetime import datetime
 from shapely.geometry import shape, Point
+from urllib.parse import quote
 
 app = Flask(__name__, static_folder='static')
+
+# Base URL for the site
+BASE_URL = 'https://austria-power.exe.xyz:8000'
 
 # Load data
 def load_json(filename):
@@ -40,6 +45,12 @@ def production():
 @app.route('/api/bezirke')
 def bezirke():
     data = load_json('bezirke.json')
+    return jsonify(data)
+
+@app.route('/api/transmission-lines')
+def transmission_lines():
+    """High voltage transmission lines from Austro Control obstacle database"""
+    data = load_json('transmission_lines.json')
     return jsonify(data)
 
 @app.route('/api/district-capacity')
@@ -163,6 +174,60 @@ def static_files(filename):
 @app.route('/power_grid.png')
 def power_grid():
     return send_file('power_grid.png')
+
+# ============ SEO ROUTES ============
+
+@app.route('/sitemap.xml')
+def sitemap():
+    """Generate dynamic sitemap.xml"""
+    bezirke = load_json('bezirke.json')
+    transformers = load_json('transformer_stations.json')
+    
+    pages = [
+        {'loc': BASE_URL + '/', 'priority': '1.0', 'changefreq': 'weekly'},
+        {'loc': BASE_URL + '/quellen', 'priority': '0.5', 'changefreq': 'monthly'},
+        {'loc': BASE_URL + '/bezirke', 'priority': '0.8', 'changefreq': 'weekly'},
+        {'loc': BASE_URL + '/umspannwerke', 'priority': '0.8', 'changefreq': 'weekly'},
+    ]
+    
+    # Add district pages
+    for feature in bezirke['features']:
+        iso = feature['properties']['iso']
+        pages.append({
+            'loc': f"{BASE_URL}/bezirk/{quote(iso, safe='')}",
+            'priority': '0.7',
+            'changefreq': 'monthly'
+        })
+    
+    # Add transformer pages
+    for i, t in enumerate(transformers):
+        if t.get('substationName'):
+            pages.append({
+                'loc': f"{BASE_URL}/umspannwerk/{i}",
+                'priority': '0.6',
+                'changefreq': 'monthly'
+            })
+    
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    for page in pages:
+        xml += f'''  <url>
+    <loc>{page['loc']}</loc>
+    <changefreq>{page['changefreq']}</changefreq>
+    <priority>{page['priority']}</priority>
+  </url>\n'''
+    xml += '</urlset>'
+    
+    return Response(xml, mimetype='application/xml')
+
+@app.route('/robots.txt')
+def robots():
+    """Robots.txt for search engines"""
+    content = f"""User-agent: *
+Allow: /
+Sitemap: {BASE_URL}/sitemap.xml
+"""
+    return Response(content, mimetype='text/plain')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)

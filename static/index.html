@@ -557,6 +557,10 @@
                         <input type="checkbox" id="layer-grid">
                         Hochspannungsnetz (APG)
                     </label>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-transmission">
+                        Hochspannungsleitungen (AC)
+                    </label>
                 </div>
             </div>
         </div>
@@ -589,6 +593,14 @@
                 <div class="legend-item">
                     <div class="legend-color" style="background: linear-gradient(to right, #ff3c3c, #ffffff); border-radius: 2px; border: 2px solid #fff; width: 14px; height: 14px;"></div>
                     Umspannwerk
+                </div>
+                <div class="legend-item transmission-legend" style="display: none;">
+                    <div style="display: flex; flex-direction: column; gap: 2px; margin-right: 8px;">
+                        <div style="width: 20px; height: 3px; background: #ff0066;"></div>
+                        <div style="width: 20px; height: 2px; background: #ff6600;"></div>
+                        <div style="width: 20px; height: 2px; background: #ffcc00; border-style: dashed;"></div>
+                    </div>
+                    <span style="font-size: 0.75rem;">380/220/110 kV</span>
                 </div>
                 <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #333;">
                     <a href="#" onclick="showSourcesModal(); return false;" style="color: #666; font-size: 0.7rem; text-decoration: none;">
@@ -668,12 +680,18 @@
         const heatmapLayer = L.layerGroup().addTo(map);
         const windparksLayer = L.layerGroup().addTo(map);
         const transformersLayer = L.layerGroup();
+        const transmissionLayer = L.layerGroup();
+        
+        // Create pane for transmission lines (below turbines but above heatmap)
+        map.createPane('transmissionPane');
+        map.getPane('transmissionPane').style.zIndex = 420;
         
         // Data storage
         let districtData = {};
         let turbinesData = [];
         let turbineMarkers = [];
         let transformersData = [];
+        let transmissionLinesData = [];
         let bezirkeGeoJSON = null;
         
         // Color scale for capacity
@@ -1163,6 +1181,58 @@
             });
         }
         
+        // Load transmission lines from Austro Control
+        async function loadTransmissionLines() {
+            const response = await fetch('/api/transmission-lines');
+            const data = await response.json();
+            transmissionLinesData = data.features || [];
+            
+            // Color by voltage
+            function getVoltageColor(voltage) {
+                if (voltage >= 380) return '#ff0066';  // Pink/magenta for 380kV
+                if (voltage >= 220) return '#ff6600';  // Orange for 220kV
+                if (voltage >= 110) return '#ffcc00';  // Yellow for 110kV
+                return '#888888';  // Gray for lower
+            }
+            
+            function getVoltageWidth(voltage) {
+                if (voltage >= 380) return 4;
+                if (voltage >= 220) return 3;
+                if (voltage >= 110) return 2;
+                return 1;
+            }
+            
+            // Add each line to the layer
+            transmissionLinesData.forEach(feature => {
+                const voltage = feature.properties.voltage || 0;
+                const name = feature.properties.name || 'Unknown';
+                const color = getVoltageColor(voltage);
+                const width = getVoltageWidth(voltage);
+                
+                const line = L.geoJSON(feature, {
+                    pane: 'transmissionPane',
+                    style: {
+                        color: color,
+                        weight: width,
+                        opacity: 0.8,
+                        dashArray: voltage >= 220 ? null : '5, 5'
+                    }
+                });
+                
+                line.bindTooltip(`
+                    <div class="tooltip-custom">
+                        <div class="title">${name}</div>
+                        <div>Spannung: ${voltage} kV</div>
+                        <div style="color: ${color};">■ ${voltage >= 380 ? 'Höchstspannung' : voltage >= 220 ? 'Hochspannung' : 'Mittelspannung'}</div>
+                    </div>
+                `, { className: 'tooltip-custom', sticky: true });
+                
+                line.addTo(transmissionLayer);
+            });
+            
+            console.log(`Loaded ${transmissionLinesData.length} transmission line segments`);
+        }
+        
         // Show modal for transformer station
         function showTransformerModal(t) {
             const available = parseFloat(t.availableCapacity) || 0;
@@ -1350,13 +1420,25 @@
             }
         });
         
+        document.getElementById('layer-transmission').addEventListener('change', function() {
+            const legend = document.querySelector('.transmission-legend');
+            if (this.checked) {
+                map.addLayer(transmissionLayer);
+                if (legend) legend.style.display = 'flex';
+            } else {
+                map.removeLayer(transmissionLayer);
+                if (legend) legend.style.display = 'none';
+            }
+        });
+        
         // Initialize
         async function init() {
             await Promise.all([
                 loadDistrictHeatmap(),
                 loadTurbines(),
                 loadTransformers(),
-                loadProduction()
+                loadProduction(),
+                loadTransmissionLines()
             ]);
             loadGridOverlay();
         }

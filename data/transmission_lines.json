@@ -1,0 +1,2465 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "380 KV-Leitung S\u00fcdburgenland-Wien S\u00fcdost",
+        "voltage": 380,
+        "region": "Burgenland",
+        "identifier": "LO_ODS_000675"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            16.36728556,
+            47.47971274
+          ],
+          [
+            16.36740644,
+            47.48247624
+          ],
+          [
+            16.36754404,
+            47.4856195
+          ],
+          [
+            16.36765992,
+            47.48824519
+          ],
+          [
+            16.367775,
+            47.49091185
+          ],
+          [
+            16.36790877,
+            47.49392273
+          ],
+          [
+            16.36802276,
+            47.4965447
+          ],
+          [
+            16.37021894,
+            47.49867334
+          ],
+          [
+            16.372616667,
+            47.501021944
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110 kV Leitung UW Oberpullendorf-UW Rotenturm",
+        "voltage": 110,
+        "region": "Burgenland",
+        "identifier": "LO_ODS_002980"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            16.305394444,
+            47.430063889
+          ],
+          [
+            16.304341667,
+            47.372247222
+          ],
+          [
+            16.288902778,
+            47.355791667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "380 KV-Leitung, S\u00fcdburgenland-Wien S\u00fcdost Mast 1036-1037",
+        "voltage": 380,
+        "region": "Burgenland",
+        "identifier": "LO_ODS_000400"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            16.26555606,
+            47.33988413
+          ],
+          [
+            16.26633662,
+            47.34288331
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Landskron-Obersielach, Mast 21-Mast 23",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002628"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.094767372,
+            46.69587945
+          ],
+          [
+            14.092481,
+            46.698806
+          ],
+          [
+            14.089789,
+            46.701942
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Leitung Villach-St.Veit/Glan, Mast 109 bis 130",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002492"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.1625884,
+            46.6786752
+          ],
+          [
+            14.165587066,
+            46.68035275
+          ],
+          [
+            14.168361111,
+            46.682027778
+          ],
+          [
+            14.171388889,
+            46.683777778
+          ],
+          [
+            14.18016646,
+            46.68889008
+          ],
+          [
+            14.21491047,
+            46.69532797
+          ],
+          [
+            14.22654078,
+            46.70556565
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Ltg. St.Veit/Glan-Annabr\u00fccke, Mast 81-82",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002484"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.44629867,
+            46.57049614
+          ],
+          [
+            14.44943797,
+            46.56827148
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Leitung Villach-St.Veit/Glan, Mast 81 - 82",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002490"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.08100248,
+            46.64905666
+          ],
+          [
+            14.08260377,
+            46.65108889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Leitung Villach-St.Veit/Glan, Mast 82 - 96",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002491"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.082602778,
+            46.651088889
+          ],
+          [
+            14.084722222,
+            46.653611111
+          ],
+          [
+            14.088583333,
+            46.654194444
+          ],
+          [
+            14.12114487,
+            46.65848891
+          ],
+          [
+            14.12612513,
+            46.66107213
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Obersielach-Lienz, M153-1002",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002579"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.17212284,
+            46.54845141
+          ],
+          [
+            14.17428652,
+            46.54460167
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Obersielach-Lienz, M139-M153",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002581"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.22121712,
+            46.5555604
+          ],
+          [
+            14.2103599,
+            46.5565022
+          ],
+          [
+            14.19165503,
+            46.54962629
+          ],
+          [
+            14.18337336,
+            46.54901335
+          ],
+          [
+            14.172125,
+            46.548447222
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Obersielach-Lienz, M137-M139",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002582"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.22835095,
+            46.55494469
+          ],
+          [
+            14.22468777,
+            46.55526383
+          ],
+          [
+            14.22121712,
+            46.5555604
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110 KV-Leitung UW Klagenfurt - KW Ferlach",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_000997"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.29383872,
+            46.58020277
+          ],
+          [
+            14.30093067,
+            46.54974296
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110 kV-Leitung Landskron-Obersielach, Mast 92-Mast 116",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_001140"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.17450079,
+            46.59391323
+          ],
+          [
+            14.25246632,
+            46.60268474
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Landskron-Obersielach Mast 114-Mast 116",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002680"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.228641143,
+            46.694884325
+          ],
+          [
+            14.231052395,
+            46.69540374
+          ],
+          [
+            14.232373697,
+            46.697280796
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Leitung Villach-St.Veit/Glan, Mast 61 - 81",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002487"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.0192244,
+            46.62690698
+          ],
+          [
+            14.0215687,
+            46.62874462
+          ],
+          [
+            14.05920068,
+            46.6446829
+          ],
+          [
+            14.06698992,
+            46.64538791
+          ],
+          [
+            14.08100248,
+            46.64905666
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Landskron-Obersielach, M11-M60",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002627"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.925929812,
+            46.635522148
+          ],
+          [
+            13.944190658,
+            46.638971456
+          ],
+          [
+            13.962337064,
+            46.651877651
+          ],
+          [
+            13.981738889,
+            46.650544444
+          ],
+          [
+            13.984755556,
+            46.650333333
+          ],
+          [
+            13.987291667,
+            46.650061111
+          ],
+          [
+            14.012776572,
+            46.64733322
+          ],
+          [
+            14.048889,
+            46.645072
+          ],
+          [
+            14.0761,
+            46.6497
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110 KV-Leitung Gurk - Treibach, M21 - M35",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_000986"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.36329817,
+            46.86661
+          ],
+          [
+            14.41408689,
+            46.85703071
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110 KV-Leitung Wietersdorf",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_000987"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.529591,
+            46.83994829
+          ],
+          [
+            14.53360023,
+            46.84156458
+          ],
+          [
+            14.53821502,
+            46.84134113
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Landskron-Obersielach, Mast 151-Mast 119",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002626"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.337375341,
+            46.726808882
+          ],
+          [
+            14.311084939,
+            46.71737915
+          ],
+          [
+            14.274912359,
+            46.712669723
+          ],
+          [
+            14.236502078,
+            46.703385837
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110 kV Leitung Mallnitz - Obervellach",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_001253"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.18139717,
+            46.94645613
+          ],
+          [
+            13.178661,
+            46.94494179
+          ],
+          [
+            13.17933131,
+            46.94291698
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Ltg. Malta Hauptstufe-Malta Oberstufe, M30-M33",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002515"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.4419323,
+            47.00290337
+          ],
+          [
+            13.45365888,
+            46.9929824
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Ltg. Malta Hauptstufe-Malta Oberstufe, M81-M86",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002516"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.50812036,
+            46.89185776
+          ],
+          [
+            13.50006798,
+            46.88131377
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Ltg. Malta Hauptstufe-Malta Oberstufe, M28-M30",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002525"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.43453286,
+            47.00924033
+          ],
+          [
+            13.44057488,
+            47.00718211
+          ],
+          [
+            13.4419323,
+            47.00290337
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Ltg. Malta Hauptstufe-Malta Oberstufe, M69-M80",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002526"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.51999217,
+            46.91938573
+          ],
+          [
+            13.51633299,
+            46.91453498
+          ],
+          [
+            13.52189676,
+            46.90633626
+          ],
+          [
+            13.51167786,
+            46.8956404
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Ltg. Malta Hauptstufe-Malta Oberstufe, M87-M101",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002527"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.4999884,
+            46.87699806
+          ],
+          [
+            13.49950588,
+            46.86632637
+          ],
+          [
+            13.49380858,
+            46.8628212
+          ],
+          [
+            13.47897506,
+            46.85862732
+          ],
+          [
+            13.46762368,
+            46.85869885
+          ],
+          [
+            13.46466489,
+            46.85721654
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Ltg. Malta Hauptstufe-Malta Oberstufe, M137-M140",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002528"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.35695954,
+            46.86080248
+          ],
+          [
+            13.3514552,
+            46.86152937
+          ],
+          [
+            13.34754063,
+            46.86186264
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Malta Haupstufe-Lienz, M70-M78",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002529"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.09358361,
+            46.93308933
+          ],
+          [
+            13.09126071,
+            46.93048244
+          ],
+          [
+            13.08932662,
+            46.92692841
+          ],
+          [
+            13.08495769,
+            46.92410645
+          ],
+          [
+            13.08297918,
+            46.92151533
+          ],
+          [
+            13.07765109,
+            46.9181477
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Ltg. Malta Hauptstufe-Malta Oberstufe, M26-M27",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002532"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.42801021,
+            47.01676114
+          ],
+          [
+            13.43154526,
+            47.01316791
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Obersielach-Lienz, Mast 495-Mast 497",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002648"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            12.965366041,
+            46.732905091
+          ],
+          [
+            12.966890601,
+            46.737116812
+          ],
+          [
+            12.966005554,
+            46.742429584
+          ],
+          [
+            12.936666667,
+            46.7525
+          ],
+          [
+            12.936666667,
+            46.7525
+          ],
+          [
+            12.936666667,
+            46.7525
+          ],
+          [
+            12.936666667,
+            46.7525
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110 kV-Leitung KW Kamering - UW Landskron",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_001141"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.791694444,
+            46.665030556
+          ],
+          [
+            13.79010874,
+            46.66290869
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "132kV Leitung Arnoldstein - Tarvis",
+        "voltage": 132,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_001631"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.66295947,
+            46.53766603
+          ],
+          [
+            13.66003617,
+            46.53776461
+          ],
+          [
+            13.65566667,
+            46.535
+          ],
+          [
+            13.64843946,
+            46.53260277
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Obersielach-Lienz, M210-M224",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002577"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.96460565,
+            46.55477109
+          ],
+          [
+            13.96216123,
+            46.55293849
+          ],
+          [
+            13.9539514,
+            46.55213342
+          ],
+          [
+            13.95005967,
+            46.55175163
+          ],
+          [
+            13.946480556,
+            46.552236111
+          ],
+          [
+            13.942658333,
+            46.552755556
+          ],
+          [
+            13.91981658,
+            46.55587033
+          ],
+          [
+            13.91470696,
+            46.5578261
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Obersielach-Lienz, M209-M210",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002578"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.96745423,
+            46.55690305
+          ],
+          [
+            13.96460565,
+            46.55477109
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Obersielach-Lienz, M205-M209",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002580"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.98404787,
+            46.55597911
+          ],
+          [
+            13.98039334,
+            46.55555178
+          ],
+          [
+            13.97634011,
+            46.55597297
+          ],
+          [
+            13.97191353,
+            46.55643619
+          ],
+          [
+            13.96745423,
+            46.55690305
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Obersielach-Lienz, M306-M308",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_003181"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.605036111,
+            46.565241667
+          ],
+          [
+            13.602161111,
+            46.567547222
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Hessenberg-St.Andr\u00e4-Obersielach, M308-M311",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002602"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.74861176,
+            46.73207144
+          ],
+          [
+            14.74079697,
+            46.72718309
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Hessenberg-St.Andr\u00e4-Obersielach, M313-M315",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002603"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.73427215,
+            46.72141587
+          ],
+          [
+            14.73057456,
+            46.71814942
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Hessenberg-St.Andr\u00e4-Obersielach, M316-M321",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002604"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.72766485,
+            46.71557735
+          ],
+          [
+            14.71379249,
+            46.70293394
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Hessenberg-St.Andr\u00e4-Obersielach, M306-M308",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002607"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.75165083,
+            46.73354535
+          ],
+          [
+            14.74861176,
+            46.73207144
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Hessenberg-St.Andr\u00e4-Obersielach, M315-M316",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002608"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.73057456,
+            46.71814942
+          ],
+          [
+            14.72766485,
+            46.71557735
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Hessenberg-St.Andr\u00e4-Obersielach, M311-M313",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002609"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.74079697,
+            46.72718309
+          ],
+          [
+            14.73427215,
+            46.72141587
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Hessenberg-St.Andr\u00e4-Obersielach, M301-M306",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002594"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.77179446,
+            46.74171515
+          ],
+          [
+            14.76245599,
+            46.73875297
+          ],
+          [
+            14.75534603,
+            46.73532774
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "380kV Ltg.Obersielach-Kainachtal, M35-M41",
+        "voltage": 380,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002611"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.79143988,
+            46.67899961
+          ],
+          [
+            14.80162887,
+            46.67826327
+          ],
+          [
+            14.813291667,
+            46.682333333
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Ltg. Schwabeck-Baumkirchen, M111-M2002",
+        "voltage": 110,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002501"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.82751608,
+            46.85354626
+          ],
+          [
+            14.83355805,
+            46.85080015
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Hessenberg-St.Andr\u00e4-Obersielach, M223-M235",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002593"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.81864785,
+            46.92561794
+          ],
+          [
+            14.81363298,
+            46.90699823
+          ],
+          [
+            14.81276568,
+            46.89772149
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Hessenberg-St.Andr\u00e4-Obersielach, M197-M199",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002595"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.78472175,
+            46.98538922
+          ],
+          [
+            14.78849773,
+            46.98075288
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Hessenberg-St.Andr\u00e4-Obersielach, M236-M242",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002596"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.81256188,
+            46.8955038
+          ],
+          [
+            14.82149937,
+            46.88077555
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220 kV Ltg. Hessenberg-St.Andr\u00e4-Obersielach, M182-M186",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002597"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.74659097,
+            47.02116138
+          ],
+          [
+            14.75583503,
+            47.01304569
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg.Hessenberg-St.Andr\u00e4-Obersielach, M193-M196",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002598"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.77202794,
+            47.00008577
+          ],
+          [
+            14.77477438,
+            46.99622788
+          ],
+          [
+            14.78068714,
+            46.98978066
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220 kV Ltg. Hessenberg-St.Andr\u00e4-Obersielach, M179-M181",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002599"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.74416923,
+            47.02948738
+          ],
+          [
+            14.74540506,
+            47.02523506
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Hessenberg-St.Andr\u00e4-Obersielach, M293-M299",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002600"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.79836487,
+            46.75013774
+          ],
+          [
+            14.78026399,
+            46.74440323
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Hessenberg-St.Andr\u00e4-Obersielach, M243-M252",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002601"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.81979268,
+            46.87837432
+          ],
+          [
+            14.80998482,
+            46.86460645
+          ],
+          [
+            14.81186588,
+            46.86047187
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Hessenberg-St. Andr\u00e4-Obersielach, M292-M293",
+        "voltage": 220,
+        "region": "K\u00e4rnten",
+        "identifier": "LO_ODS_002605"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.80287457,
+            46.75479785
+          ],
+          [
+            14.79836487,
+            46.75013774
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "380kV Ltg. Obersielach-Kainachtal, Mast 74-Mast 110",
+        "voltage": 380,
+        "region": "K\u00e4rnten, Steiermark",
+        "identifier": "LO_ODS_002612"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.90771122,
+            46.74066687
+          ],
+          [
+            14.91006523,
+            46.7485914
+          ],
+          [
+            14.92680898,
+            46.75177354
+          ],
+          [
+            14.9384011,
+            46.7539768
+          ],
+          [
+            14.9475534,
+            46.75604228
+          ],
+          [
+            14.95348963,
+            46.76173992
+          ],
+          [
+            14.968574,
+            46.76984718
+          ],
+          [
+            14.9808674,
+            46.76843228
+          ],
+          [
+            15.00932281,
+            46.77596767
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV-Leitung St.Veit/Glan-Mariahof, Mast 107-110",
+        "voltage": 110,
+        "region": "K\u00e4rnten, Steiermark",
+        "identifier": "LO_ODS_002483"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.40020874,
+            46.98366516
+          ],
+          [
+            14.40487721,
+            46.98968933
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg.Hessenberg-St.Andr\u00e4-Obersielach, M178-M179",
+        "voltage": 220,
+        "region": "K\u00e4rnten, Steiermark",
+        "identifier": "LO_ODS_002606"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.74332478,
+            47.0323988
+          ],
+          [
+            14.74416923,
+            47.02948738
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220kV Ltg. Malta Hauptstufe-Lienz, M115-M141",
+        "voltage": 220,
+        "region": "K\u00e4rnten, Tirol",
+        "identifier": "LO_ODS_002530"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            12.97225212,
+            46.858761
+          ],
+          [
+            12.96281416,
+            46.85604348
+          ],
+          [
+            12.93897499,
+            46.85571699
+          ],
+          [
+            12.93188195,
+            46.85681696
+          ],
+          [
+            12.928163889,
+            46.856819444
+          ],
+          [
+            12.92107964,
+            46.85681867
+          ],
+          [
+            12.91789834,
+            46.85512249
+          ],
+          [
+            12.915227778,
+            46.853697222
+          ],
+          [
+            12.90444393,
+            46.84793728
+          ],
+          [
+            12.89878769,
+            46.84163852
+          ],
+          [
+            12.89566827,
+            46.83813989
+          ],
+          [
+            12.88978638,
+            46.83650707
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110 kV-Leitung Ernsthofen - Hessenberg, Mast 143 - 144",
+        "voltage": 110,
+        "region": "Ober\u00f6sterreich",
+        "identifier": "LO_ODS_001157"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.54779825,
+            47.90057265
+          ],
+          [
+            14.55218043,
+            47.89662444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110 kV-Leitung Ernsthofen - Hessenberg, Mast 149 - 150",
+        "voltage": 110,
+        "region": "Ober\u00f6sterreich",
+        "identifier": "LO_ODS_001158"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.53929091,
+            47.89345518
+          ],
+          [
+            14.53256751,
+            47.89242664
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110 kV-Leitung Ernsthofen - Hessenberg, Mast 161 - 162",
+        "voltage": 110,
+        "region": "Ober\u00f6sterreich",
+        "identifier": "LO_ODS_001159"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.53248878,
+            47.89196547
+          ],
+          [
+            14.53918867,
+            47.89274084
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110 kV-Leitung Ernsthofen - Hessenberg, Mast 182 - 183",
+        "voltage": 110,
+        "region": "Ober\u00f6sterreich",
+        "identifier": "LO_ODS_001160"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.58795924,
+            47.88106433
+          ],
+          [
+            14.58988461,
+            47.87819138
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110 kV-Leitung Ernsthofen - Hessenberg, Mast 215 - 216",
+        "voltage": 110,
+        "region": "Ober\u00f6sterreich",
+        "identifier": "LO_ODS_001161"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.63290218,
+            47.82133446
+          ],
+          [
+            14.63407163,
+            47.81845825
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110 KV-Leitung Laufnitzdorf - Bruck an der Mur",
+        "voltage": 110,
+        "region": "Steiermark",
+        "identifier": "LO_ODS_000788"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            15.31075965,
+            47.37260859
+          ],
+          [
+            15.31034902,
+            47.38013537
+          ],
+          [
+            15.31294097,
+            47.38532142
+          ],
+          [
+            15.30700317,
+            47.38911399
+          ],
+          [
+            15.3038418,
+            47.39108479
+          ],
+          [
+            15.30008904,
+            47.39341828
+          ],
+          [
+            15.29534493,
+            47.39637775
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "220 kV-Leitung Hessenberg-Ternitz (UW Hessenberg bis UW Donawitz)",
+        "voltage": 220,
+        "region": "Steiermark",
+        "identifier": "LO_ODS_002813"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            15.022388874,
+            47.396250008
+          ],
+          [
+            15.022749997,
+            47.396583362
+          ],
+          [
+            15.024500005,
+            47.396861136
+          ],
+          [
+            15.028583297,
+            47.395277782
+          ],
+          [
+            15.030888913,
+            47.394361121
+          ],
+          [
+            15.035472208,
+            47.395166682
+          ],
+          [
+            15.039222225,
+            47.395805552
+          ],
+          [
+            15.04644441,
+            47.396305526
+          ],
+          [
+            15.048666663,
+            47.396444414
+          ],
+          [
+            15.058972225,
+            47.398249982
+          ],
+          [
+            15.060222231,
+            47.398722206
+          ],
+          [
+            15.064888889,
+            47.398916664
+          ],
+          [
+            15.067944419,
+            47.39808331
+          ],
+          [
+            15.070722189,
+            47.397277794
+          ],
+          [
+            15.07455557,
+            47.396777767
+          ],
+          [
+            15.0776111,
+            47.396388896
+          ],
+          [
+            15.079083349,
+            47.39433333
+          ],
+          [
+            15.08052775,
+            47.392277806
+          ],
+          [
+            15.078472225,
+            47.390138883
+          ],
+          [
+            15.075277816,
+            47.38886112
+          ],
+          [
+            15.072611077,
+            47.387805558
+          ],
+          [
+            15.070277793,
+            47.386861093
+          ],
+          [
+            15.068000024,
+            47.385944467
+          ],
+          [
+            15.067916661,
+            47.384611132
+          ],
+          [
+            15.069944428,
+            47.383805531
+          ],
+          [
+            15.072194438,
+            47.382888913
+          ],
+          [
+            15.072138922,
+            47.382222211
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110 kV Arnstein-Modriach 135/1A",
+        "voltage": 110,
+        "region": "Steiermark",
+        "identifier": "LO_ODS_002676"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            15.097083341,
+            46.985944446
+          ],
+          [
+            15.090083309,
+            46.98127775
+          ],
+          [
+            15.087916662,
+            46.980111089
+          ],
+          [
+            15.086111139,
+            46.979110251
+          ],
+          [
+            15.083500006,
+            46.976750024
+          ],
+          [
+            15.081027752,
+            46.974999998
+          ],
+          [
+            15.079055591,
+            46.973611128
+          ],
+          [
+            15.077166703,
+            46.972277756
+          ],
+          [
+            15.075333331,
+            46.970972243
+          ],
+          [
+            15.072527803,
+            46.970333327
+          ],
+          [
+            15.069305546,
+            46.96955556
+          ],
+          [
+            15.066611139,
+            46.968138902
+          ],
+          [
+            15.064805526,
+            46.967194422
+          ],
+          [
+            15.062499999,
+            46.965972219
+          ],
+          [
+            15.060111111,
+            46.964722222
+          ],
+          [
+            15.058833346,
+            46.964249979
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Weiz - Birkfeld, 110 KV-Weitspannfeld",
+        "voltage": 110,
+        "region": "Steiermark",
+        "identifier": "LO_ODS_000216"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            15.68361869,
+            47.26738491
+          ],
+          [
+            15.68024662,
+            47.27645111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Weiz - Birkfeld, 110 KV-Weitspannfeld",
+        "voltage": 110,
+        "region": "Steiermark",
+        "identifier": "LO_ODS_000217"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            15.67378544,
+            47.29531473
+          ],
+          [
+            15.68096428,
+            47.29941784
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Weiz - Birkfeld, 110 KV-Weitspannfeld",
+        "voltage": 110,
+        "region": "Steiermark",
+        "identifier": "LO_ODS_000218"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            15.67951743,
+            47.31847793
+          ],
+          [
+            15.6842619,
+            47.32324914
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110KV Leitung UfW \u00d6tztal - UW Landeck - M116-M117",
+        "voltage": 110,
+        "region": "Tirol",
+        "identifier": "LO_ODS_002956"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            10.79201855,
+            47.208050911
+          ],
+          [
+            10.788264723,
+            47.209223952
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Melach-\u00dcberspannung 220 KV",
+        "voltage": 220,
+        "region": "Tirol",
+        "identifier": "LO_ODS_000242"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.25847098,
+            47.23915179
+          ],
+          [
+            11.2531215,
+            47.23977253
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Viggartal, 110KV-Leitung",
+        "voltage": 110,
+        "region": "Tirol",
+        "identifier": "LO_ODS_000397"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.43265713,
+            47.18596285
+          ],
+          [
+            11.43560809,
+            47.18194734
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Melach-\u00dcberspannung 110 KV",
+        "voltage": 110,
+        "region": "Tirol",
+        "identifier": "LO_ODS_000398"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.25328659,
+            47.24030191
+          ],
+          [
+            11.25828877,
+            47.2396768
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110kV Bahnstromleitung UW W\u00f6rgl-Kitzb\u00fchel",
+        "voltage": 110,
+        "region": "Tirol",
+        "identifier": "LO_ODS_001831"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            12.22404776,
+            47.50893533
+          ],
+          [
+            12.22091591,
+            47.50784658
+          ],
+          [
+            12.21743232,
+            47.50663409
+          ],
+          [
+            12.2141301,
+            47.50548555
+          ],
+          [
+            12.21092944,
+            47.50437648
+          ],
+          [
+            12.20769296,
+            47.50325724
+          ],
+          [
+            12.20441902,
+            47.50211384
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Stromleitung 110kV Zuleitung UW Fiss",
+        "voltage": 110,
+        "region": "Tirol",
+        "identifier": "LO_ODS_002640"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            10.658758422,
+            47.070241262
+          ],
+          [
+            10.656635972,
+            47.069211029
+          ],
+          [
+            10.655178007,
+            47.066967002
+          ],
+          [
+            10.65161403,
+            47.064264009
+          ],
+          [
+            10.645725035,
+            47.061953011
+          ],
+          [
+            10.643611029,
+            47.059999973
+          ],
+          [
+            10.640893985,
+            47.059691972
+          ],
+          [
+            10.639713958,
+            47.059761001
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "TINETZ 110KV UW Matrei i.O. - UW Gruben",
+        "voltage": 110,
+        "region": "Tirol",
+        "identifier": "LO_ODS_003052"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            12.51628144,
+            47.035561364
+          ],
+          [
+            12.516425979,
+            47.035407778
+          ],
+          [
+            12.52065861,
+            47.031959209
+          ],
+          [
+            12.521425869,
+            47.031254807
+          ],
+          [
+            12.522124202,
+            47.030624918
+          ],
+          [
+            12.523369198,
+            47.029509001
+          ],
+          [
+            12.524191124,
+            47.02797183
+          ],
+          [
+            12.52482053,
+            47.026726245
+          ],
+          [
+            12.525269299,
+            47.025911602
+          ],
+          [
+            12.526312267,
+            47.023541521
+          ],
+          [
+            12.527089035,
+            47.020716021
+          ],
+          [
+            12.527164646,
+            47.020515402
+          ],
+          [
+            12.527413764,
+            47.019697423
+          ],
+          [
+            12.52779836,
+            47.018584518
+          ],
+          [
+            12.528152057,
+            47.017568817
+          ],
+          [
+            12.528560421,
+            47.016369983
+          ],
+          [
+            12.528930755,
+            47.015312106
+          ],
+          [
+            12.529272569,
+            47.014309306
+          ],
+          [
+            12.529985162,
+            47.012700392
+          ],
+          [
+            12.530654973,
+            47.011250251
+          ],
+          [
+            12.531041946,
+            47.010396476
+          ],
+          [
+            12.531428918,
+            47.009532963
+          ],
+          [
+            12.53186818,
+            47.00854302
+          ],
+          [
+            12.532414397,
+            47.007340742
+          ],
+          [
+            12.532972499,
+            47.006089813
+          ],
+          [
+            12.533473558,
+            47.004984729
+          ],
+          [
+            12.534019775,
+            47.003767782
+          ],
+          [
+            12.534668195,
+            47.00233685
+          ],
+          [
+            12.535048037,
+            47.001484553
+          ],
+          [
+            12.535430256,
+            47.000653315
+          ],
+          [
+            12.535850504,
+            46.99966645
+          ],
+          [
+            12.536551213,
+            46.99847694
+          ],
+          [
+            12.537465166,
+            46.997018764
+          ],
+          [
+            12.538385061,
+            46.995353856
+          ],
+          [
+            12.539308923,
+            46.993773418
+          ],
+          [
+            12.539849104,
+            46.992852651
+          ],
+          [
+            12.539079394,
+            46.990984772
+          ],
+          [
+            12.540627001,
+            46.989563588
+          ],
+          [
+            12.542022185,
+            46.988347069
+          ],
+          [
+            12.543045836,
+            46.987406713
+          ],
+          [
+            12.543657466,
+            46.986360736
+          ],
+          [
+            12.54424528,
+            46.985355357
+          ],
+          [
+            12.544959319,
+            46.98412087
+          ],
+          [
+            12.545605808,
+            46.983017459
+          ],
+          [
+            12.546494967,
+            46.981586483
+          ],
+          [
+            12.547509859,
+            46.97994673
+          ],
+          [
+            12.547616815,
+            46.978702963
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Terfens, \u00dcberspannung Vomperbach/220KV",
+        "voltage": 220,
+        "region": "Tirol",
+        "identifier": "LO_ODS_001179"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.64667633,
+            47.33752382
+          ],
+          [
+            11.6534368,
+            47.34341201
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110 KV-Bahnstromleitung Arlberg - KW Braz, M114 - M115",
+        "voltage": 110,
+        "region": "Vorarlberg",
+        "identifier": "LO_ODS_001135"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            10.182605,
+            47.136786
+          ],
+          [
+            10.17909,
+            47.138743
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "110/220/380kV VIW B\u00fcrs-Brederis-Meiningen",
+        "voltage": 380,
+        "region": "Vorarlberg",
+        "identifier": "LO_ODS_003046"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            9.800416667,
+            47.147583333
+          ],
+          [
+            9.798138889,
+            47.150444444
+          ]
+        ]
+      }
+    }
+  ]
+}
