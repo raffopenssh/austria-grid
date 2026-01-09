@@ -564,29 +564,33 @@
         <div class="map-container">
             <div id="map"></div>
             <div class="legend">
-                <h4>Kapazität für Zubau</h4>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #00d4aa;"></div>
-                    Hoch (>70%)
+                <div class="heatmap-legend">
+                    <h4>Kapazität für Zubau</h4>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #00d4aa;"></div>
+                        Hoch (>70%)
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ffd93d;"></div>
+                        Mittel (30-70%)
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ff6b6b;"></div>
+                        Niedrig (<30%)
+                    </div>
                 </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #ffd93d;"></div>
-                    Mittel (30-70%)
+                <div class="windparks-legend" style="margin-top: 10px;">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: linear-gradient(to right, rgb(68,1,84), rgb(49,104,142), rgb(53,183,121), rgb(253,231,37)); border-radius: 50%; border: 2px solid #fff; width: 14px; height: 14px;"></div>
+                        Windkraftanlage
+                    </div>
+                    <div style="display: flex; align-items: center; font-size: 0.7rem; color: #888; margin-left: 22px; margin-top: 2px;">
+                        <span>1 MW</span>
+                        <div style="flex: 1; height: 6px; margin: 0 5px; background: linear-gradient(to right, rgb(68,1,84), rgb(49,104,142), rgb(53,183,121), rgb(253,231,37)); border-radius: 3px;"></div>
+                        <span>7 MW</span>
+                    </div>
                 </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #ff6b6b;"></div>
-                    Niedrig (<30%)
-                </div>
-                <div class="legend-item" style="margin-top: 10px;">
-                    <div class="legend-color" style="background: linear-gradient(to right, rgb(68,1,84), rgb(49,104,142), rgb(53,183,121), rgb(253,231,37)); border-radius: 50%; border: 2px solid #fff; width: 14px; height: 14px;"></div>
-                    Windkraftanlage
-                </div>
-                <div style="display: flex; align-items: center; font-size: 0.7rem; color: #888; margin-left: 22px; margin-top: 2px;">
-                    <span>1 MW</span>
-                    <div style="flex: 1; height: 6px; margin: 0 5px; background: linear-gradient(to right, rgb(68,1,84), rgb(49,104,142), rgb(53,183,121), rgb(253,231,37)); border-radius: 3px;"></div>
-                    <span>7 MW</span>
-                </div>
-                <div class="legend-item">
+                <div class="legend-item transformers-legend" style="display: none;">
                     <div class="legend-color" style="background: linear-gradient(to right, #ff3c3c, #ffffff); border-radius: 2px; border: 2px solid #fff; width: 14px; height: 14px;"></div>
                     Umspannwerk
                 </div>
@@ -1369,26 +1373,35 @@
         
         // Layer toggle handlers
         document.getElementById('layer-heatmap').addEventListener('change', function() {
+            const legend = document.querySelector('.heatmap-legend');
             if (this.checked) {
                 map.addLayer(heatmapLayer);
+                if (legend) legend.style.display = 'block';
             } else {
                 map.removeLayer(heatmapLayer);
+                if (legend) legend.style.display = 'none';
             }
         });
         
         document.getElementById('layer-windparks').addEventListener('change', function() {
+            const legend = document.querySelector('.windparks-legend');
             if (this.checked) {
                 map.addLayer(windparksLayer);
+                if (legend) legend.style.display = 'block';
             } else {
                 map.removeLayer(windparksLayer);
+                if (legend) legend.style.display = 'none';
             }
         });
         
         document.getElementById('layer-transformers').addEventListener('change', function() {
+            const legend = document.querySelector('.transformers-legend');
             if (this.checked) {
                 map.addLayer(transformersLayer);
+                if (legend) legend.style.display = 'flex';
             } else {
                 map.removeLayer(transformersLayer);
+                if (legend) legend.style.display = 'none';
             }
         });
         
