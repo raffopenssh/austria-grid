@@ -4,9 +4,12 @@
 from flask import Flask, jsonify, send_from_directory, send_file, render_template_string, Response, request
 import json
 import os
+import tempfile
 from datetime import datetime
-from shapely.geometry import shape, Point
+from shapely.geometry import shape, Point, LineString
 from urllib.parse import quote
+import geopandas as gpd
+import pandas as pd
 
 app = Flask(__name__, static_folder='static')
 
@@ -174,6 +177,94 @@ def static_files(filename):
 @app.route('/power_grid.png')
 def power_grid():
     return send_file('power_grid.png')
+
+# ============ DATA EXPORT ============
+
+@app.route('/data.gpkg')
+def download_geopackage():
+    """Export all data as GeoPackage"""
+    # Create temporary file
+    tmp = tempfile.NamedTemporaryFile(suffix='.gpkg', delete=False)
+    tmp_path = tmp.name
+    tmp.close()
+    
+    try:
+        # Wind turbines
+        turbines = load_json('wind_turbines_enhanced.json')
+        turbine_data = []
+        for t in turbines:
+            if t.get('lat') and t.get('lon'):
+                turbine_data.append({
+                    'name': t.get('display_name', ''),
+                    'standort': t.get('standort', ''),
+                    'bezirk': t.get('bezirk', ''),
+                    'bundesland': t.get('bundesland', ''),
+                    'height_m': t.get('height_m'),
+                    'estimated_mw': t.get('estimated_mw'),
+                    'lighted': t.get('lighted', False),
+                    'geometry': Point(t['lon'], t['lat'])
+                })
+        if turbine_data:
+            gdf = gpd.GeoDataFrame(turbine_data, crs="EPSG:4326")
+            gdf.to_file(tmp_path, driver='GPKG', layer='wind_turbines')
+        
+        # Transformer stations
+        transformers = load_json('transformer_stations.json')
+        transformer_data = []
+        for t in transformers:
+            if t.get('latitude') and t.get('longitude'):
+                transformer_data.append({
+                    'name': t.get('substationName', ''),
+                    'operator': t.get('networkOperator', ''),
+                    'state': t.get('state', ''),
+                    'booked_mw': t.get('bookedCapacity'),
+                    'available_mw': t.get('availableCapacity'),
+                    'geometry': Point(t['longitude'], t['latitude'])
+                })
+        if transformer_data:
+            gdf = gpd.GeoDataFrame(transformer_data, crs="EPSG:4326")
+            gdf.to_file(tmp_path, driver='GPKG', layer='transformer_stations', mode='a')
+        
+        # Transmission lines
+        lines = load_json('transmission_lines.json')
+        line_data = []
+        for feature in lines.get('features', []):
+            props = feature.get('properties', {})
+            coords = feature.get('geometry', {}).get('coordinates', [])
+            if len(coords) >= 2:
+                line_data.append({
+                    'name': props.get('name', ''),
+                    'voltage_kv': props.get('voltage'),
+                    'region': props.get('region', ''),
+                    'geometry': LineString(coords)
+                })
+        if line_data:
+            gdf = gpd.GeoDataFrame(line_data, crs="EPSG:4326")
+            gdf.to_file(tmp_path, driver='GPKG', layer='transmission_lines', mode='a')
+        
+        # Districts
+        bezirke = load_json('bezirke.json')
+        district_data = []
+        for feature in bezirke.get('features', []):
+            props = feature.get('properties', {})
+            geom = shape(feature['geometry'])
+            district_data.append({
+                'name': props.get('name', ''),
+                'iso': props.get('iso', ''),
+                'geometry': geom
+            })
+        if district_data:
+            gdf = gpd.GeoDataFrame(district_data, crs="EPSG:4326")
+            gdf.to_file(tmp_path, driver='GPKG', layer='bezirke', mode='a')
+        
+        return send_file(
+            tmp_path,
+            mimetype='application/geopackage+sqlite3',
+            as_attachment=True,
+            download_name='austria_wind_power.gpkg'
+        )
+    except Exception as e:
+        return Response(f"Error generating GeoPackage: {str(e)}", status=500)
 
 # ============ SEO ROUTES ============
 
