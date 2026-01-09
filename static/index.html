@@ -554,12 +554,8 @@
                         Umspannwerke
                     </label>
                     <label class="layer-toggle">
-                        <input type="checkbox" id="layer-grid">
-                        Hochspannungsnetz (APG)
-                    </label>
-                    <label class="layer-toggle">
                         <input type="checkbox" id="layer-transmission">
-                        Hochspannungsleitungen (AC)
+                        Hochspannungssegmente
                     </label>
                 </div>
             </div>
@@ -632,8 +628,8 @@
                 <p style="margin-bottom: 10px;"><strong>Bezirksgrenzen:</strong><br>
                 <a href="https://www.data.gv.at" target="_blank" style="color: #4a9eff;">data.gv.at</a> – Open Government Data Austria</p>
                 
-                <p style="margin-bottom: 10px;"><strong>Hindernisbefeuerung:</strong><br>
-                <a href="https://sdimd-free.austrocontrol.at/" target="_blank" style="color: #4a9eff;">Austro Control</a> – Hindernisdatenbank Österreich</p>
+                <p style="margin-bottom: 10px;"><strong>Hindernisbefeuerung & Hochspannungsleitungen:</strong><br>
+                <a href="https://sdimd-free.austrocontrol.at/" target="_blank" style="color: #4a9eff;">Austro Control</a> – Hindernisdatenbank Österreich (Luftfahrthindernisse)</p>
             </div>
             
             <h2 style="color: #00d4aa; margin: 20px 0 15px 0;"><i class="fas fa-cogs"></i> Methodik</h2>
@@ -663,9 +659,6 @@
         }).addTo(map);
         
         // Create custom panes for layer ordering
-        map.createPane('gridPane');
-        map.getPane('gridPane').style.zIndex = 350;
-        
         map.createPane('heatmapPane');
         map.getPane('heatmapPane').style.zIndex = 400;
         
@@ -676,7 +669,6 @@
         map.getPane('transformerPane').style.zIndex = 500;
         
         // Layer groups
-        const gridLayer = L.layerGroup();
         const heatmapLayer = L.layerGroup().addTo(map);
         const windparksLayer = L.layerGroup().addTo(map);
         const transformersLayer = L.layerGroup();
@@ -1374,19 +1366,6 @@
             });
         }
         
-        // Add power grid overlay using styled SVG
-        function loadGridOverlay() {
-            // Bounds calibrated to align the APG grid map with the base map
-            const bounds = [[46.15, 9.2], [49.15, 17.45]];
-            const imageOverlay = L.imageOverlay('/static/power_grid_styled.svg', bounds, {
-                opacity: 0.9,
-                interactive: false,
-                className: 'power-grid-overlay',
-                pane: 'gridPane'
-            });
-            imageOverlay.addTo(gridLayer);
-        }
-        
         // Layer toggle handlers
         document.getElementById('layer-heatmap').addEventListener('change', function() {
             if (this.checked) {
@@ -1412,14 +1391,6 @@
             }
         });
         
-        document.getElementById('layer-grid').addEventListener('change', function() {
-            if (this.checked) {
-                map.addLayer(gridLayer);
-            } else {
-                map.removeLayer(gridLayer);
-            }
-        });
-        
         document.getElementById('layer-transmission').addEventListener('change', function() {
             const legend = document.querySelector('.transmission-legend');
             if (this.checked) {
@@ -1440,7 +1411,6 @@
                 loadProduction(),
                 loadTransmissionLines()
             ]);
-            loadGridOverlay();
         }
         
         init();
