@@ -3,9 +3,13 @@
 ## Data Enhancements (Future Work)
 
 ### Hydropower Integration
-- [ ] Add hydropower plants from https://oesterreichsenergie.at/kraftwerkskarte
-- [ ] Include pumped storage facilities
+- [x] Add hydropower plants (156 plants, 13.5 GW total)
+  - Source: Austria Groundwater App (groundwater-at.exe.xyz)
+  - 86× Laufkraftwerk (run-of-river)
+  - 50× Speicherkraftwerk (reservoir)
+  - 20× Pumpspeicherkraftwerk (pumped storage)
 - [ ] Show connection to transmission grid
+- [ ] Add more plants from https://oesterreichsenergie.at/kraftwerkskarte
 
 ### Additional Data Sources
 - [ ] **ENTSO-E**: Import cross-border flows and grid loading data
