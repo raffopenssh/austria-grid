@@ -1390,6 +1390,25 @@
             });
             
             console.log(`Loaded ${plants.length} hydropower plants`);
+            
+            // Also load hydropower-grid connections
+            const connResponse = await fetch('/api/hydro-connections');
+            const connData = await connResponse.json();
+            const gridConns = connData.features || [];
+            
+            gridConns.forEach(conn => {
+                const props = conn.properties;
+                const line = L.geoJSON(conn, {
+                    style: {
+                        color: '#00bcd4',
+                        weight: 1,
+                        opacity: 0.4,
+                        dashArray: '3, 6'
+                    }
+                });
+                line.addTo(hydropowerLayer);
+            });
+            console.log(`Added ${gridConns.length} hydropower-grid connections`);
         }
         
         // Load cross-border interconnections

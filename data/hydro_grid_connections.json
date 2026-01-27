@@ -1,0 +1,745 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "description": "Inferred connections from large hydropower plants to 380kV grid",
+    "note": "These are approximate/inferred, not actual grid connections"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 172.0,
+        "plant_type": "Laufkraftwerk",
+        "plant_region": "Wien",
+        "distance_km": 6.8,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            16.4813,
+            48.17744
+          ],
+          [
+            16.4247834,
+            48.1543786
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 328.0,
+        "plant_type": "Laufkraftwerk",
+        "plant_region": "Nieder\u00f6sterreich",
+        "distance_km": 0.9,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            15.85644,
+            48.37589
+          ],
+          [
+            15.8617667,
+            48.3697805
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 293.0,
+        "plant_type": "Laufkraftwerk",
+        "plant_region": "Nieder\u00f6sterreich",
+        "distance_km": 9.4,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            16.24316,
+            48.35518
+          ],
+          [
+            16.2356856,
+            48.4397341
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 187.0,
+        "plant_type": "Laufkraftwerk",
+        "plant_region": "Nieder\u00f6sterreich",
+        "distance_km": 10.4,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            15.30451,
+            48.22293
+          ],
+          [
+            15.3073532,
+            48.1289107
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 245.5,
+        "plant_type": "Laufkraftwerk",
+        "plant_region": "Nieder\u00f6sterreich",
+        "distance_km": 4.3,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            15.06957,
+            48.18966
+          ],
+          [
+            15.0725462,
+            48.1507969
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 132.0,
+        "plant_type": "Laufkraftwerk",
+        "plant_region": "Ober\u00f6sterreich",
+        "distance_km": 34.5,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.71131,
+            48.51815
+          ],
+          [
+            13.6130076,
+            48.223079
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 287.4,
+        "plant_type": "Laufkraftwerk",
+        "plant_region": "Ober\u00f6sterreich",
+        "distance_km": 32.5,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.0229,
+            48.38564
+          ],
+          [
+            13.9628468,
+            48.0986598
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 179.0,
+        "plant_type": "Laufkraftwerk",
+        "plant_region": "Ober\u00f6sterreich",
+        "distance_km": 24.0,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.14929,
+            48.31861
+          ],
+          [
+            14.1481121,
+            48.1021691
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 168.0,
+        "plant_type": "Laufkraftwerk",
+        "plant_region": "Ober\u00f6sterreich",
+        "distance_km": 14.7,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.43222,
+            48.24909
+          ],
+          [
+            14.4738279,
+            48.1234549
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 210.0,
+        "plant_type": "Laufkraftwerk",
+        "plant_region": "Ober\u00f6sterreich",
+        "distance_km": 3.9,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.69607,
+            48.16669
+          ],
+          [
+            14.6946421,
+            48.1317624
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 100.0,
+        "plant_type": "Laufkraftwerk",
+        "plant_region": "Ober\u00f6sterreich",
+        "distance_km": 8.0,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.00912,
+            48.24424
+          ],
+          [
+            13.0802841,
+            48.2569232
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 114.0,
+        "plant_type": "Pumpspeicherkraftwerk",
+        "plant_region": "K\u00e4rnten",
+        "distance_km": 36.2,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.09066,
+            46.9858
+          ],
+          [
+            12.8062848,
+            46.8260266
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 100.0,
+        "plant_type": "Speicherkraftwerk",
+        "plant_region": "K\u00e4rnten",
+        "distance_km": 35.8,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.11018,
+            46.93387
+          ],
+          [
+            12.8062848,
+            46.8260266
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 120.0,
+        "plant_type": "Pumpspeicherkraftwerk",
+        "plant_region": "K\u00e4rnten",
+        "distance_km": 38.2,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.35304,
+            47.06599
+          ],
+          [
+            13.2109339,
+            47.3793953
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 120.0,
+        "plant_type": "Speicherkraftwerk",
+        "plant_region": "Salzburg",
+        "distance_km": 4.4,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.13916,
+            47.31492
+          ],
+          [
+            13.1332003,
+            47.3541942
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 260.0,
+        "plant_type": "Speicherkraftwerk",
+        "plant_region": "Salzburg",
+        "distance_km": 0.2,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            12.73908,
+            47.2598
+          ],
+          [
+            12.7406927,
+            47.2597119
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 592.8,
+        "plant_type": "Pumpspeicherkraftwerk",
+        "plant_region": "Salzburg",
+        "distance_km": 0.4,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            12.71929,
+            47.19698
+          ],
+          [
+            12.7222334,
+            47.1990774
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 104.0,
+        "plant_type": "Pumpspeicherkraftwerk",
+        "plant_region": "Salzburg",
+        "distance_km": 41.8,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.47145,
+            47.10803
+          ],
+          [
+            13.2109339,
+            47.3793953
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 355.0,
+        "plant_type": "Speicherkraftwerk",
+        "plant_region": "Tirol",
+        "distance_km": 9.9,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.85007,
+            47.15806
+          ],
+          [
+            11.8975448,
+            47.2339073
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 360.0,
+        "plant_type": "Pumpspeicherkraftwerk",
+        "plant_region": "Tirol",
+        "distance_km": 7.4,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.96708,
+            47.14629
+          ],
+          [
+            11.9761615,
+            47.2121562
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 231.0,
+        "plant_type": "Pumpspeicherkraftwerk",
+        "plant_region": "Tirol",
+        "distance_km": 21.3,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.77375,
+            47.08678
+          ],
+          [
+            11.8975448,
+            47.2339073
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 289.0,
+        "plant_type": "Pumpspeicherkraftwerk",
+        "plant_region": "Tirol",
+        "distance_km": 14.3,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.00601,
+            47.2073
+          ],
+          [
+            10.8903957,
+            47.263667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 500.0,
+        "plant_type": "Speicherkraftwerk",
+        "plant_region": "Tirol",
+        "distance_km": 7.0,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            10.968,
+            47.2694
+          ],
+          [
+            10.9098075,
+            47.2939207
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 392.0,
+        "plant_type": "Speicherkraftwerk",
+        "plant_region": "Tirol",
+        "distance_km": 0.3,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            10.66503,
+            47.06756
+          ],
+          [
+            10.6680407,
+            47.0673176
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 380.0,
+        "plant_type": "Pumpspeicherkraftwerk",
+        "plant_region": "Vorarlberg",
+        "distance_km": 21.3,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            10.06077,
+            46.93491
+          ],
+          [
+            10.0703562,
+            47.126363
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 157.0,
+        "plant_type": "Speicherkraftwerk",
+        "plant_region": "Vorarlberg",
+        "distance_km": 17.5,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            10.05596,
+            46.96918
+          ],
+          [
+            10.0165002,
+            47.121943
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 288.0,
+        "plant_type": "Speicherkraftwerk",
+        "plant_region": "Vorarlberg",
+        "distance_km": 17.3,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            10.05729,
+            46.97103
+          ],
+          [
+            10.0703562,
+            47.126363
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 525.0,
+        "plant_type": "Pumpspeicherkraftwerk",
+        "plant_region": "Vorarlberg",
+        "distance_km": 16.5,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            10.04324,
+            46.97547
+          ],
+          [
+            10.0165002,
+            47.121943
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 260.0,
+        "plant_type": "Pumpspeicherkraftwerk",
+        "plant_region": "Vorarlberg",
+        "distance_km": 7.6,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            9.87425,
+            47.0739
+          ],
+          [
+            9.8644772,
+            47.1414248
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 198.0,
+        "plant_type": "Speicherkraftwerk",
+        "plant_region": "Vorarlberg",
+        "distance_km": 6.4,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            9.88143,
+            47.08514
+          ],
+          [
+            9.8810785,
+            47.1426723
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 295.0,
+        "plant_type": "Pumpspeicherkraftwerk",
+        "plant_region": "Vorarlberg",
+        "distance_km": 6.4,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            9.87487,
+            47.08435
+          ],
+          [
+            9.8687568,
+            47.1420225
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "plant_mw": 200.2,
+        "plant_type": "Speicherkraftwerk",
+        "plant_region": "Tirol",
+        "distance_km": 0.1,
+        "connection_type": "inferred"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.8991,
+            47.23361
+          ],
+          [
+            11.8984401,
+            47.2338549
+          ]
+        ]
+      }
+    }
+  ]
+}
