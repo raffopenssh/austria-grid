@@ -8,16 +8,17 @@
   - 86× Laufkraftwerk (run-of-river)
   - 50× Speicherkraftwerk (reservoir)
   - 20× Pumpspeicherkraftwerk (pumped storage)
-- [ ] Show connection to transmission grid
+- [x] Show connection to transmission grid (32 inferred connections for plants >100 MW)
 - [ ] Add more plants from https://oesterreichsenergie.at/kraftwerkskarte
 
 ### Additional Data Sources
-- [ ] **ENTSO-E**: Import cross-border flows and grid loading data
+- [x] **Cross-border interconnections**: 9 connections to DE, CZ, HU, SK, SI, IT, CH, LI
+- [x] **E-Control Statistics**: Grid lengths by voltage level (2024)
+  - 380kV: 3,161 km, 220kV: 3,618 km, 110kV: 11,693 km
+- [ ] **ENTSO-E**: Import cross-border flows and grid loading data (needs API key)
   - https://transparency.entsoe.eu
-- [ ] **Open Power System Data**: European generation data
+- [ ] **Open Power System Data**: European generation data (Austria not available)
   - https://open-power-system-data.org
-- [ ] **E-Control Statistics**: Detailed grid statistics
-  - https://www.e-control.at/statistik/e-statistik/data
 - [ ] **ÖNIP (National Infrastructure Plan)**: Planned grid expansions
   - https://www.bmwet.gv.at/dam/jcr:f67c2aa8-4019-4e7b-94ae-e1c847911a05/Integrierter-oesterreichischer-Netzinfrastrukturplan.pdf
 
