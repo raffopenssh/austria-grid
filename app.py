@@ -68,6 +68,12 @@ def osm_substations():
     data = load_json('osm_substations.json')
     return jsonify(data)
 
+@app.route('/api/hydropower')
+def hydropower():
+    """Hydropower plants in Austria"""
+    data = load_json('hydropower_plants.json')
+    return jsonify(data)
+
 @app.route('/api/district-capacity')
 def district_capacity():
     """Calculate capacity analysis for each district using proper point-in-polygon"""

@@ -559,6 +559,10 @@
                         <input type="checkbox" id="layer-transmission">
                         Hochspannungsleitungen
                     </label>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-hydropower">
+                        Wasserkraftwerke
+                    </label>
                 </div>
             </div>
         </div>
@@ -608,6 +612,22 @@
                         </div>
                     </div>
                 </div>
+                <div class="legend-item hydropower-legend" style="display: none;">
+                    <div style="display: flex; flex-direction: column; gap: 3px; margin-right: 8px;">
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <div style="width: 12px; height: 12px; background: #00bcd4; border-radius: 50%;"></div>
+                            <span style="font-size: 0.65rem; color: #888;">Laufkraftwerk</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <div style="width: 12px; height: 12px; background: #2196f3; border-radius: 50%;"></div>
+                            <span style="font-size: 0.65rem; color: #888;">Speicher</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <div style="width: 12px; height: 12px; background: #9c27b0; border-radius: 50%;"></div>
+                            <span style="font-size: 0.65rem; color: #888;">Pumpspeicher</span>
+                        </div>
+                    </div>
+                </div>
                 <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #333; font-size: 0.7rem;">
                     <a href="#" onclick="showSourcesModal(); return false;" style="color: #666; text-decoration: none;">
                         <i class="fas fa-info-circle"></i> Quellen & Methodik
@@ -642,6 +662,10 @@
                 
                 <p style="margin-bottom: 10px;"><strong>Hochspannungs-Umspannwerke (220/380 kV):</strong><br>
                 <a href="https://www.openstreetmap.org" target="_blank" style="color: #4a9eff;">OpenStreetMap</a> – 85 Umspannwerke via Overpass API (ODbL)</p>
+                
+                <p style="margin-bottom: 10px;"><strong>Wasserkraftwerke:</strong><br>
+                <a href="https://groundwater-at.exe.xyz" target="_blank" style="color: #4a9eff;">Austria Groundwater App</a> – 156 Kraftwerke (13.5 GW)<br>
+                <span style="color: #888;">86× Laufkraftwerk, 50× Speicher, 20× Pumpspeicher</span></p>
                 
                 <p style="margin-bottom: 10px;"><strong>Erzeugungsdaten:</strong><br>
                 <a href="https://www.apg.at/de/markt/Markttransparenz" target="_blank" style="color: #4a9eff;">APG Markttransparenz</a> – Windstromerzeugung 2024</p>
@@ -723,6 +747,7 @@
         const windparksLayer = L.layerGroup().addTo(map);
         const transformersLayer = L.layerGroup();
         const transmissionLayer = L.layerGroup();
+        const hydropowerLayer = L.layerGroup();
         
         // Create pane for transmission lines (below turbines but above heatmap)
         map.createPane('transmissionPane');
@@ -1287,6 +1312,58 @@
             console.log(`Loaded ${transmissionLinesData.length} transmission lines from OSM (${count380}× 380kV, ${count220}× 220kV)`);
         }
         
+        // Load hydropower plants
+        async function loadHydropower() {
+            const response = await fetch('/api/hydropower');
+            const data = await response.json();
+            const plants = data.features || [];
+            
+            function getPlantColor(type) {
+                if (type === 'Laufkraftwerk') return '#00bcd4';  // Cyan for run-of-river
+                if (type === 'Speicherkraftwerk') return '#2196f3';  // Blue for reservoir
+                if (type === 'Pumpspeicherkraftwerk') return '#9c27b0';  // Purple for pumped storage
+                return '#607d8b';  // Gray default
+            }
+            
+            function getPlantRadius(mw) {
+                // Scale radius by capacity
+                if (mw >= 500) return 12;
+                if (mw >= 100) return 9;
+                if (mw >= 50) return 7;
+                if (mw >= 10) return 5;
+                return 4;
+            }
+            
+            plants.forEach(plant => {
+                const props = plant.properties;
+                const coords = plant.geometry.coordinates;
+                const color = getPlantColor(props.type);
+                const radius = getPlantRadius(props.mw || 0);
+                
+                const marker = L.circleMarker([coords[1], coords[0]], {
+                    radius: radius,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 1,
+                    opacity: 0.9,
+                    fillOpacity: 0.8
+                });
+                
+                marker.bindTooltip(`
+                    <div class="tooltip-custom">
+                        <div class="title" style="color: ${color};">${props.type}</div>
+                        <div><strong>${props.mw ? props.mw.toFixed(1) : '?'} MW</strong></div>
+                        <div>Fluss: ${props.river || 'k.A.'}</div>
+                        <div>Region: ${props.region || 'k.A.'}</div>
+                    </div>
+                `, { className: 'tooltip-custom' });
+                
+                marker.addTo(hydropowerLayer);
+            });
+            
+            console.log(`Loaded ${plants.length} hydropower plants`);
+        }
+        
         // Show modal for transformer station
         function showTransformerModal(t) {
             const available = parseFloat(t.availableCapacity) || 0;
@@ -1473,6 +1550,17 @@
             }
         });
         
+        document.getElementById('layer-hydropower').addEventListener('change', function() {
+            const legend = document.querySelector('.hydropower-legend');
+            if (this.checked) {
+                map.addLayer(hydropowerLayer);
+                if (legend) legend.style.display = 'flex';
+            } else {
+                map.removeLayer(hydropowerLayer);
+                if (legend) legend.style.display = 'none';
+            }
+        });
+        
         // Initialize
         async function init() {
             await Promise.all([
@@ -1480,7 +1568,8 @@
                 loadTurbines(),
                 loadTransformers(),
                 loadProduction(),
-                loadTransmissionLines()
+                loadTransmissionLines(),
+                loadHydropower()
             ]);
         }
         

@@ -1,0 +1,2663 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "source": "Austria Groundwater App (groundwater-at.exe.xyz)",
+    "description": "Hydropower plants in Austria",
+    "count": 156,
+    "extracted": "2026-01-27"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 172.0,
+        "region": "Wien",
+        "river": "Donau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.4813,
+          48.17744
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 48.0,
+        "region": "Nieder\u00f6sterreich",
+        "river": "Kamp",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.33253,
+          48.59234
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 17.3,
+        "region": "Nieder\u00f6sterreich",
+        "river": "Kamp",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.47683,
+          48.60448
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 328.0,
+        "region": "Nieder\u00f6sterreich",
+        "river": "Donau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.85644,
+          48.37589
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 293.0,
+        "region": "Nieder\u00f6sterreich",
+        "river": "Donau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.24316,
+          48.35518
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 187.0,
+        "region": "Nieder\u00f6sterreich",
+        "river": "Donau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.30451,
+          48.22293
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 245.5,
+        "region": "Nieder\u00f6sterreich",
+        "river": "Donau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.06957,
+          48.18966
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 24.8,
+        "region": "Nieder\u00f6sterreich",
+        "river": "Enns",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.47481,
+          48.13127
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 43.2,
+        "region": "Nieder\u00f6sterreich",
+        "river": "Enns",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.46856,
+          48.09885
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 12.6,
+        "region": "Nieder\u00f6sterreich",
+        "river": "Ybbs",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.83022,
+          47.89066
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 86.4,
+        "region": "Ober\u00f6sterreich",
+        "river": "Inn",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.43469,
+          48.5534
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 132.0,
+        "region": "Ober\u00f6sterreich",
+        "river": "Donau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.71131,
+          48.51815
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 19.0,
+        "region": "Ober\u00f6sterreich",
+        "river": "Ranna",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.7513,
+          48.49004
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 33.8,
+        "region": "Ober\u00f6sterreich",
+        "river": "Gro\u00dfe M\u00fchl",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.98703,
+          48.43355
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 287.4,
+        "region": "Ober\u00f6sterreich",
+        "river": "Donau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.0229,
+          48.38564
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 179.0,
+        "region": "Ober\u00f6sterreich",
+        "river": "Donau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.14929,
+          48.31861
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 10.0,
+        "region": "Ober\u00f6sterreich",
+        "river": "Traun",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.31879,
+          48.24955
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 168.0,
+        "region": "Ober\u00f6sterreich",
+        "river": "Donau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.43222,
+          48.24909
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 51.9,
+        "region": "Nieder\u00f6sterreich",
+        "river": "Donau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.53084,
+          48.22476
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 210.0,
+        "region": "Ober\u00f6sterreich",
+        "river": "Donau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.69607,
+          48.16669
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 38.3,
+        "region": "Ober\u00f6sterreich",
+        "river": "Enns",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.41208,
+          48.01774
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 34.0,
+        "region": "Ober\u00f6sterreich",
+        "river": "Enns",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.37754,
+          47.9931
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 40.4,
+        "region": "Ober\u00f6sterreich",
+        "river": "Enns",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.35218,
+          47.94095
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 39.4,
+        "region": "Ober\u00f6sterreich",
+        "river": "Enns",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.43373,
+          47.92304
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 71.8,
+        "region": "Ober\u00f6sterreich",
+        "river": "Enns",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.51239,
+          47.89277
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 36.8,
+        "region": "Ober\u00f6sterreich",
+        "river": "Enns",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.63868,
+          47.8485
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 29.8,
+        "region": "Ober\u00f6sterreich",
+        "river": "Enns",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.64995,
+          47.77545
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 19.6,
+        "region": "Ober\u00f6sterreich",
+        "river": "Steyr",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.15752,
+          47.82842
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 13.3,
+        "region": "Ober\u00f6sterreich",
+        "river": "Gosaubach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.63239,
+          47.60822
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 12.2,
+        "region": "Ober\u00f6sterreich",
+        "river": "Traun",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.7969,
+          47.93301
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 13.9,
+        "region": "Ober\u00f6sterreich",
+        "river": "Traun",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.88626,
+          48.08925
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 100.0,
+        "region": "Ober\u00f6sterreich",
+        "river": "Inn",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.00912,
+          48.24424
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 72.5,
+        "region": "Ober\u00f6sterreich",
+        "river": "Inn",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.15914,
+          48.29118
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 84.0,
+        "region": "Ober\u00f6sterreich",
+        "river": "Inn",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.31844,
+          48.32003
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 96.0,
+        "region": "Ober\u00f6sterreich",
+        "river": "Inn",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.44,
+          48.4354
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 45.8,
+        "region": "Ober\u00f6sterreich",
+        "river": "Traun",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.22353,
+          48.20574
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 42.8,
+        "region": "Ober\u00f6sterreich",
+        "river": "Traun",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.09958,
+          48.17242
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 9.68,
+        "region": "Ober\u00f6sterreich",
+        "river": "Traun",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.98606,
+          48.13657
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 61.0,
+        "region": "Steiermark",
+        "river": "S\u00f6lkbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.94862,
+          47.43422
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 27.0,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.06599,
+          47.10762
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 21.9,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.71169,
+          47.17894
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 16.2,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.21544,
+          47.41026
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 25.5,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.33449,
+          47.36497
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 18.0,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.31966,
+          47.2916
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 13.9,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.30964,
+          47.2508
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 13.2,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.33592,
+          47.20958
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 12.0,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.33734,
+          47.18615
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 17.7,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.39196,
+          47.10892
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 18.8,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.46796,
+          46.99786
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 18.5,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.50423,
+          46.94349
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 15.6,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.48588,
+          46.9117
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 20.2,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.53777,
+          46.85758
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 15.7,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.56619,
+          46.82812
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 14.5,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.58706,
+          46.78917
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 13.0,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.57177,
+          46.74585
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 13.0,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.62098,
+          46.71623
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 30.0,
+        "region": "Steiermark",
+        "river": "Teigitsch",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.16018,
+          47.0184
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 63.0,
+        "region": "Steiermark",
+        "river": "Erzbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.74326,
+          47.60743
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 25.0,
+        "region": "Steiermark",
+        "river": "Enns",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.72531,
+          47.67014
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 31.1,
+        "region": "Steiermark",
+        "river": "Enns",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.68939,
+          47.70347
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 25.7,
+        "region": "Steiermark",
+        "river": "Enns",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.67208,
+          47.71977
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 17.7,
+        "region": "Steiermark",
+        "river": "Mur",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.44273,
+          47.03993
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 32.0,
+        "region": "K\u00e4rnten",
+        "river": "-",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.95723,
+          46.99546
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 68.0,
+        "region": "K\u00e4rnten",
+        "river": "-",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.0521,
+          46.97712
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 18.0,
+        "region": "K\u00e4rnten",
+        "river": "-",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.07163,
+          46.86738
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 114.0,
+        "region": "K\u00e4rnten",
+        "river": "-",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.09066,
+          46.9858
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 140.0,
+        "region": "K\u00e4rnten",
+        "river": "-",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.74982,
+          46.774
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 100.0,
+        "region": "K\u00e4rnten",
+        "river": "-",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.11018,
+          46.93387
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 14.9,
+        "region": "K\u00e4rnten",
+        "river": "M\u00f6ll",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.19174,
+          46.93702
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 430.0,
+        "region": "K\u00e4rnten",
+        "river": "M\u00f6ll",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.3109,
+          46.87294
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 730.0,
+        "region": "K\u00e4rnten",
+        "river": "M\u00f6ll",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.32901,
+          46.87008
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 41.0,
+        "region": "K\u00e4rnten",
+        "river": "Drau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.36014,
+          46.83323
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 10.0,
+        "region": "K\u00e4rnten",
+        "river": "Wei\u00dfenbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.59291,
+          46.73977
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 23.5,
+        "region": "K\u00e4rnten",
+        "river": "Drau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.64474,
+          46.72083
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 24.6,
+        "region": "K\u00e4rnten",
+        "river": "Drau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.72596,
+          46.67034
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 24.6,
+        "region": "K\u00e4rnten",
+        "river": "Drau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.82918,
+          46.63282
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 80.0,
+        "region": "K\u00e4rnten",
+        "river": "Drau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.99274,
+          46.58635
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 88.0,
+        "region": "K\u00e4rnten",
+        "river": "Drau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.17108,
+          46.53477
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 75.0,
+        "region": "K\u00e4rnten",
+        "river": "Drau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.29897,
+          46.54668
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 90.0,
+        "region": "K\u00e4rnten",
+        "river": "Drau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.47977,
+          46.56162
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 17.0,
+        "region": "K\u00e4rnten",
+        "river": "Freibach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.45539,
+          46.5248
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 87.0,
+        "region": "K\u00e4rnten",
+        "river": "Drau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.70109,
+          46.62913
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 79.0,
+        "region": "K\u00e4rnten",
+        "river": "Drau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.87249,
+          46.65807
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 28.0,
+        "region": "K\u00e4rnten",
+        "river": "Drau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.93675,
+          46.64351
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 55.0,
+        "region": "K\u00e4rnten",
+        "river": "Feistrttzbach/Krumbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.95605,
+          46.63367
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 120.0,
+        "region": "K\u00e4rnten",
+        "river": "Malta",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.35304,
+          47.06599
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 12.4,
+        "region": "K\u00e4rnten",
+        "river": "Gail",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.75879,
+          46.55994
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 14.7,
+        "region": "Salzburg",
+        "river": "Salzach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.03385,
+          47.82021
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 22.0,
+        "region": "Salzburg",
+        "river": "Salzach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.08265,
+          47.73327
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 15.0,
+        "region": "Salzburg",
+        "river": "Almbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.20917,
+          47.77393
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 28.0,
+        "region": "Salzburg",
+        "river": "Almbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.15311,
+          47.73491
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 11.7,
+        "region": "Salzburg",
+        "river": "Salzach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.10897,
+          47.67272
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 16.0,
+        "region": "Salzburg",
+        "river": "Salzach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.1939,
+          47.47061
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 17.7,
+        "region": "Salzburg",
+        "river": "Salzach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.21025,
+          47.44119
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 16.0,
+        "region": "Salzburg",
+        "river": "Salzach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.22026,
+          47.4067
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 16.5,
+        "region": "Salzburg",
+        "river": "Salzach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.20962,
+          47.37468
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 16.4,
+        "region": "Salzburg",
+        "river": "Wagrainer Bach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.20699,
+          47.34224
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 11.25,
+        "region": "Salzburg",
+        "river": "Gro\u00dfarlbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.18515,
+          47.32081
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 16.5,
+        "region": "Salzburg",
+        "river": "Salzach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.19734,
+          47.33857
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 16.5,
+        "region": "Salzburg",
+        "river": "Salzach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.17445,
+          47.32158
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 120.0,
+        "region": "Salzburg",
+        "river": "Salzach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.13916,
+          47.31492
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 13.0,
+        "region": "Salzburg",
+        "river": "Salzach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.14101,
+          47.31614
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 66.0,
+        "region": "Salzburg",
+        "river": "Stubache",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.56653,
+          47.26107
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 23.5,
+        "region": "Salzburg",
+        "river": "Krimmler Ache",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.23018,
+          47.24384
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 35.5,
+        "region": "Salzburg",
+        "river": "Stubache",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.60856,
+          47.19785
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 80.0,
+        "region": "Salzburg",
+        "river": "Stubache",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.62663,
+          47.17087
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 260.0,
+        "region": "Salzburg",
+        "river": "Kapruner Ache",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.73908,
+          47.2598
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 14.96,
+        "region": "Salzburg",
+        "river": "Fuscher Ache",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.817,
+          47.17533
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 592.8,
+        "region": "Salzburg",
+        "river": "Kapruner Ache",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.71929,
+          47.19698
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 30.9,
+        "region": "Salzburg",
+        "river": "Nassfelder Ache",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.12708,
+          47.13596
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 44.5,
+        "region": "Salzburg",
+        "river": "Nassfelder Ache",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.11452,
+          47.08658
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 31.5,
+        "region": "Salzburg",
+        "river": "Bockhartsee",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.06207,
+          47.06661
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 104.0,
+        "region": "Salzburg",
+        "river": "Rotg\u00fcldensee",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.47145,
+          47.10803
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 24.0,
+        "region": "Salzburg",
+        "river": "Die\u00dfbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.81812,
+          47.49099
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 60.0,
+        "region": "Tirol",
+        "river": "Drau",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.74935,
+          46.80127
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 11.7,
+        "region": "Tirol",
+        "river": "Kalserbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.60116,
+          46.92303
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 48.0,
+        "region": "Tirol",
+        "river": "Inn",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.13452,
+          47.74461
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 60.0,
+        "region": "Tirol",
+        "river": "Inn",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.20011,
+          47.64161
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 31.5,
+        "region": "Tirol",
+        "river": "Inn",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.13873,
+          47.56024
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 37.9,
+        "region": "Tirol",
+        "river": "Inn",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.0879,
+          47.51606
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 79.0,
+        "region": "Tirol",
+        "river": "Achensee",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.75679,
+          47.38939
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 355.0,
+        "region": "Tirol",
+        "river": "Stilluppbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.85007,
+          47.15806
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 360.0,
+        "region": "Tirol",
+        "river": "Ziller",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.96708,
+          47.14629
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 6.1,
+        "region": "Tirol",
+        "river": "Zemmbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.83246,
+          47.15159
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 231.0,
+        "region": "Tirol",
+        "river": "Zemmbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.77375,
+          47.08678
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 15.4,
+        "region": "Tirol",
+        "river": "Ruetz",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.35865,
+          47.15847
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 18.0,
+        "region": "Tirol",
+        "river": "Sill",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.39962,
+          47.20214
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 28.0,
+        "region": "Tirol",
+        "river": "Sill",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.40522,
+          47.25064
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 289.0,
+        "region": "Tirol",
+        "river": "-",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.00601,
+          47.2073
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 500.0,
+        "region": "Tirol",
+        "river": "Inn",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.968,
+          47.2694
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 89.0,
+        "region": "Tirol",
+        "river": "Inn",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.72132,
+          47.21211
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 392.0,
+        "region": "Tirol",
+        "river": "Fagge",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.66503,
+          47.06756
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 13.5,
+        "region": "Tirol",
+        "river": "Rosanna",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.47305,
+          47.12094
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 17.8,
+        "region": "Tirol",
+        "river": "Archbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.74628,
+          47.49513
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 12.3,
+        "region": "Tirol",
+        "river": "Lech",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.68092,
+          47.55322
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 36.0,
+        "region": "Vorarlberg",
+        "river": "Ill",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.0536,
+          46.92696
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 380.0,
+        "region": "Vorarlberg",
+        "river": "Ill",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.06077,
+          46.93491
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 157.0,
+        "region": "Vorarlberg",
+        "river": "Ill",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.05596,
+          46.96918
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 288.0,
+        "region": "Vorarlberg",
+        "river": "Ill",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.05729,
+          46.97103
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 525.0,
+        "region": "Vorarlberg",
+        "river": "Ill",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.04324,
+          46.97547
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 12.0,
+        "region": "Vorarlberg",
+        "river": "Ill",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.91578,
+          47.06647
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 260.0,
+        "region": "Vorarlberg",
+        "river": "Ill",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.87425,
+          47.0739
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 198.0,
+        "region": "Vorarlberg",
+        "river": "Ill",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.88143,
+          47.08514
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 295.0,
+        "region": "Vorarlberg",
+        "river": "Ill",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.87487,
+          47.08435
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 16.0,
+        "region": "Vorarlberg",
+        "river": "Alfenz",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.06392,
+          47.12905
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 36.0,
+        "region": "Vorarlberg",
+        "river": "Alfenz",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.05451,
+          47.13296
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 25.5,
+        "region": "Vorarlberg",
+        "river": "Alfenz",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.94616,
+          47.13386
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 86.0,
+        "region": "Vorarlberg",
+        "river": "Ill",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.66966,
+          47.19886
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 19.0,
+        "region": "Vorarlberg",
+        "river": "Lutz",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.78836,
+          47.2048
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 15.0,
+        "region": "Vorarlberg",
+        "river": "Bregenzerach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.87701,
+          47.40315
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 74.0,
+        "region": "Vorarlberg",
+        "river": "Bregenzerach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.86418,
+          47.47017
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 30.0,
+        "region": "Vorarlberg",
+        "river": "Bregenzerach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.85982,
+          47.47041
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Pumpspeicherkraftwerk",
+        "mw": 12.0,
+        "region": "Vorarlberg",
+        "river": "Rellsbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.8022,
+          47.07672
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 200.2,
+        "region": "Tirol",
+        "river": "Gerlosbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.8991,
+          47.23361
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Speicherkraftwerk",
+        "mw": 25.0,
+        "region": "Tirol",
+        "river": "Gerlosbach",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.05805,
+          47.23551
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "Laufkraftwerk",
+        "mw": 89.0,
+        "region": "Tirol",
+        "river": "Inn",
+        "source": "Austria Groundwater App"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.66075,
+          47.06233
+        ]
+      }
+    }
+  ]
+}
