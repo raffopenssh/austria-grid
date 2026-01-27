@@ -86,6 +86,12 @@ def hydro_connections():
     data = load_json('hydro_grid_connections.json')
     return jsonify(data)
 
+@app.route('/api/onip-powerlines')
+def onip_powerlines():
+    """ÖNIP Basisnetz 2030 power line points (extracted from planning map)"""
+    data = load_json('onip_powerlines_points.json')
+    return jsonify(data)
+
 @app.route('/api/district-capacity')
 def district_capacity():
     """Calculate capacity analysis for each district using proper point-in-polygon"""

@@ -590,6 +590,10 @@
                         <input type="checkbox" id="layer-crossborder">
                         Grenzübergänge
                     </label>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-onip">
+                        ÖNIP 2030 (Vergleich)
+                    </label>
                 </div>
             </div>
         </div>
@@ -776,6 +780,7 @@
         const transmissionLayer = L.layerGroup();
         const hydropowerLayer = L.layerGroup();
         const crossBorderLayer = L.layerGroup();
+        const onipLayer = L.layerGroup();
         
         // Create pane for transmission lines (below turbines but above heatmap)
         map.createPane('transmissionPane');
@@ -1444,6 +1449,33 @@
             console.log(`Loaded ${connections.length} cross-border connections`);
         }
         
+        // Load ÖNIP 2030 power line points for comparison
+        async function loadOnipPowerlines() {
+            const response = await fetch('/api/onip-powerlines');
+            const data = await response.json();
+            const points = data.features || [];
+            
+            points.forEach(point => {
+                const coords = point.geometry.coordinates;
+                const voltage = point.properties.voltage;
+                const color = voltage === 380 ? '#ffeb3b' : '#8bc34a';  // Yellow for 380, light green for 220
+                
+                const marker = L.circleMarker([coords[1], coords[0]], {
+                    radius: 2,
+                    fillColor: color,
+                    color: color,
+                    weight: 1,
+                    opacity: 0.6,
+                    fillOpacity: 0.4
+                });
+                marker.addTo(onipLayer);
+            });
+            
+            const count380 = points.filter(p => p.properties.voltage === 380).length;
+            const count220 = points.filter(p => p.properties.voltage === 220).length;
+            console.log(`Loaded ÖNIP points: ${count380}× 380kV, ${count220}× 220kV`);
+        }
+        
         // Show modal for transformer station
         function showTransformerModal(t) {
             const available = parseFloat(t.availableCapacity) || 0;
@@ -1649,6 +1681,14 @@
             }
         });
         
+        document.getElementById('layer-onip').addEventListener('change', function() {
+            if (this.checked) {
+                map.addLayer(onipLayer);
+            } else {
+                map.removeLayer(onipLayer);
+            }
+        });
+        
         // Initialize
         async function init() {
             await Promise.all([
@@ -1658,7 +1698,8 @@
                 loadProduction(),
                 loadTransmissionLines(),
                 loadHydropower(),
-                loadCrossBorder()
+                loadCrossBorder(),
+                loadOnipPowerlines()
             ]);
         }
         
