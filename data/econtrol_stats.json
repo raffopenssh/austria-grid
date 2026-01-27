@@ -1,0 +1,30 @@
+{
+  "year": 2024,
+  "source": "E-Control Austria",
+  "url": "https://www.e-control.at/statistik/e-statistik/data",
+  "grid_system_length_km": {
+    "cable_110kv": 848.248,
+    "cable_220kv": 9.69,
+    "cable_380kv": 58.45,
+    "cable_medium_voltage": 48821.172,
+    "cable_low_voltage": 157627.944,
+    "overhead_110kv": 10844.722,
+    "overhead_220kv": 3607.853,
+    "overhead_380kv": 3102.832,
+    "overhead_medium_voltage": 21773.876,
+    "overhead_low_voltage": 26169.67,
+    "total": 272864.457
+  },
+  "summary": {
+    "total_grid_km": 272864.457,
+    "transmission_380kv_km": 3161.2819999999997,
+    "transmission_220kv_km": 3617.543,
+    "transmission_110kv_km": 11692.97,
+    "distribution_mv_km": 70595.048,
+    "distribution_lv_km": 183797.614
+  },
+  "generation_capacity_kw": {
+    "hydro_storage": 1341200.0,
+    "hydro_run_of_river": 635800.0
+  }
+}
