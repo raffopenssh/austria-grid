@@ -56,6 +56,18 @@ def transmission_lines():
     data = load_json('transmission_lines.json')
     return jsonify(data)
 
+@app.route('/api/osm-transmission-lines')
+def osm_transmission_lines():
+    """High voltage transmission lines (220kV, 380kV) from OpenStreetMap"""
+    data = load_json('osm_transmission_lines.json')
+    return jsonify(data)
+
+@app.route('/api/osm-substations')
+def osm_substations():
+    """High voltage substations (220kV, 380kV) from OpenStreetMap"""
+    data = load_json('osm_substations.json')
+    return jsonify(data)
+
 @app.route('/api/district-capacity')
 def district_capacity():
     """Calculate capacity analysis for each district using proper point-in-polygon"""

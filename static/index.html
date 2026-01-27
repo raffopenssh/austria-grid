@@ -597,12 +597,16 @@
                     Umspannwerk
                 </div>
                 <div class="legend-item transmission-legend" style="display: none;">
-                    <div style="display: flex; flex-direction: column; gap: 2px; margin-right: 8px;">
-                        <div style="width: 20px; height: 3px; background: #ff0066;"></div>
-                        <div style="width: 20px; height: 2px; background: #ff6600;"></div>
-                        <div style="width: 20px; height: 2px; background: #ffcc00; border-style: dashed;"></div>
+                    <div style="display: flex; flex-direction: column; gap: 3px; margin-right: 8px;">
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <div style="width: 20px; height: 3px; background: #ff0066;"></div>
+                            <span style="font-size: 0.65rem; color: #888;">380kV</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <div style="width: 20px; height: 2px; background: #4a9eff;"></div>
+                            <span style="font-size: 0.65rem; color: #888;">220kV</span>
+                        </div>
                     </div>
-                    <span style="font-size: 0.75rem;">380/220/110 kV</span>
                 </div>
                 <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #333; font-size: 0.7rem;">
                     <a href="#" onclick="showSourcesModal(); return false;" style="color: #666; text-decoration: none;">
@@ -619,7 +623,7 @@
     
     <!-- Sources Modal -->
     <div id="sources-modal" class="modal-overlay">
-        <div class="modal" style="max-width: 500px; padding: 20px;">
+        <div class="modal" style="max-width: 600px; padding: 20px; max-height: 90vh; overflow-y: auto;">
             <span class="modal-close" onclick="closeSourcesModal()">&times;</span>
             <h2 style="color: #00d4aa; margin-bottom: 15px;"><i class="fas fa-database"></i> Datenquellen</h2>
             <div style="font-size: 0.85rem; line-height: 1.6;">
@@ -627,10 +631,17 @@
                 <a href="https://www.igwindkraft.at" target="_blank" style="color: #4a9eff;">IG Windkraft</a> – Standortdaten österreichischer Windkraftanlagen</p>
                 
                 <p style="margin-bottom: 10px;"><strong>Netzkapazitäten:</strong><br>
-                <a href="https://www.e-control.at" target="_blank" style="color: #4a9eff;">E-Control Austria</a> – Einspeisekapazitäten der Netzbetreiber</p>
+                <a href="https://www.e-control.at/statistik/e-statistik/data" target="_blank" style="color: #4a9eff;">E-Control Austria</a> – Einspeisekapazitäten der Netzbetreiber und Stromstatistiken</p>
                 
-                <p style="margin-bottom: 10px;"><strong>Umspannwerke:</strong><br>
-                <a href="https://www.apg.at" target="_blank" style="color: #4a9eff;">APG (Austrian Power Grid)</a> – Transformatorstationen und Netzinfrastruktur</p>
+                <p style="margin-bottom: 10px;"><strong>Umspannwerke (Niederspannung):</strong><br>
+                <a href="https://www.apg.at" target="_blank" style="color: #4a9eff;">APG (Austrian Power Grid)</a> – Transformatorstationen aus Netzbetreiber-Daten</p>
+                
+                <p style="margin-bottom: 10px;"><strong>Hochspannungs-Übertragungsnetz (220/380 kV):</strong><br>
+                <a href="https://www.openstreetmap.org" target="_blank" style="color: #4a9eff;">OpenStreetMap</a> – 1.291 Leitungssegmente via Overpass API (ODbL)<br>
+                <span style="color: #888;">1.291 Segmente: 831× 220kV, 460× 380kV</span></p>
+                
+                <p style="margin-bottom: 10px;"><strong>Hochspannungs-Umspannwerke (220/380 kV):</strong><br>
+                <a href="https://www.openstreetmap.org" target="_blank" style="color: #4a9eff;">OpenStreetMap</a> – 85 Umspannwerke via Overpass API (ODbL)</p>
                 
                 <p style="margin-bottom: 10px;"><strong>Erzeugungsdaten:</strong><br>
                 <a href="https://www.apg.at/de/markt/Markttransparenz" target="_blank" style="color: #4a9eff;">APG Markttransparenz</a> – Windstromerzeugung 2024</p>
@@ -638,8 +649,23 @@
                 <p style="margin-bottom: 10px;"><strong>Bezirksgrenzen:</strong><br>
                 <a href="https://www.data.gv.at" target="_blank" style="color: #4a9eff;">data.gv.at</a> – Open Government Data Austria</p>
                 
-                <p style="margin-bottom: 10px;"><strong>Hindernisbefeuerung & Hochspannungsleitungen:</strong><br>
-                <a href="https://sdimd-free.austrocontrol.at/" target="_blank" style="color: #4a9eff;">Austro Control</a> – Hindernisdatenbank Österreich (Luftfahrthindernisse)</p>
+                <p style="margin-bottom: 10px;"><strong>Hindernisbefeuerung & Leitungen (ergänzend):</strong><br>
+                <a href="https://sdimd-free.austrocontrol.at/" target="_blank" style="color: #4a9eff;">Austro Control</a> – Hindernisdatenbank Österreich</p>
+            </div>
+            
+            <h2 style="color: #00d4aa; margin: 20px 0 15px 0;"><i class="fas fa-book"></i> Weiterführende Quellen</h2>
+            <div style="font-size: 0.85rem; line-height: 1.6; color: #aaa;">
+                <p style="margin-bottom: 10px;"><a href="https://www.bmwet.gv.at/dam/jcr:f67c2aa8-4019-4e7b-94ae-e1c847911a05/Integrierter-oesterreichischer-Netzinfrastrukturplan.pdf" target="_blank" style="color: #4a9eff;">Integrierter österreichischer Netzinfrastrukturplan (ÖNIP)</a><br>
+                <span style="color: #666;">BMWET – Strategische Netzplanung 2030</span></p>
+                
+                <p style="margin-bottom: 10px;"><a href="https://oesterreichsenergie.at/kraftwerkskarte" target="_blank" style="color: #4a9eff;">Kraftwerkskarte Österreich</a><br>
+                <span style="color: #666;">Oesterreichs Energie – inkl. Wasserkraftwerke</span></p>
+                
+                <p style="margin-bottom: 10px;"><a href="https://open-power-system-data.org" target="_blank" style="color: #4a9eff;">Open Power System Data</a><br>
+                <span style="color: #666;">Europäische Stromerzeugungsdaten</span></p>
+                
+                <p style="margin-bottom: 10px;"><a href="https://transparency.entsoe.eu" target="_blank" style="color: #4a9eff;">ENTSO-E Transparency Platform</a><br>
+                <span style="color: #666;">Europäischer Übertragungsnetzbetreiber</span></p>
             </div>
             
             <h2 style="color: #00d4aa; margin: 20px 0 15px 0;"><i class="fas fa-cogs"></i> Methodik</h2>
@@ -648,11 +674,25 @@
                 
                 <p style="margin-bottom: 10px;"><strong>Turbinenleistung:</strong> Die geschätzte Leistung (MW) basiert auf der Nabenhöhe und typischen Leistungskurven moderner Windkraftanlagen.</p>
                 
+                <p style="margin-bottom: 10px;"><strong>Übertragungsnetz:</strong> Die 220/380 kV Leitungen stammen aus OpenStreetMap (community-basiert). Die Daten sind nicht vollständig verifiziert – die tatsächliche Netzstruktur ist nur teilweise öffentlich dokumentiert.</p>
+                
                 <p><strong>Visualisierung:</strong> Farbskalen verwenden Viridis (Turbinen) und einen Rot-Weiß-Gradienten (Umspannwerke) für optimale Unterscheidbarkeit.</p>
             </div>
             
+            <h2 style="color: #ff6b6b; margin: 20px 0 15px 0;"><i class="fas fa-exclamation-triangle"></i> Datenlücken</h2>
+            <div style="font-size: 0.85rem; line-height: 1.6; color: #aaa;">
+                <p style="margin-bottom: 10px;">Die tatsächliche Netzinfrastruktur ist nicht vollständig öffentlich zugänglich. Insbesondere fehlen:</p>
+                <ul style="margin-left: 20px; color: #888;">
+                    <li>Detaillierte Leitungskapazitäten und Auslastung</li>
+                    <li>Netzverknüpfungspunkte und Engpassstellen</li>
+                    <li>Geplante Netzausbauprojekte mit Zeitrahmen</li>
+                    <li>110 kV Verteilnetz (teilweise in OSM)</li>
+                </ul>
+            </div>
+            
             <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #333; font-size: 0.75rem; color: #666;">
-                Stand: Januar 2025 · Keine Gewähr für Vollständigkeit oder Richtigkeit
+                Stand: Januar 2025 · Keine Gewähr für Vollständigkeit oder Richtigkeit<br>
+                <a href="https://github.com/raffopenssh/austria-grid" target="_blank" style="color: #4a9eff;">GitHub Repository</a>
             </div>
         </div>
     </div>
@@ -1183,56 +1223,68 @@
             });
         }
         
-        // Load transmission lines from Austro Control
+        // Load transmission lines from OpenStreetMap (primary source)
         async function loadTransmissionLines() {
-            const response = await fetch('/api/transmission-lines');
+            // Load OSM high-voltage lines (220kV, 380kV)
+            const response = await fetch('/api/osm-transmission-lines');
             const data = await response.json();
             transmissionLinesData = data.features || [];
             
             // Color by voltage
             function getVoltageColor(voltage) {
                 if (voltage >= 380) return '#ff0066';  // Pink/magenta for 380kV
-                if (voltage >= 220) return '#ff6600';  // Orange for 220kV
+                if (voltage >= 220) return '#4a9eff';  // Blue for 220kV
                 if (voltage >= 110) return '#ffcc00';  // Yellow for 110kV
                 return '#888888';  // Gray for lower
             }
             
             function getVoltageWidth(voltage) {
-                if (voltage >= 380) return 4;
-                if (voltage >= 220) return 3;
-                if (voltage >= 110) return 2;
+                if (voltage >= 380) return 3;
+                if (voltage >= 220) return 2;
+                if (voltage >= 110) return 1.5;
                 return 1;
             }
+            
+            // Track counts
+            let count380 = 0, count220 = 0;
             
             // Add each line to the layer
             transmissionLinesData.forEach(feature => {
                 const voltage = feature.properties.voltage || 0;
-                const name = feature.properties.name || 'Unknown';
+                const name = feature.properties.name || feature.properties.ref || '';
+                const operator = feature.properties.operator || '';
                 const color = getVoltageColor(voltage);
                 const width = getVoltageWidth(voltage);
+                
+                if (voltage >= 380) count380++;
+                else if (voltage >= 220) count220++;
                 
                 const line = L.geoJSON(feature, {
                     pane: 'transmissionPane',
                     style: {
                         color: color,
                         weight: width,
-                        opacity: 0.8,
-                        dashArray: voltage >= 220 ? null : '5, 5'
+                        opacity: 0.7,
+                        lineCap: 'round',
+                        lineJoin: 'round'
                     }
                 });
                 
+                const displayName = name || `${voltage}kV Leitung`;
                 line.bindTooltip(`
                     <div class="tooltip-custom">
-                        <div class="title">${name}</div>
+                        <div class="title">${displayName}</div>
                         <div>Spannung: ${voltage} kV</div>
-                        <div style="color: ${color};">■ ${voltage >= 380 ? 'Höchstspannung' : voltage >= 220 ? 'Hochspannung' : 'Mittelspannung'}</div>
+                        ${operator ? `<div>Betreiber: ${operator}</div>` : ''}
+                        <div style="color: ${color};">■ ${voltage >= 380 ? 'Höchstspannung (380kV)' : 'Hochspannung (220kV)'}</div>
+                        <div style="font-size: 0.7rem; color: #888;">Quelle: OpenStreetMap</div>
                     </div>
                 `, { className: 'tooltip-custom', sticky: true });
                 
                 line.addTo(transmissionLayer);
             });
             
-            console.log(`Loaded ${transmissionLinesData.length} transmission line segments`);
+            console.log(`Loaded ${transmissionLinesData.length} transmission lines from OSM (${count380}× 380kV, ${count220}× 220kV)`);
         }
         
         // Show modal for transformer station

@@ -1,0 +1,1626 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "source": "OpenStreetMap via Overpass API",
+    "attribution": "\u00a9 OpenStreetMap contributors, ODbL",
+    "extracted": "2026-01-27",
+    "description": "High-voltage substations (220kV, 380kV) in Austria"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 5653873949,
+        "osm_type": "node",
+        "name": "",
+        "voltage": "220000",
+        "operator": "Verbund Hydro Power GmbH",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.3432254,
+          46.8954518
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 23899163,
+        "osm_type": "way",
+        "name": "Umspannwerk Kirchbichl",
+        "voltage": "220000;110000",
+        "operator": "",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.0761303,
+          47.5222807
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 24253250,
+        "osm_type": "way",
+        "name": "Umspannwerk Bisamberg",
+        "voltage": "380000;220000;110000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.3782533,
+          48.3583123
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 24768685,
+        "osm_type": "way",
+        "name": "Umspannwerk Thaur",
+        "voltage": "220000;110000",
+        "operator": "TIWAG-Netz AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.4713662,
+          47.27284
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 26644088,
+        "osm_type": "way",
+        "name": "Umspannwerk Wien Nord",
+        "voltage": "380000;110000",
+        "operator": "Wiener Netze",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.3900092,
+          48.2576399
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 27673934,
+        "osm_type": "way",
+        "name": "Umspannwerk Kendlerstra\u00dfe",
+        "voltage": "380000",
+        "operator": "Wiener Netze",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.311149,
+          48.2051052
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 27763479,
+        "osm_type": "way",
+        "name": "Umspannwerk Ernsthofen",
+        "voltage": "380000;220000;110000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.4738968,
+          48.1245976
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 27795895,
+        "osm_type": "way",
+        "name": "Umspannwerk Wien S\u00fcdost",
+        "voltage": "380000;220000;110000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.4195774,
+          48.1238348
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 27797285,
+        "osm_type": "way",
+        "name": "Umspannwerk Pottenbrunn",
+        "voltage": "380000;110000",
+        "operator": "Netz N\u00d6",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.6892335,
+          48.2250575
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 28596524,
+        "osm_type": "way",
+        "name": "Schaltanlage Mayrhofen",
+        "voltage": "220000",
+        "operator": "",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.8507323,
+          47.1625541
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 30042006,
+        "osm_type": "way",
+        "name": "Schaltwerk Etzersdorf",
+        "voltage": "380000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.7373625,
+          48.2687938
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 30076588,
+        "osm_type": "way",
+        "name": "Umspannwerk Ybbsfeld",
+        "voltage": "220000;110000",
+        "operator": "APG;Netz N\u00d6",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.0478209,
+          48.146697
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 33041399,
+        "osm_type": "way",
+        "name": "Umspannwerk Salzach Stich",
+        "voltage": "220000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.0296454,
+          47.8310518
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 33631653,
+        "osm_type": "way",
+        "name": "Umspannwerk Greifenstein",
+        "voltage": "220000",
+        "operator": "",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.2407904,
+          48.356702
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 38821658,
+        "osm_type": "way",
+        "name": "Umspannwerk Kaprun",
+        "voltage": "380000;220000;110000",
+        "operator": "Verbund Hydro Power, Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.7424019,
+          47.2592344
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 38868243,
+        "osm_type": "way",
+        "name": "Umspannwerk Tauern",
+        "voltage": "380000;220000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.7398102,
+          47.2777201
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 47001881,
+        "osm_type": "way",
+        "name": "Umspannwerk Thei\u00df",
+        "voltage": "380000;110000",
+        "operator": "Netz N\u00d6",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.7056235,
+          48.3939814
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 50650855,
+        "osm_type": "way",
+        "name": "Umspannwerk Sattledt",
+        "voltage": "220000",
+        "operator": "Austrian Grid Power AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.0521115,
+          48.0832552
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 59531071,
+        "osm_type": "way",
+        "name": "Umspannwerk D\u00fcrnrohr",
+        "voltage": "380000;220000;110000",
+        "operator": "Austrian Power Grid;Netz Nieder\u00f6sterreich",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.8856141,
+          48.3288984
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 61108302,
+        "osm_type": "way",
+        "name": "Umspannwerk Meiningen",
+        "voltage": "380000;220000",
+        "operator": "Vorarlberger Energienetze GmbH",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.5919204,
+          47.3123674
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 70497801,
+        "osm_type": "way",
+        "name": "Umspannwerk Ybbs Persenbeug",
+        "voltage": "220000",
+        "operator": "Verbund",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.0656375,
+          48.1895046
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 81540198,
+        "osm_type": "way",
+        "name": "Umspannwerk St. Peter",
+        "voltage": "380000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.0819957,
+          48.2563255
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 81684898,
+        "osm_type": "way",
+        "name": "Umspannwerk S\u00fcdburgenland/Rotenturm",
+        "voltage": "380000;110000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.2763973,
+          47.2506067
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 82201785,
+        "osm_type": "way",
+        "name": "Umspannwerk Neusiedl",
+        "voltage": "220000;110000",
+        "operator": "Austrian Power Grid;Netz Burgenland",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.837982,
+          47.9604113
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 83202471,
+        "osm_type": "way",
+        "name": "Umspannwerk Ternitz",
+        "voltage": "220000;110000;20000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.0649892,
+          47.7070882
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 83529203,
+        "osm_type": "way",
+        "name": "Umspannwerk Werben - Dornbirn",
+        "voltage": "220000;110000",
+        "operator": "Vorarlberger Energienetze GmbH",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.7165734,
+          47.4326458
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 83740194,
+        "osm_type": "way",
+        "name": "Umspannwerk Kainachtal/Zwaring",
+        "voltage": "380000;110000",
+        "operator": "Verbund Austrian Power Grid AG;STEWEAG-STEG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.4230708,
+          46.9036309
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 83742801,
+        "osm_type": "way",
+        "name": "Umspannwerk Oststeiermark/W\u00fcnschendorf",
+        "voltage": "380000;110000",
+        "operator": "Verbund Austrian Power Grid AG;STEWEAG-STEG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.7257874,
+          47.0909039
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 83805040,
+        "osm_type": "way",
+        "name": "Malta Hauptstufe",
+        "voltage": "220000;110000",
+        "operator": "",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.3277449,
+          46.8709922
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 83831570,
+        "osm_type": "way",
+        "name": "Umspannwerk Obersielach",
+        "voltage": "380000;220000;110000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.681692,
+          46.6685514
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 84789829,
+        "osm_type": "way",
+        "name": "Schaltwerk Strass",
+        "voltage": "220000",
+        "operator": "",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.8387173,
+          47.3924278
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 86119428,
+        "osm_type": "way",
+        "name": "Kraftwerk Rosegg",
+        "voltage": "220000",
+        "operator": "Verbund Hydro Power GmbH",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.0279728,
+          46.5683182
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 86119456,
+        "osm_type": "way",
+        "name": "Freiluftschaltanlage Feistritz",
+        "voltage": "220000",
+        "operator": "APG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.1729613,
+          46.535844
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 87365703,
+        "osm_type": "way",
+        "name": "Kraftwerk Edling",
+        "voltage": "220000",
+        "operator": "Verbund Hydro Power GmbH",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.7024405,
+          46.6297973
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 88680218,
+        "osm_type": "way",
+        "name": "Umspannwerk Hessenberg",
+        "voltage": "220000;110000",
+        "operator": "Verbund Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.0209736,
+          47.3970491
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 88684218,
+        "osm_type": "way",
+        "name": "Umspannwerk Zeltweg",
+        "voltage": "220000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.7261996,
+          47.1809776
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 89451551,
+        "osm_type": "way",
+        "name": "Umspannwerk Wei\u00dfenbach",
+        "voltage": "220000;110000",
+        "operator": "Verbund;Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.2077762,
+          47.5745247
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 89985993,
+        "osm_type": "way",
+        "name": "Umspannwerk Pyhrn",
+        "voltage": "220000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.3304791,
+          47.6784472
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 92873353,
+        "osm_type": "way",
+        "name": "Umspannwerk Aschach",
+        "voltage": "220000",
+        "operator": "",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.0196105,
+          48.385225
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 93077882,
+        "osm_type": "way",
+        "name": "Umspannwerk Hausruck",
+        "voltage": "220000",
+        "operator": "Verbund Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.8997876,
+          48.1044024
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 95812231,
+        "osm_type": "way",
+        "name": "Umspannwerk Silz",
+        "voltage": "220000;110000",
+        "operator": "TIWAG-Netz AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.9662584,
+          47.2695305
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 95837658,
+        "osm_type": "way",
+        "name": "Umspannwerk Wallsee",
+        "voltage": "220000;110000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.6952629,
+          48.1641688
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 95860758,
+        "osm_type": "way",
+        "name": "Umspannwerk Zwentendorf",
+        "voltage": "220000",
+        "operator": "Netz N\u00d6",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.8850252,
+          48.353966
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 96616299,
+        "osm_type": "way",
+        "name": "Umspannwerk Neusiedl an der Zaya",
+        "voltage": "380000;220000;110000",
+        "operator": "Netz N\u00d6;APG",
+        "substation": "distribution",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.8000937,
+          48.6057763
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 100602290,
+        "osm_type": "way",
+        "name": "Umspannwerk Prutz",
+        "voltage": "220000;110000",
+        "operator": "",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.6653149,
+          47.0694064
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 101997887,
+        "osm_type": "way",
+        "name": "Umspannwerk B\u00fcrs",
+        "voltage": "380000;220000",
+        "operator": "Vorarlberger Illwerke AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.8104929,
+          47.1430048
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 105065132,
+        "osm_type": "way",
+        "name": "Umspannwerk Salzburg",
+        "voltage": "380000;220000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.0668277,
+          47.8879833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 107248400,
+        "osm_type": "way",
+        "name": "Umspannwerk Sarasdorf",
+        "voltage": "380000;110000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.6959469,
+          48.0318168
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 118060597,
+        "osm_type": "way",
+        "name": "Umspannwerk S\u00fcd",
+        "voltage": "380000;110000",
+        "operator": "Wiener Netze",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.3307975,
+          48.1650599
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 118091356,
+        "osm_type": "way",
+        "name": "",
+        "voltage": "220000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.8551217,
+          48.3731802
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 122592181,
+        "osm_type": "way",
+        "name": "Umspannwerk D\u00fcrnrohr",
+        "voltage": "380000",
+        "operator": "Verbund",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.8799634,
+          48.329522
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 123176540,
+        "osm_type": "way",
+        "name": "Umspannwerk L\u00fcnerseewerk",
+        "voltage": "220000",
+        "operator": "Vorarlberger Illwerke AG",
+        "substation": "generation",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.8737711,
+          47.0732127
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 132550284,
+        "osm_type": "way",
+        "name": "",
+        "voltage": "220000",
+        "operator": "",
+        "substation": "transition",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.8704495,
+          47.1564788
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 134565164,
+        "osm_type": "way",
+        "name": "Kabel\u00fcberf\u00fchrungsstation Pfarrgasse",
+        "voltage": "380000",
+        "operator": "Wiener Netze GmbH",
+        "substation": "transition",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.340623,
+          48.1363123
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 138407040,
+        "osm_type": "way",
+        "name": "Umspannwerk Simmering - 380kV-Anlage",
+        "voltage": "380000",
+        "operator": "Wiener Netze",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.4315212,
+          48.1822123
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 140375658,
+        "osm_type": "way",
+        "name": "SF6-Halle 380 kV",
+        "voltage": "380000",
+        "operator": "",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.8978247,
+          47.2341328
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 145583866,
+        "osm_type": "way",
+        "name": "Umspannwerk Vill",
+        "voltage": "220000",
+        "operator": "TIWAG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.3924219,
+          47.2363081
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 152245073,
+        "osm_type": "way",
+        "name": "Umspannwerk Klaus",
+        "voltage": "220000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.1632065,
+          47.8213918
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 156973414,
+        "osm_type": "way",
+        "name": "Umspannwerk Zell am Ziller",
+        "voltage": "380000;220000;110000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.897857,
+          47.2333799
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 162826525,
+        "osm_type": "way",
+        "name": "Lienz",
+        "voltage": "380000;220000;110000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.8063356,
+          46.8250919
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 171066516,
+        "osm_type": "way",
+        "name": "Umspannwerk Zurndorf",
+        "voltage": "380000;110000",
+        "operator": "Austrian Power Grid AG;Energie Burgenland AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.9945648,
+          47.9377161
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 180468540,
+        "osm_type": "way",
+        "name": "Umspannwerk Greuth",
+        "voltage": "220000",
+        "operator": "Eneco S.r.l.",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.6798601,
+          46.5431735
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 210191809,
+        "osm_type": "way",
+        "name": "Umspannwerk Sch\u00e4rding",
+        "voltage": "220000",
+        "operator": "",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.442859,
+          48.4345509
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 219909160,
+        "osm_type": "way",
+        "name": "Schaltanlage Kopswerk I",
+        "voltage": "220000",
+        "operator": "Vorarlberger Energienetze GmbH",
+        "substation": "generation",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.0541209,
+          46.9689597
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 219909161,
+        "osm_type": "way",
+        "name": "Umspannwerk Rodundwerk II",
+        "voltage": "220000",
+        "operator": "",
+        "substation": "generation",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.8744295,
+          47.0848407
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 235546807,
+        "osm_type": "way",
+        "name": "Schaltwerk Kronstorf",
+        "voltage": "380000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.4693298,
+          48.1163904
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 291703253,
+        "osm_type": "way",
+        "name": "",
+        "voltage": "380000",
+        "operator": "Vorarlberger Illwerke AG",
+        "substation": "minor_distribution",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.8120791,
+          47.1445862
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 318616912,
+        "osm_type": "way",
+        "name": "Umspannwerk Schwarzenbach",
+        "voltage": "380000;110000",
+        "operator": "Austrian Power Grid AG;\u00d6sterreichische Bundesbahnen",
+        "substation": "distribution",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.5833727,
+          47.2784598
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 347968939,
+        "osm_type": "way",
+        "name": "Umspannwerk Rosshag",
+        "voltage": "220000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.7786275,
+          47.0855167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 603139216,
+        "osm_type": "way",
+        "name": "Villach S\u00fcd",
+        "voltage": "220000;110000",
+        "operator": "Austrian Power Grid AG;KNG-K\u00e4rnten Netz GmbH",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.8278922,
+          46.5539607
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 636620861,
+        "osm_type": "way",
+        "name": "Kabel\u00fcberf\u00fchrungsstation Schemmerlstra\u00dfe",
+        "voltage": "380000",
+        "operator": "Wiener Netze",
+        "substation": "transition",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.4247414,
+          48.1541022
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 694695942,
+        "osm_type": "way",
+        "name": "Umspannwerk Mellach",
+        "voltage": "380000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.4911746,
+          46.9100887
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 727225348,
+        "osm_type": "way",
+        "name": "APG Umspannwerk Westtirol",
+        "voltage": "380000;220000;110000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.8739154,
+          47.2439938
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 758728343,
+        "osm_type": "way",
+        "name": "K\u00fchtai",
+        "voltage": "220000",
+        "operator": "TenneT TSO GmbH",
+        "substation": "industrial",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.005711,
+          47.2077284
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 765101679,
+        "osm_type": "way",
+        "name": "Umspannwerk Kledering",
+        "voltage": "220000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.4315299,
+          48.138992
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 822919374,
+        "osm_type": "way",
+        "name": "",
+        "voltage": "380000",
+        "operator": "",
+        "substation": "transition",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.744822,
+          47.2577668
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 852324809,
+        "osm_type": "way",
+        "name": "Umspannwerk Walgauwerk",
+        "voltage": "220000",
+        "operator": "Vorarlberger Energienetze GmbH",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.6700549,
+          47.1989119
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 943595603,
+        "osm_type": "way",
+        "name": "",
+        "voltage": "220000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "distribution",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.6838447,
+          46.668214
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 1001640574,
+        "osm_type": "way",
+        "name": "",
+        "voltage": "380000",
+        "operator": "Austrian Power Grid",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.9250618,
+          48.3274978
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 1047447425,
+        "osm_type": "way",
+        "name": "Umspannwerk Nauders",
+        "voltage": "380000;220000",
+        "operator": "Austrian Grid Power AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.5066291,
+          46.8588305
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 1051033055,
+        "osm_type": "way",
+        "name": "Umspannwerk Pongau",
+        "voltage": "380000;220000;110000;30000",
+        "operator": "Austrian Grid Power AG;Salzburg Netz",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.210767,
+          47.3787883
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 1066994709,
+        "osm_type": "way",
+        "name": "Schaltanlage Kopswerk II",
+        "voltage": "220000",
+        "operator": "",
+        "substation": "generation",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.0433122,
+          46.9743103
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 1203160522,
+        "osm_type": "way",
+        "name": "Schaltwerk Weibern",
+        "voltage": "220000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "distribution",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.7029569,
+          48.173615
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 1320673539,
+        "osm_type": "way",
+        "name": "Umspannwerk St. Peter",
+        "voltage": "380000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.0825747,
+          48.2587704
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_id": 18396881,
+        "osm_type": "relation",
+        "name": "",
+        "voltage": "380000",
+        "operator": "Austrian Power Grid AG",
+        "substation": "transmission",
+        "source": "OpenStreetMap"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.7416894,
+          47.258737
+        ]
+      }
+    }
+  ]
+}
