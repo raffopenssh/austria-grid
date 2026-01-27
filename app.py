@@ -74,6 +74,12 @@ def hydropower():
     data = load_json('hydropower_plants.json')
     return jsonify(data)
 
+@app.route('/api/cross-border')
+def cross_border():
+    """Cross-border transmission interconnections"""
+    data = load_json('cross_border_connections.json')
+    return jsonify(data)
+
 @app.route('/api/district-capacity')
 def district_capacity():
     """Calculate capacity analysis for each district using proper point-in-polygon"""

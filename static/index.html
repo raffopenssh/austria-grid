@@ -563,6 +563,10 @@
                         <input type="checkbox" id="layer-hydropower">
                         Wasserkraftwerke
                     </label>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-crossborder">
+                        Grenzübergänge
+                    </label>
                 </div>
             </div>
         </div>
@@ -748,6 +752,7 @@
         const transformersLayer = L.layerGroup();
         const transmissionLayer = L.layerGroup();
         const hydropowerLayer = L.layerGroup();
+        const crossBorderLayer = L.layerGroup();
         
         // Create pane for transmission lines (below turbines but above heatmap)
         map.createPane('transmissionPane');
@@ -1364,6 +1369,39 @@
             console.log(`Loaded ${plants.length} hydropower plants`);
         }
         
+        // Load cross-border interconnections
+        async function loadCrossBorder() {
+            const response = await fetch('/api/cross-border');
+            const data = await response.json();
+            const connections = data.features || [];
+            
+            connections.forEach(conn => {
+                const props = conn.properties;
+                const color = props.voltage >= 380 ? '#ff9800' : '#ffc107';  // Orange for 380kV, yellow for 220kV
+                
+                const line = L.geoJSON(conn, {
+                    style: {
+                        color: color,
+                        weight: 5,
+                        opacity: 0.9,
+                        dashArray: '10, 10'
+                    }
+                });
+                
+                line.bindTooltip(`
+                    <div class="tooltip-custom">
+                        <div class="title" style="color: ${color};">${props.name}</div>
+                        <div><strong>${props.capacity_mw} MW</strong> Kapazität</div>
+                        <div>${props.voltage} kV</div>
+                    </div>
+                `, { className: 'tooltip-custom', sticky: true });
+                
+                line.addTo(crossBorderLayer);
+            });
+            
+            console.log(`Loaded ${connections.length} cross-border connections`);
+        }
+        
         // Show modal for transformer station
         function showTransformerModal(t) {
             const available = parseFloat(t.availableCapacity) || 0;
@@ -1561,6 +1599,14 @@
             }
         });
         
+        document.getElementById('layer-crossborder').addEventListener('change', function() {
+            if (this.checked) {
+                map.addLayer(crossBorderLayer);
+            } else {
+                map.removeLayer(crossBorderLayer);
+            }
+        });
+        
         // Initialize
         async function init() {
             await Promise.all([
@@ -1569,7 +1615,8 @@
                 loadTransformers(),
                 loadProduction(),
                 loadTransmissionLines(),
-                loadHydropower()
+                loadHydropower(),
+                loadCrossBorder()
             ]);
         }
         
