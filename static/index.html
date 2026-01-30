@@ -630,6 +630,10 @@
                         Wasserkraftwerke
                     </label>
                     <label class="layer-toggle">
+                        <input type="checkbox" id="layer-power-plants">
+                        Alle Kraftwerke <span style="font-size: 0.65rem; color: #888;">(Live)</span>
+                    </label>
+                    <label class="layer-toggle">
                         <input type="checkbox" id="layer-crossborder">
                         Grenzübergänge
                     </label>
@@ -822,6 +826,7 @@
         const transformersLayer = L.layerGroup();
         const transmissionLayer = L.layerGroup();
         const substationLoadLayer = L.layerGroup();
+        const powerPlantsLayer = L.layerGroup();
         const hydropowerLayer = L.layerGroup();
         const crossBorderLayer = L.layerGroup();
         const onipLayer = L.layerGroup();
@@ -1576,6 +1581,103 @@
             }
         }
         
+        // Load all power plants with live production
+        async function loadPowerPlants() {
+            try {
+                const response = await fetch('/api/power-plants');
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error('Power plants error:', data.error);
+                    return;
+                }
+                
+                powerPlantsLayer.clearLayers();
+                
+                const plants = data.plants || [];
+                
+                // Color mapping for source types
+                const sourceColors = {
+                    'hydro_run_of_river': '#00bcd4',  // Cyan
+                    'hydro_reservoir': '#0097a7',     // Dark cyan
+                    'hydro_pumped': '#006064',        // Teal
+                    'wind': '#4caf50',                // Green
+                    'solar': '#ffeb3b',               // Yellow
+                    'gas': '#ff9800',                 // Orange
+                    'coal': '#795548',                // Brown
+                    'biomass': '#8bc34a',             // Light green
+                    'waste': '#9e9e9e',               // Gray
+                    'other': '#9c27b0',               // Purple
+                };
+                
+                const sourceNames = {
+                    'hydro_run_of_river': 'Laufwasser',
+                    'hydro_reservoir': 'Speicher',
+                    'hydro_pumped': 'Pumpspeicher',
+                    'wind': 'Wind',
+                    'solar': 'Solar',
+                    'gas': 'Gas',
+                    'coal': 'Kohle',
+                    'biomass': 'Biomasse',
+                    'waste': 'Abfall',
+                    'other': 'Andere',
+                };
+                
+                // Filter to plants with capacity > 1 MW for visibility
+                const visiblePlants = plants.filter(p => p.capacity_mw >= 1);
+                
+                visiblePlants.forEach(plant => {
+                    const color = sourceColors[plant.source] || '#9c27b0';
+                    const sourceName = sourceNames[plant.source] || plant.source;
+                    
+                    // Size based on production (min 4, max 15)
+                    const radius = Math.max(4, Math.min(15, 4 + Math.sqrt(plant.production_mw) * 0.8));
+                    
+                    // Opacity based on utilization
+                    const opacity = plant.utilization > 0 ? 0.8 : 0.4;
+                    
+                    const marker = L.circleMarker([plant.lat, plant.lon], {
+                        radius: radius,
+                        fillColor: color,
+                        color: '#fff',
+                        weight: 1,
+                        opacity: opacity,
+                        fillOpacity: opacity * 0.7,
+                    });
+                    
+                    // Production bar for tooltip
+                    const utilPct = (plant.utilization * 100).toFixed(0);
+                    const barWidth = Math.round(plant.utilization * 100);
+                    
+                    marker.bindTooltip(`
+                        <div class="tooltip-custom">
+                            <div class="title" style="color: ${color};">${plant.name || 'Kraftwerk'}</div>
+                            <div><strong>${sourceName}</strong></div>
+                            <div style="margin-top: 5px;">
+                                <div>Kapazität: <strong>${plant.capacity_mw.toFixed(1)} MW</strong></div>
+                                <div>Produktion: <strong style="color: ${plant.production_mw > 0 ? '#00e676' : '#666'};">${plant.production_mw.toFixed(1)} MW</strong></div>
+                            </div>
+                            <div style="margin-top: 5px;">
+                                <div style="font-size: 0.75rem;">Auslastung: ${utilPct}%</div>
+                                <div style="background: #333; border-radius: 3px; height: 6px; width: 100px; margin-top: 2px;">
+                                    <div style="background: ${color}; height: 100%; width: ${barWidth}px; border-radius: 3px;"></div>
+                                </div>
+                            </div>
+                            ${plant.substation ? `<div style="font-size: 0.7rem; color: #888; margin-top: 5px;">UW: ${plant.substation}</div>` : ''}
+                        </div>
+                    `, { className: 'tooltip-custom', sticky: true });
+                    
+                    marker.addTo(powerPlantsLayer);
+                });
+                
+                // Log summary
+                const totalProd = plants.reduce((sum, p) => sum + p.production_mw, 0);
+                console.log(`Loaded ${visiblePlants.length} power plants (${plants.length} total), producing ${totalProd.toFixed(0)} MW`);
+            } catch (error) {
+                console.error('Error loading power plants:', error);
+            }
+        }
+        
         // Load ÖNIP 2030 power line points for comparison
         async function loadOnipPowerlines() {
             const response = await fetch('/api/onip-powerlines');
@@ -1784,6 +1886,15 @@
                 map.addLayer(substationLoadLayer);
             } else {
                 map.removeLayer(substationLoadLayer);
+            }
+        });
+        
+        document.getElementById('layer-power-plants').addEventListener('change', function() {
+            if (this.checked) {
+                loadPowerPlants();
+                map.addLayer(powerPlantsLayer);
+            } else {
+                map.removeLayer(powerPlantsLayer);
             }
         });
         

@@ -400,25 +400,59 @@ def substation_loads():
         return jsonify(cached)
     
     try:
+        from substation_load_model import get_substation_loads_json
+        result = get_substation_loads_json()
+        set_cached(cache_key, result)
+        return jsonify(result)
+    except Exception as e:
+        import traceback
+        return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
+
+
+@app.route('/api/power-plants')
+def all_power_plants():
+    """Get all power plants with current production estimates"""
+    cache_key = 'power_plants'
+    cached = get_cached(cache_key)
+    if cached:
+        return jsonify(cached)
+    
+    try:
+        data = load_json('all_power_plants.json')
+        
+        # Get utilization factors from latest substation load calculation
         from substation_load_model import SubstationLoadModel
         model = SubstationLoadModel()
-        loads = model.run()
+        model.load_power_plants()
+        model.load_live_data()
+        model.calculate_utilization_factors()
+        model.estimate_plant_production()
         
-        # Filter to high-voltage substations with significant activity
-        hv_loads = [s for s in loads if s['voltage'] >= 110]
+        plants = model.get_all_plants()
         
         result = {
             'timestamp': datetime.now(timezone.utc).isoformat(),
-            'substations': hv_loads,
+            'plants': plants,
+            'utilization_factors': model.utilization_factors,
             'summary': {
-                'total': len(hv_loads),
-                'high_load': sum(1 for s in hv_loads if s['status'] == 'high'),
-                'medium_load': sum(1 for s in hv_loads if s['status'] == 'medium'),
-                'low_load': sum(1 for s in hv_loads if s['status'] == 'low'),
-                'total_generation_mw': sum(s['generation_mw'] for s in hv_loads),
-                'total_load_mw': sum(s['load_mw'] for s in hv_loads),
+                'total_plants': len(plants),
+                'total_capacity_mw': sum(p['capacity_mw'] for p in plants),
+                'total_production_mw': sum(p['production_mw'] for p in plants),
+                'by_source': {}
             }
         }
+        
+        # Group by source
+        for plant in plants:
+            src = plant['source']
+            if src not in result['summary']['by_source']:
+                result['summary']['by_source'][src] = {
+                    'count': 0, 'capacity_mw': 0, 'production_mw': 0
+                }
+            result['summary']['by_source'][src]['count'] += 1
+            result['summary']['by_source'][src]['capacity_mw'] += plant['capacity_mw']
+            result['summary']['by_source'][src]['production_mw'] += plant['production_mw']
+        
         set_cached(cache_key, result)
         return jsonify(result)
     except Exception as e:
