@@ -725,34 +725,31 @@
             <span class="modal-close" onclick="closeSourcesModal()">&times;</span>
             <h2 style="color: #00d4aa; margin-bottom: 15px;"><i class="fas fa-database"></i> Datenquellen</h2>
             <div style="font-size: 0.85rem; line-height: 1.6;">
-                <p style="margin-bottom: 10px;"><strong>Windkraftanlagen:</strong><br>
-                <a href="https://www.igwindkraft.at" target="_blank" style="color: #4a9eff;">IG Windkraft</a> – Standortdaten österreichischer Windkraftanlagen</p>
+                <p style="margin-bottom: 10px;"><strong>Live-Daten (ENTSO-E Transparency):</strong><br>
+                <a href="https://transparency.entsoe.eu" target="_blank" style="color: #4a9eff;">ENTSO-E Transparency Platform</a> – Echtzeit-Erzeugung, Strompreise, Grenzflüsse<br>
+                <span style="color: #888;">API-Abruf alle 5 Minuten, kalibriert auf Kraftwerksebene</span></p>
                 
-                <p style="margin-bottom: 10px;"><strong>Netzkapazitäten:</strong><br>
-                <a href="https://www.e-control.at/statistik/e-statistik/data" target="_blank" style="color: #4a9eff;">E-Control Austria</a> – Einspeisekapazitäten der Netzbetreiber und Stromstatistiken</p>
+                <p style="margin-bottom: 10px;"><strong>Kraftwerke (688 Anlagen, 26.8 GW):</strong><br>
+                <a href="https://www.openstreetmap.org" target="_blank" style="color: #4a9eff;">OpenStreetMap</a> – 4.700+ Erzeugungsanlagen via Overpass API (ODbL)<br>
+                <span style="color: #888;">Wasser: 14.7 GW, Gas: 8 GW, Wind: 2.9 GW, Solar: 0.6 GW</span></p>
                 
-                <p style="margin-bottom: 10px;"><strong>Umspannwerke (Niederspannung):</strong><br>
-                <a href="https://www.apg.at" target="_blank" style="color: #4a9eff;">APG (Austrian Power Grid)</a> – Transformatorstationen aus Netzbetreiber-Daten</p>
+                <p style="margin-bottom: 10px;"><strong>Windkraftanlagen (1.578 Turbinen):</strong><br>
+                <a href="https://www.igwindkraft.at" target="_blank" style="color: #4a9eff;">IG Windkraft</a> – Standortdaten, <a href="https://sdimd-free.austrocontrol.at/" target="_blank" style="color: #4a9eff;">Austro Control</a> – Hindernisdatenbank</p>
                 
-                <p style="margin-bottom: 10px;"><strong>Hochspannungs-Übertragungsnetz (220/380 kV):</strong><br>
-                <a href="https://www.openstreetmap.org" target="_blank" style="color: #4a9eff;">OpenStreetMap</a> – 1.291 Leitungssegmente via Overpass API (ODbL)<br>
-                <span style="color: #888;">1.291 Segmente: 831× 220kV, 460× 380kV</span></p>
+                <p style="margin-bottom: 10px;"><strong>Wasserkraftwerke (156 Großkraftwerke, 13.5 GW):</strong><br>
+                <a href="https://groundwater-at.exe.xyz" target="_blank" style="color: #4a9eff;">Austria Groundwater App</a><br>
+                <span style="color: #888;">86× Laufkraft, 50× Speicher, 20× Pumpspeicher</span></p>
                 
-                <p style="margin-bottom: 10px;"><strong>Hochspannungs-Umspannwerke (220/380 kV):</strong><br>
-                <a href="https://www.openstreetmap.org" target="_blank" style="color: #4a9eff;">OpenStreetMap</a> – 85 Umspannwerke via Overpass API (ODbL)</p>
+                <p style="margin-bottom: 10px;"><strong>Übertragungsnetz (220/380 kV):</strong><br>
+                <a href="https://www.openstreetmap.org" target="_blank" style="color: #4a9eff;">OpenStreetMap</a> – 1.291 Leitungssegmente, 85 Umspannwerke<br>
+                <span style="color: #888;">831× 220kV, 460× 380kV</span></p>
                 
-                <p style="margin-bottom: 10px;"><strong>Wasserkraftwerke:</strong><br>
-                <a href="https://groundwater-at.exe.xyz" target="_blank" style="color: #4a9eff;">Austria Groundwater App</a> – 156 Kraftwerke (13.5 GW)<br>
-                <span style="color: #888;">86× Laufkraftwerk, 50× Speicher, 20× Pumpspeicher</span></p>
-                
-                <p style="margin-bottom: 10px;"><strong>Erzeugungsdaten:</strong><br>
-                <a href="https://www.apg.at/de/markt/Markttransparenz" target="_blank" style="color: #4a9eff;">APG Markttransparenz</a> – Windstromerzeugung 2024</p>
+                <p style="margin-bottom: 10px;"><strong>Netzkapazitäten & Statistik:</strong><br>
+                <a href="https://www.e-control.at" target="_blank" style="color: #4a9eff;">E-Control Austria</a> – Einspeisekapazitäten, Netzlängen<br>
+                <a href="https://www.apg.at" target="_blank" style="color: #4a9eff;">APG</a> – Transformatorstationen</p>
                 
                 <p style="margin-bottom: 10px;"><strong>Bezirksgrenzen:</strong><br>
                 <a href="https://www.data.gv.at" target="_blank" style="color: #4a9eff;">data.gv.at</a> – Open Government Data Austria</p>
-                
-                <p style="margin-bottom: 10px;"><strong>Hindernisbefeuerung & Leitungen (ergänzend):</strong><br>
-                <a href="https://sdimd-free.austrocontrol.at/" target="_blank" style="color: #4a9eff;">Austro Control</a> – Hindernisdatenbank Österreich</p>
             </div>
             
             <h2 style="color: #00d4aa; margin: 20px 0 15px 0;"><i class="fas fa-book"></i> Weiterführende Quellen</h2>
@@ -772,13 +769,22 @@
             
             <h2 style="color: #00d4aa; margin: 20px 0 15px 0;"><i class="fas fa-cogs"></i> Methodik</h2>
             <div style="font-size: 0.85rem; line-height: 1.6; color: #aaa;">
-                <p style="margin-bottom: 10px;"><strong>Kapazitätsschätzung:</strong> Die verfügbare Netzkapazität wird aus den offiziellen Netzbetreiber-Angaben abgeleitet. Da diese oft konservativ sind, werden zusätzliche Faktoren wie internationale Erfahrungswerte berücksichtigt.</p>
+                <p style="margin-bottom: 10px;"><strong>Kraftwerks-Produktionsschätzung:</strong><br>
+                1. ENTSO-E liefert Erzeugung pro Typ (Wasser, Wind, Gas, etc.)<br>
+                2. Auslastungsfaktor = ENTSO-E Erzeugung / installierte Kapazität<br>
+                3. Einzelproduktion = Kraftwerkskapazität × Auslastungsfaktor<br>
+                4. Kalibrierung: Summe der Einzelproduktionen = ENTSO-E Total</p>
                 
-                <p style="margin-bottom: 10px;"><strong>Turbinenleistung:</strong> Die geschätzte Leistung (MW) basiert auf der Nabenhöhe und typischen Leistungskurven moderner Windkraftanlagen.</p>
+                <p style="margin-bottom: 10px;"><strong>Umspannwerks-Lastschätzung:</strong><br>
+                1. Kraftwerke werden dem nächsten Umspannwerk zugeordnet (&lt;50km)<br>
+                2. Verbrauch wird regional verteilt (Wien: 2.5×, Tirol: 0.7×, etc.)<br>
+                3. Grenzflüsse werden Grenz-Umspannwerken zugeordnet<br>
+                4. Netto-Fluss = Erzeugung - Verbrauch + Importe<br>
+                5. Auslastung % = |Netto-Fluss| / Umspannwerks-Kapazität</p>
                 
-                <p style="margin-bottom: 10px;"><strong>Übertragungsnetz:</strong> Die 220/380 kV Leitungen stammen aus OpenStreetMap (community-basiert). Die Daten sind nicht vollständig verifiziert – die tatsächliche Netzstruktur ist nur teilweise öffentlich dokumentiert.</p>
+                <p style="margin-bottom: 10px;"><strong>Turbinenleistung:</strong> Geschätzt aus Nabenhöhe (3-7 MW pro Anlage).</p>
                 
-                <p><strong>Visualisierung:</strong> Farbskalen verwenden Viridis (Turbinen) und einen Rot-Weiß-Gradienten (Umspannwerke) für optimale Unterscheidbarkeit.</p>
+                <p><strong>Datenaktualisierung:</strong> ENTSO-E alle 5 Min, OSM-Daten regelmäßig.</p>
             </div>
             
             <h2 style="color: #ff6b6b; margin: 20px 0 15px 0;"><i class="fas fa-exclamation-triangle"></i> Datenlücken</h2>
@@ -834,6 +840,9 @@
         // Create pane for transmission lines (below turbines but above heatmap)
         map.createPane('transmissionPane');
         map.getPane('transmissionPane').style.zIndex = 420;
+        
+        map.createPane('powerPlantsPane');
+        map.getPane('powerPlantsPane').style.zIndex = 430;
         
         // Data storage
         let districtData = {};
@@ -1643,6 +1652,7 @@
                         weight: 1,
                         opacity: opacity,
                         fillOpacity: opacity * 0.7,
+                        pane: 'powerPlantsPane'
                     });
                     
                     // Production bar for tooltip

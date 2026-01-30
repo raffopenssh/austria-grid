@@ -2,76 +2,78 @@
 
 ## Current State (2026-01-30)
 
-### Completed
-1. **OSM Transmission Lines**: 1,291 segments (460× 380kV, 831× 220kV)
-2. **OSM Substations**: 85 high-voltage substations
-3. **Grid Network Topology**: 41 nodes, 460 edges with connectivity
-4. **Hydropower**: 156 plants (13.5 GW)
-5. **Cross-border Connections**: 9 interconnectors
-6. **E-Control Statistics**: Grid lengths by voltage
-7. **ENTSO-E Live Data Integration** ✅ (2026-01-30)
-   - Real-time generation by source (hydro, wind, solar, gas, etc.)
+### Completed Features
+
+1. **OSM Infrastructure Data**
+   - 1,291 transmission line segments (460× 380kV, 831× 220kV)
+   - 514 substations (85 HV from OSM + 429 from transformer data)
+   - 41 nodes, 460 edges network topology
+
+2. **Power Plant Data** ✅
+   - 688 power plants with capacity data (from 4,700+ OSM elements)
+   - Total: 26,825 MW capacity
+   - By source:
+     - Hydro run-of-river: 404 plants, 14,697 MW
+     - Gas: 35 plants, 8,005 MW
+     - Wind: 121 plants, 2,902 MW
+     - Solar: 93 plants, 581 MW
+     - Coal: 1 plant, 225 MW
+     - Biomass: 24 plants, 113 MW
+     - Waste: 6 plants, 277 MW
+
+3. **ENTSO-E Live Data Integration** ✅
+   - Real-time generation by source type
    - Day-ahead electricity prices (€/MWh)
-   - Cross-border physical flows with all neighbors
-   - 5-minute cache + auto-refresh
+   - Cross-border physical flows with DE, CZ, SK, HU, SI, IT, CH
+   - SQLite database for historical storage
+   - Cron job fetching every 15 minutes
 
-### ENTSO-E API Integration
-- **API Key**: `35efd923-6969-4470-b2bd-0155b2254346`
-- **Endpoints**:
-  - `/api/entsoe/generation` - actual generation by type
-  - `/api/entsoe/prices` - day-ahead prices
-  - `/api/entsoe/cross-border-flows` - physical flows
-  - `/api/entsoe/summary` - combined dashboard
+4. **Substation Load Model** ✅
+   - Estimates load on each substation based on:
+     - Nearby power plants assigned to substations
+     - Current production calculated from ENTSO-E utilization
+     - Regional load distribution factors
+     - Cross-border flows at border substations
+   - Displays load percentage with color coding
 
-### Layers (cleaned up)
+### Map Layers
 - ✅ District heatmap (capacity analysis)
-- ✅ Wind turbines
+- ✅ Wind turbines (1,578 individual turbines)
 - ✅ Transformers (Umspannwerke)
+- ✅ UW Lastanzeige (live substation load)
+- ✅ Alle Kraftwerke (688 power plants with live production)
 - ✅ Transmission lines (OSM 380/220kV)
-- ✅ Hydropower plants
+- ✅ Wasserkraftwerke (156 major hydro)
 - ✅ Cross-border connections
-- ⚠️ ÖNIP 2030 (marked as approximate - inaccurate georeferencing)
+- ⚠️ ÖNIP 2030 (approximate georeferencing)
 
-### TODO: Electricity Districts (Netzgebiete)
-- Currently using political districts (Bezirke)
-- Should use grid operator districts (Netzgebiete)
-- Source: https://stele.at/karte/ or E-Control
-- Grid operators: APG, Netz NÖ, Wiener Netze, etc.
+### API Endpoints
+- `/api/entsoe/generation` - Live generation by type
+- `/api/entsoe/prices` - Day-ahead prices
+- `/api/entsoe/cross-border-flows` - Physical flows
+- `/api/substation-loads` - Substation load estimates
+- `/api/power-plants` - All plants with production
 
 ### Potential Improvements
-1. **Price history chart**: Show 24h price trend in live panel
-2. **Generation mix pie chart**: Visual breakdown of current generation
-3. **Historical flow visualization**: Animate cross-border flows on map
-4. **Load data**: Add consumption data from ENTSO-E
-5. **Forecasts**: Day-ahead generation forecasts
-
-### Z-Layer Order (front to back)
-1. Popups/tooltips (z-index: 1000+)
-2. Transformers/substations (z-index: 500)
-3. Wind turbines (z-index: 450)
-4. Transmission lines (z-index: 420)
-5. Hydropower (z-index: 410)
-6. Cross-border (z-index: 405)
-7. District heatmap (z-index: 400)
-8. Base map tiles
+1. **Price history chart**: 24h trend visualization
+2. **Generation mix chart**: Real-time pie/donut chart
+3. **Individual plant pages**: SEO pages for major plants
+4. **Flow animation**: Animate power flow on map
+5. **Forecasting**: Day-ahead generation forecast
+6. **Grid operator districts**: Replace political Bezirke with Netzgebiete
 
 ### Key Commands
 ```bash
 cd /home/exedev/austria-grid
 sudo systemctl restart austria-grid
-git add <files> && git commit -m "message" && git push origin main
+python3 fetch_power_plants.py  # Refresh OSM data
+python3 entsoe_fetcher.py fetch 24  # Fetch 24h of data
 ```
 
 ### Live URLs
 - App: https://austria-power.exe.xyz:8000/
 - GitHub: https://github.com/raffopenssh/austria-grid
 
-### ENTSO-E API Reference
-- Portal: https://transparency.entsoe.eu/
-- API docs: https://transparency.entsoe.eu/content/static_content/Static%20content/web%20api/Guide.html
+### ENTSO-E API
+- Key: `35efd923-6969-4470-b2bd-0155b2254346`
 - Austria bidding zone: `10YAT-APG------L`
-- Document types:
-  - A75: Actual generation per type
-  - A44: Day-ahead prices
-  - A11: Physical flows
-  - A65: System total load

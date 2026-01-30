@@ -217,63 +217,84 @@ class SubstationLoadModel:
         }
         
     def load_power_plants(self):
-        """Load all power plants from comprehensive dataset."""
+        """Load all power plants from multiple data sources and merge."""
+        plants_by_location = {}  # Key: (rounded lat, lon) to avoid duplicates
+        
+        # 1. Load from all_power_plants.json (OSM data)
         try:
             data = load_json('all_power_plants.json')
             for feature in data.get('features', []):
                 plant = PowerPlant(feature)
                 if plant.capacity_mw and plant.capacity_mw > 0:
-                    self.power_plants.append(plant)
-        except FileNotFoundError:
-            print("all_power_plants.json not found, using hydropower + wind data")
-            
-            # Fall back to separate files
-            try:
-                hydro = load_json('hydropower_plants.json')
-                for feature in hydro.get('features', []):
-                    props = feature['properties']
-                    # Adapt to PowerPlant format
-                    feature['properties']['capacity_mw'] = props.get('mw', 0)
-                    feature['properties']['source'] = 'hydro_run_of_river'
-                    if 'pump' in props.get('type', '').lower():
-                        feature['properties']['source'] = 'hydro_pumped'
-                    elif 'speicher' in props.get('type', '').lower():
-                        feature['properties']['source'] = 'hydro_reservoir'
-                    plant = PowerPlant(feature)
-                    if plant.capacity_mw > 0:
-                        self.power_plants.append(plant)
-            except:
-                pass
-            
-            try:
-                wind = load_json('wind_turbines_enhanced.json')
-                for t in wind:
-                    if t.get('lat') and t.get('lon'):
-                        feature = {
-                            'properties': {
-                                'name': t.get('name', 'Wind Turbine'),
-                                'capacity_mw': t.get('estimated_mw', 3.0),
-                                'source': 'wind',
-                            },
-                            'geometry': {
-                                'type': 'Point',
-                                'coordinates': [t['lon'], t['lat']]
-                            }
+                    key = (round(plant.lat, 3), round(plant.lon, 3))
+                    if key not in plants_by_location or plant.capacity_mw > plants_by_location[key].capacity_mw:
+                        plants_by_location[key] = plant
+        except Exception as e:
+            print(f"Could not load all_power_plants.json: {e}")
+        
+        # 2. Load hydropower with better categorization (pumped storage, reservoir)
+        try:
+            hydro = load_json('hydropower_plants.json')
+            for feature in hydro.get('features', []):
+                props = feature['properties']
+                plant_type = props.get('type', '').lower()
+                
+                # Determine source type
+                if 'pump' in plant_type:
+                    source = 'hydro_pumped'
+                elif 'speicher' in plant_type:
+                    source = 'hydro_reservoir'
+                else:
+                    source = 'hydro_run_of_river'
+                
+                feature['properties']['capacity_mw'] = props.get('mw', 0)
+                feature['properties']['source'] = source
+                feature['properties']['name'] = props.get('name', f"{props.get('river', '')} {plant_type}")
+                
+                plant = PowerPlant(feature)
+                if plant.capacity_mw > 0:
+                    key = (round(plant.lat, 3), round(plant.lon, 3))
+                    # Prefer this data if it has better categorization
+                    if key not in plants_by_location or source != 'hydro_run_of_river':
+                        plants_by_location[key] = plant
+        except Exception as e:
+            print(f"Could not load hydropower_plants.json: {e}")
+        
+        # 3. Load wind turbines
+        try:
+            wind = load_json('wind_turbines_enhanced.json')
+            for t in wind:
+                if t.get('lat') and t.get('lon'):
+                    feature = {
+                        'properties': {
+                            'name': t.get('name', 'Windkraftanlage'),
+                            'capacity_mw': t.get('estimated_mw', 3.0),
+                            'source': 'wind',
+                        },
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': [t['lon'], t['lat']]
                         }
-                        self.power_plants.append(PowerPlant(feature))
-            except:
-                pass
+                    }
+                    plant = PowerPlant(feature)
+                    key = (round(plant.lat, 3), round(plant.lon, 3))
+                    if key not in plants_by_location:
+                        plants_by_location[key] = plant
+        except Exception as e:
+            print(f"Could not load wind_turbines_enhanced.json: {e}")
+        
+        self.power_plants = list(plants_by_location.values())
         
         # Count by source
-        by_source = {}
+        self.capacity_by_source = {}
         for p in self.power_plants:
-            if p.source not in by_source:
-                by_source[p.source] = {'count': 0, 'capacity': 0}
-            by_source[p.source]['count'] += 1
-            by_source[p.source]['capacity'] += p.capacity_mw
+            if p.source not in self.capacity_by_source:
+                self.capacity_by_source[p.source] = {'count': 0, 'capacity': 0}
+            self.capacity_by_source[p.source]['count'] += 1
+            self.capacity_by_source[p.source]['capacity'] += p.capacity_mw
         
         print(f"Loaded {len(self.power_plants)} power plants:")
-        for src, stats in sorted(by_source.items()):
+        for src, stats in sorted(self.capacity_by_source.items()):
             print(f"  {src}: {stats['count']} plants, {stats['capacity']:.0f} MW")
     
     def load_substations(self):
@@ -338,59 +359,91 @@ class SubstationLoadModel:
         print(f"Total load estimate: {self.load_data['total']:.0f} MW")
     
     def calculate_utilization_factors(self):
-        """Calculate utilization factor for each source type."""
-        # Sum capacity by source
-        capacity_by_source = {}
-        for plant in self.power_plants:
-            src = plant.source
-            if src not in capacity_by_source:
-                capacity_by_source[src] = 0
-            capacity_by_source[src] += plant.capacity_mw
+        """Calculate utilization factors to match ENTSO-E totals exactly."""
         
-        # Map ENTSO-E generation to source types
-        generation_by_source = {}
+        # Map ENTSO-E generation to our source categories
+        entsoe_by_source = {}
         for entsoe_type, value in self.generation_data.items():
             src = ENTSOE_TO_SOURCE.get(entsoe_type, 'other')
-            if src not in generation_by_source:
-                generation_by_source[src] = 0
-            generation_by_source[src] += value
+            if src not in entsoe_by_source:
+                entsoe_by_source[src] = 0
+            entsoe_by_source[src] += value
         
-        # Calculate utilization factors
-        print("\nUtilization factors:")
-        for src, capacity in capacity_by_source.items():
-            if capacity > 0:
-                gen = generation_by_source.get(src, 0)
-                factor = min(gen / capacity, 1.0) if capacity > 0 else 0
+        print("\nENTSO-E generation by source:")
+        for src, gen in sorted(entsoe_by_source.items()):
+            print(f"  {src}: {gen:.0f} MW")
+        
+        # Calculate utilization factors to match ENTSO-E exactly
+        print("\nCalibrated utilization factors:")
+        for src, stats in self.capacity_by_source.items():
+            capacity = stats['capacity']
+            entsoe_gen = entsoe_by_source.get(src, 0)
+            
+            if capacity > 0 and entsoe_gen > 0:
+                # Calculate factor that makes our production match ENTSO-E
+                factor = entsoe_gen / capacity
+                # Cap at 1.0 (100% utilization) but allow slight overage for rounding
+                factor = min(factor, 1.05)
                 self.utilization_factors[src] = factor
-                if gen > 0 or factor > 0:
-                    print(f"  {src}: {gen:.0f} MW / {capacity:.0f} MW = {factor:.1%}")
+                print(f"  {src}: {entsoe_gen:.0f} MW / {capacity:.0f} MW = {factor:.1%}")
+            elif capacity > 0:
+                # No ENTSO-E data for this source, use defaults
+                defaults = {
+                    'hydro_run_of_river': 0.05,
+                    'hydro_reservoir': 0.10,
+                    'hydro_pumped': 0.02,
+                    'wind': 0.04,
+                    'solar': 0.0,
+                    'gas': 0.28,
+                    'coal': 0.0,
+                    'biomass': 0.80,
+                    'waste': 0.36,
+                    'other': 0.30,
+                }
+                self.utilization_factors[src] = defaults.get(src, 0.1)
             else:
                 self.utilization_factors[src] = 0
         
-        # Set defaults for missing sources
-        defaults = {
-            'hydro_run_of_river': 0.4,
-            'hydro_reservoir': 0.3,
-            'hydro_pumped': 0.2,
-            'wind': 0.2,
-            'solar': 0.0,  # Will be 0 at night
-            'gas': 0.5,
-            'coal': 0.3,
-            'biomass': 0.5,
-            'other': 0.3,
-        }
-        for src, default in defaults.items():
-            if src not in self.utilization_factors:
-                self.utilization_factors[src] = default
+        # Store ENTSO-E totals for validation
+        self.entsoe_by_source = entsoe_by_source
     
     def estimate_plant_production(self):
-        """Estimate current production for each plant."""
-        total_production = 0
+        """Estimate current production for each plant, calibrated to ENTSO-E."""
+        # First pass: calculate raw production
+        production_by_source = {}
         for plant in self.power_plants:
             plant.estimate_production(self.utilization_factors)
-            total_production += plant.current_production_mw
+            src = plant.source
+            if src not in production_by_source:
+                production_by_source[src] = 0
+            production_by_source[src] += plant.current_production_mw
         
-        print(f"\nEstimated total production: {total_production:.0f} MW")
+        # Second pass: adjust to match ENTSO-E exactly
+        print("\nProduction calibration:")
+        for src, model_prod in production_by_source.items():
+            entsoe_prod = self.entsoe_by_source.get(src, 0)
+            if model_prod > 0 and entsoe_prod > 0:
+                # Calculate adjustment factor
+                adjustment = entsoe_prod / model_prod
+                if abs(adjustment - 1.0) > 0.01:  # Only adjust if > 1% difference
+                    print(f"  {src}: adjusting {model_prod:.0f} -> {entsoe_prod:.0f} MW (factor: {adjustment:.3f})")
+                    # Apply adjustment to all plants of this source
+                    for plant in self.power_plants:
+                        if plant.source == src:
+                            plant.current_production_mw *= adjustment
+                            plant.utilization_factor *= adjustment
+        
+        # Calculate final total
+        total_production = sum(p.current_production_mw for p in self.power_plants)
+        entsoe_total = sum(self.generation_data.values())
+        
+        print(f"\nFinal production: {total_production:.0f} MW (ENTSO-E: {entsoe_total:.0f} MW)")
+        
+        # Validate
+        if entsoe_total > 0:
+            match_pct = (total_production / entsoe_total) * 100
+            print(f"Match: {match_pct:.1f}%")
+        
         return total_production
     
     def assign_plants_to_substations(self):
