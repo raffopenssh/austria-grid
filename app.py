@@ -5,16 +5,127 @@ from flask import Flask, jsonify, send_from_directory, send_file, render_templat
 import json
 import os
 import tempfile
-from datetime import datetime
+from datetime import datetime, timedelta
 from shapely.geometry import shape, Point, LineString
 from urllib.parse import quote
 import geopandas as gpd
 import pandas as pd
+import requests
+import xml.etree.ElementTree as ET
+from functools import lru_cache
+import time
 
 app = Flask(__name__, static_folder='static')
 
 # Base URL for the site
 BASE_URL = 'https://austria-power.exe.xyz:8000'
+
+# ENTSO-E API configuration
+ENTSOE_API_KEY = os.environ.get('ENTSOE_API_KEY', '35efd923-6969-4470-b2bd-0155b2254346')
+ENTSOE_BASE_URL = 'https://web-api.tp.entsoe.eu/api'
+AUSTRIA_BZ = '10YAT-APG------L'  # Austria bidding zone
+
+# Country codes for cross-border flows
+COUNTRY_CODES = {
+    'DE': '10Y1001A1001A83F',  # Germany (DE-LU)
+    'CZ': '10YCZ-CEPS-----N',  # Czech Republic
+    'SK': '10YSK-SEPS-----K',  # Slovakia
+    'HU': '10YHU-MAVIR----U',  # Hungary
+    'SI': '10YSI-ELES-----O',  # Slovenia
+    'IT': '10YIT-GRTN-----B',  # Italy
+    'CH': '10YCH-SWISSGRIDZ',  # Switzerland
+}
+
+# PSR type codes for generation
+PSR_TYPES = {
+    'B01': 'Biomasse',
+    'B02': 'Braunkohle',
+    'B03': 'Steinkohle',
+    'B04': 'Erdgas',
+    'B05': 'Heizöl',
+    'B06': 'Gas',
+    'B09': 'Geothermie',
+    'B10': 'Wasserkraft (Laufwasser)',
+    'B11': 'Wasserkraft (Speicher)',
+    'B12': 'Wasserkraft (Pumpspeicher)',
+    'B14': 'Kernkraft',
+    'B15': 'Andere erneuerbare',
+    'B16': 'Solar',
+    'B17': 'Abfall',
+    'B18': 'Wind Offshore',
+    'B19': 'Wind Onshore',
+    'B20': 'Andere',
+}
+
+# Cache for ENTSO-E data (5 min TTL)
+entsoe_cache = {}
+CACHE_TTL = 300  # seconds
+
+
+# ENTSO-E helper functions
+def get_cached(key):
+    """Get cached data if not expired"""
+    if key in entsoe_cache:
+        data, timestamp = entsoe_cache[key]
+        if time.time() - timestamp < CACHE_TTL:
+            return data
+    return None
+
+def set_cached(key, data):
+    """Store data in cache"""
+    entsoe_cache[key] = (data, time.time())
+
+def parse_entsoe_xml(xml_text, value_key='quantity'):
+    """Parse ENTSO-E XML response into structured data"""
+    root = ET.fromstring(xml_text)
+    ns = {'': root.tag.split('}')[0].strip('{')}
+    
+    result = []
+    for ts in root.findall('.//{%s}TimeSeries' % ns['']):
+        psr_type = None
+        psr_elem = ts.find('.//{%s}psrType' % ns[''])
+        if psr_elem is not None:
+            psr_type = psr_elem.text
+        
+        in_domain = ts.find('.//{%s}in_Domain.mRID' % ns[''])
+        out_domain = ts.find('.//{%s}out_Domain.mRID' % ns[''])
+        
+        for period in ts.findall('.//{%s}Period' % ns['']):
+            start = period.find('.//{%s}start' % ns['']).text
+            resolution = period.find('.//{%s}resolution' % ns['']).text
+            
+            for point in period.findall('.//{%s}Point' % ns['']):
+                pos = int(point.find('.//{%s}position' % ns['']).text)
+                
+                # Handle both quantity and price.amount
+                value_elem = point.find('.//{%s}%s' % (ns[''], value_key))
+                if value_elem is None:
+                    value_elem = point.find('.//{%s}price.amount' % ns[''])
+                
+                if value_elem is not None:
+                    value = float(value_elem.text)
+                    result.append({
+                        'psr_type': psr_type,
+                        'position': pos,
+                        'value': value,
+                        'start': start,
+                        'resolution': resolution,
+                        'in_domain': in_domain.text if in_domain is not None else None,
+                        'out_domain': out_domain.text if out_domain is not None else None,
+                    })
+    return result
+
+def fetch_entsoe(params):
+    """Fetch data from ENTSO-E API"""
+    params['securityToken'] = ENTSOE_API_KEY
+    try:
+        response = requests.get(ENTSOE_BASE_URL, params=params, timeout=30)
+        response.raise_for_status()
+        return response.text
+    except Exception as e:
+        print(f"ENTSO-E API error: {e}")
+        return None
+
 
 # Load data
 def load_json(filename):
@@ -97,6 +208,188 @@ def grid_network():
     """380kV grid network topology with substations and connected lines"""
     data = load_json('grid_network_380kv.json')
     return jsonify(data)
+
+
+# ============ ENTSO-E LIVE DATA ROUTES ============
+
+@app.route('/api/entsoe/generation')
+def entsoe_generation():
+    """Current actual generation per type in Austria"""
+    cache_key = 'generation'
+    cached = get_cached(cache_key)
+    if cached:
+        return jsonify(cached)
+    
+    now = datetime.utcnow()
+    start = (now - timedelta(hours=2)).strftime('%Y%m%d%H00')
+    end = now.strftime('%Y%m%d%H00')
+    
+    xml_data = fetch_entsoe({
+        'documentType': 'A75',  # Actual generation per type
+        'processType': 'A16',   # Realised
+        'in_Domain': AUSTRIA_BZ,
+        'periodStart': start,
+        'periodEnd': end,
+    })
+    
+    if not xml_data:
+        return jsonify({'error': 'Failed to fetch data'}), 500
+    
+    parsed = parse_entsoe_xml(xml_data)
+    
+    # Aggregate latest values by PSR type
+    generation = {}
+    for item in parsed:
+        psr = item['psr_type']
+        if psr and item['value'] > 0:
+            name = PSR_TYPES.get(psr, psr)
+            if name not in generation or item['position'] > generation[name]['position']:
+                generation[name] = {'value': item['value'], 'position': item['position']}
+    
+    result = {
+        'timestamp': now.isoformat(),
+        'generation': {k: v['value'] for k, v in generation.items()},
+        'total_mw': sum(v['value'] for v in generation.values()),
+        'unit': 'MW',
+    }
+    set_cached(cache_key, result)
+    return jsonify(result)
+
+@app.route('/api/entsoe/prices')
+def entsoe_prices():
+    """Day-ahead electricity prices for Austria"""
+    cache_key = 'prices'
+    cached = get_cached(cache_key)
+    if cached:
+        return jsonify(cached)
+    
+    now = datetime.utcnow()
+    start = (now - timedelta(days=1)).strftime('%Y%m%d0000')
+    end = (now + timedelta(days=1)).strftime('%Y%m%d2300')
+    
+    xml_data = fetch_entsoe({
+        'documentType': 'A44',  # Price document
+        'in_Domain': AUSTRIA_BZ,
+        'out_Domain': AUSTRIA_BZ,
+        'periodStart': start,
+        'periodEnd': end,
+    })
+    
+    if not xml_data:
+        return jsonify({'error': 'Failed to fetch data'}), 500
+    
+    parsed = parse_entsoe_xml(xml_data, value_key='price.amount')
+    
+    # Convert to hourly prices
+    prices = []
+    for item in parsed:
+        prices.append({
+            'position': item['position'],
+            'price_eur_mwh': item['value'],
+            'start': item['start'],
+        })
+    
+    # Find current price (position based on current hour)
+    current_hour = now.hour
+    current_price = None
+    for p in prices:
+        # Each position represents 15 minutes, so position 1-4 = hour 0, 5-8 = hour 1, etc.
+        pos_hour = (p['position'] - 1) // 4
+        if pos_hour == current_hour:
+            current_price = p['price_eur_mwh']
+            break
+    
+    result = {
+        'timestamp': now.isoformat(),
+        'current_price_eur_mwh': current_price,
+        'prices': prices[-96:],  # Last 24 hours (96 x 15min intervals)
+        'currency': 'EUR',
+        'unit': 'MWh',
+    }
+    set_cached(cache_key, result)
+    return jsonify(result)
+
+@app.route('/api/entsoe/cross-border-flows')
+def entsoe_cross_border():
+    """Current cross-border physical flows"""
+    cache_key = 'cross_border_flows'
+    cached = get_cached(cache_key)
+    if cached:
+        return jsonify(cached)
+    
+    now = datetime.utcnow()
+    start = (now - timedelta(hours=2)).strftime('%Y%m%d%H00')
+    end = now.strftime('%Y%m%d%H00')
+    
+    flows = {}
+    
+    for country, code in COUNTRY_CODES.items():
+        # Import (from country to Austria)
+        xml_import = fetch_entsoe({
+            'documentType': 'A11',  # Aggregated energy data report
+            'in_Domain': code,
+            'out_Domain': AUSTRIA_BZ,
+            'periodStart': start,
+            'periodEnd': end,
+        })
+        
+        # Export (from Austria to country)
+        xml_export = fetch_entsoe({
+            'documentType': 'A11',
+            'in_Domain': AUSTRIA_BZ,
+            'out_Domain': code,
+            'periodStart': start,
+            'periodEnd': end,
+        })
+        
+        import_mw = 0
+        export_mw = 0
+        
+        if xml_import:
+            parsed = parse_entsoe_xml(xml_import)
+            if parsed:
+                import_mw = parsed[-1]['value'] if parsed else 0
+        
+        if xml_export:
+            parsed = parse_entsoe_xml(xml_export)
+            if parsed:
+                export_mw = parsed[-1]['value'] if parsed else 0
+        
+        flows[country] = {
+            'import_mw': import_mw,
+            'export_mw': export_mw,
+            'net_mw': import_mw - export_mw,  # Positive = net import
+        }
+    
+    total_import = sum(f['import_mw'] for f in flows.values())
+    total_export = sum(f['export_mw'] for f in flows.values())
+    
+    result = {
+        'timestamp': now.isoformat(),
+        'flows': flows,
+        'total_import_mw': total_import,
+        'total_export_mw': total_export,
+        'net_position_mw': total_import - total_export,
+        'unit': 'MW',
+    }
+    set_cached(cache_key, result)
+    return jsonify(result)
+
+@app.route('/api/entsoe/summary')
+def entsoe_summary():
+    """Summary dashboard with all key metrics"""
+    # Fetch all data (uses cache)
+    generation = entsoe_generation().get_json() if hasattr(entsoe_generation(), 'get_json') else {}
+    prices = entsoe_prices().get_json() if hasattr(entsoe_prices(), 'get_json') else {}
+    flows = entsoe_cross_border().get_json() if hasattr(entsoe_cross_border(), 'get_json') else {}
+    
+    return jsonify({
+        'timestamp': datetime.utcnow().isoformat(),
+        'generation': generation,
+        'prices': prices,
+        'cross_border': flows,
+    })
+
 
 @app.route('/api/district-capacity')
 def district_capacity():

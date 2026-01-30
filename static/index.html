@@ -525,6 +525,45 @@
                 </div>
             </div>
             
+            <!-- Live ENTSO-E Data Panel -->
+            <div class="panel" id="live-panel">
+                <h3><i class="fas fa-signal"></i> Live Daten <span id="live-status" style="font-size: 0.7rem; color: #00d4aa;">⏳</span></h3>
+                <div class="stat-row">
+                    <span class="stat-label">Strompreis aktuell</span>
+                    <span class="stat-value" id="live-price">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Gesamterzeugung</span>
+                    <span class="stat-value positive" id="live-generation">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">→ Wasserkraft</span>
+                    <span class="stat-value" id="live-hydro">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">→ Wind</span>
+                    <span class="stat-value" id="live-wind">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">→ Solar</span>
+                    <span class="stat-value" id="live-solar">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">→ Gas</span>
+                    <span class="stat-value" id="live-gas">-</span>
+                </div>
+                <hr style="border: none; border-top: 1px solid #333; margin: 8px 0;">
+                <div class="stat-row">
+                    <span class="stat-label">Netto Import/Export</span>
+                    <span class="stat-value" id="live-net-position">-</span>
+                </div>
+                <div id="cross-border-flows" style="font-size: 0.75rem; margin-top: 8px;"></div>
+                <div style="font-size: 0.65rem; color: #666; margin-top: 8px;">
+                    <span>Quelle: ENTSO-E Transparency</span>
+                    <span id="live-timestamp" style="float: right;">-</span>
+                </div>
+            </div>
+            
             <div class="panel" id="turbine-ranking">
                 <h3><i class="fas fa-trophy"></i> Windkraftanlagen im Blickfeld</h3>
                 <div class="ranking-section">
@@ -1689,6 +1728,90 @@
             }
         });
         
+        // Load live ENTSO-E data
+        async function loadLiveData() {
+            const statusEl = document.getElementById('live-status');
+            statusEl.textContent = '⏳';
+            statusEl.style.color = '#ffc107';
+            
+            try {
+                // Fetch generation data
+                const genResponse = await fetch('/api/entsoe/generation');
+                const genData = await genResponse.json();
+                
+                if (genData.generation) {
+                    document.getElementById('live-generation').textContent = 
+                        Math.round(genData.total_mw).toLocaleString('de-AT') + ' MW';
+                    
+                    const gen = genData.generation;
+                    document.getElementById('live-hydro').textContent = 
+                        Math.round((gen['Wasserkraft (Laufwasser)'] || 0) + (gen['Wasserkraft (Speicher)'] || 0) + (gen['Wasserkraft (Pumpspeicher)'] || 0)).toLocaleString('de-AT') + ' MW';
+                    document.getElementById('live-wind').textContent = 
+                        Math.round((gen['Wind Onshore'] || 0) + (gen['Wind Offshore'] || 0)).toLocaleString('de-AT') + ' MW';
+                    document.getElementById('live-solar').textContent = 
+                        Math.round(gen['Solar'] || 0).toLocaleString('de-AT') + ' MW';
+                    document.getElementById('live-gas').textContent = 
+                        Math.round((gen['Gas'] || 0) + (gen['Erdgas'] || 0)).toLocaleString('de-AT') + ' MW';
+                }
+                
+                // Fetch price data
+                const priceResponse = await fetch('/api/entsoe/prices');
+                const priceData = await priceResponse.json();
+                
+                if (priceData.current_price_eur_mwh !== null) {
+                    const price = priceData.current_price_eur_mwh;
+                    const priceEl = document.getElementById('live-price');
+                    priceEl.textContent = price.toFixed(2) + ' €/MWh';
+                    priceEl.style.color = price > 100 ? '#ff6b6b' : price > 50 ? '#ffc107' : '#00d4aa';
+                }
+                
+                // Fetch cross-border flows
+                const flowResponse = await fetch('/api/entsoe/cross-border-flows');
+                const flowData = await flowResponse.json();
+                
+                if (flowData.flows) {
+                    const netPos = flowData.net_position_mw;
+                    const netEl = document.getElementById('live-net-position');
+                    if (netPos > 0) {
+                        netEl.textContent = '+' + Math.round(netPos).toLocaleString('de-AT') + ' MW';
+                        netEl.style.color = '#ff6b6b';  // Import = red
+                    } else {
+                        netEl.textContent = Math.round(netPos).toLocaleString('de-AT') + ' MW';
+                        netEl.style.color = '#00d4aa';  // Export = green
+                    }
+                    
+                    // Show individual flows
+                    const flowsEl = document.getElementById('cross-border-flows');
+                    const countryNames = {
+                        'DE': 'Deutschland', 'CZ': 'Tschechien', 'SK': 'Slowakei',
+                        'HU': 'Ungarn', 'SI': 'Slowenien', 'IT': 'Italien', 'CH': 'Schweiz'
+                    };
+                    let flowHtml = '';
+                    for (const [code, flow] of Object.entries(flowData.flows)) {
+                        const net = flow.net_mw;
+                        if (Math.abs(net) > 50) {
+                            const arrow = net > 0 ? '←' : '→';
+                            const color = net > 0 ? '#ff6b6b' : '#00d4aa';
+                            flowHtml += `<div style="color: ${color};">${arrow} ${countryNames[code] || code}: ${Math.abs(Math.round(net)).toLocaleString('de-AT')} MW</div>`;
+                        }
+                    }
+                    flowsEl.innerHTML = flowHtml || '<div style="color: #666;">Ausgeglichen</div>';
+                }
+                
+                // Update timestamp
+                const now = new Date();
+                document.getElementById('live-timestamp').textContent = 
+                    now.toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' });
+                
+                statusEl.textContent = '●';
+                statusEl.style.color = '#00d4aa';
+            } catch (error) {
+                console.error('Error loading live data:', error);
+                statusEl.textContent = '●';
+                statusEl.style.color = '#ff6b6b';
+            }
+        }
+        
         // Initialize
         async function init() {
             await Promise.all([
@@ -1701,6 +1824,12 @@
                 loadCrossBorder(),
                 loadOnipPowerlines()
             ]);
+            
+            // Load live data after main init
+            loadLiveData();
+            
+            // Refresh live data every 5 minutes
+            setInterval(loadLiveData, 5 * 60 * 1000);
         }
         
         init();
