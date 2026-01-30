@@ -618,6 +618,10 @@
                         Umspannwerke
                     </label>
                     <label class="layer-toggle">
+                        <input type="checkbox" id="layer-substation-load">
+                        UW Lastanzeige <span style="font-size: 0.65rem; color: #888;">(Live)</span>
+                    </label>
+                    <label class="layer-toggle">
                         <input type="checkbox" id="layer-transmission">
                         Hochspannungsleitungen
                     </label>
@@ -817,6 +821,7 @@
         const windparksLayer = L.layerGroup().addTo(map);
         const transformersLayer = L.layerGroup();
         const transmissionLayer = L.layerGroup();
+        const substationLoadLayer = L.layerGroup();
         const hydropowerLayer = L.layerGroup();
         const crossBorderLayer = L.layerGroup();
         const onipLayer = L.layerGroup();
@@ -1488,6 +1493,89 @@
             console.log(`Loaded ${connections.length} cross-border connections`);
         }
         
+        // Load substation loads (live estimation)
+        async function loadSubstationLoads() {
+            try {
+                const response = await fetch('/api/substation-loads');
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error('Substation load error:', data.error);
+                    return;
+                }
+                
+                // Clear existing markers
+                substationLoadLayer.clearLayers();
+                
+                const substations = data.substations || [];
+                
+                // Filter to show only significant substations (220kV+)
+                const hvSubstations = substations.filter(s => s.voltage >= 220 && s.name);
+                
+                hvSubstations.forEach(sub => {
+                    // Color based on load percentage
+                    let color, fillColor;
+                    if (sub.load_percent > 80) {
+                        color = '#ff1744';  // Red - high load
+                        fillColor = '#ff5252';
+                    } else if (sub.load_percent > 50) {
+                        color = '#ff9100';  // Orange - medium load
+                        fillColor = '#ffab40';
+                    } else if (sub.load_percent > 20) {
+                        color = '#ffea00';  // Yellow - moderate
+                        fillColor = '#ffff00';
+                    } else {
+                        color = '#00e676';  // Green - low load
+                        fillColor = '#69f0ae';
+                    }
+                    
+                    // Size based on voltage
+                    const radius = sub.voltage >= 380 ? 12 : 9;
+                    
+                    const marker = L.circleMarker([sub.lat, sub.lon], {
+                        radius: radius,
+                        fillColor: fillColor,
+                        color: color,
+                        weight: 3,
+                        opacity: 1,
+                        fillOpacity: 0.7,
+                        pane: 'transformerPane'
+                    });
+                    
+                    // Build tooltip content
+                    const genStr = sub.generation_mw > 0 ? `+${sub.generation_mw.toFixed(0)} MW Erzeugung` : '';
+                    const loadStr = `${sub.load_mw.toFixed(0)} MW Last`;
+                    const flowStr = sub.net_flow_mw >= 0 
+                        ? `<span style="color: #00e676;">▲ ${sub.net_flow_mw.toFixed(0)} MW Einspeisung</span>`
+                        : `<span style="color: #ff5252;">▼ ${Math.abs(sub.net_flow_mw).toFixed(0)} MW Verbrauch</span>`;
+                    
+                    const plantsStr = sub.connected_plants && sub.connected_plants.length > 0 
+                        ? `<div style="font-size: 0.7rem; color: #888; margin-top: 4px;">Angeschlossen: ${sub.connected_plants.slice(0, 3).join(', ')}${sub.connected_plants.length > 3 ? '...' : ''}</div>` 
+                        : '';
+                    
+                    marker.bindTooltip(`
+                        <div class="tooltip-custom">
+                            <div class="title" style="color: ${color};">${sub.name || 'Umspannwerk'}</div>
+                            <div><strong>${sub.voltage} kV</strong> | ${sub.capacity_mva} MVA</div>
+                            <div style="margin-top: 4px;">
+                                <strong style="font-size: 1.1em; color: ${color};">${sub.load_percent.toFixed(1)}%</strong> Auslastung
+                            </div>
+                            <div style="margin-top: 4px;">${flowStr}</div>
+                            ${genStr ? `<div style="color: #69f0ae;">${genStr}</div>` : ''}
+                            <div style="color: #ff8a80;">${loadStr}</div>
+                            ${plantsStr}
+                        </div>
+                    `, { className: 'tooltip-custom', sticky: true });
+                    
+                    marker.addTo(substationLoadLayer);
+                });
+                
+                console.log(`Loaded ${hvSubstations.length} substation loads (${data.summary?.high_load || 0} high, ${data.summary?.medium_load || 0} medium)`);
+            } catch (error) {
+                console.error('Error loading substation loads:', error);
+            }
+        }
+        
         // Load ÖNIP 2030 power line points for comparison
         async function loadOnipPowerlines() {
             const response = await fetch('/api/onip-powerlines');
@@ -1687,6 +1775,15 @@
             } else {
                 map.removeLayer(transformersLayer);
                 if (legend) legend.style.display = 'none';
+            }
+        });
+        
+        document.getElementById('layer-substation-load').addEventListener('change', function() {
+            if (this.checked) {
+                loadSubstationLoads();
+                map.addLayer(substationLoadLayer);
+            } else {
+                map.removeLayer(substationLoadLayer);
             }
         });
         

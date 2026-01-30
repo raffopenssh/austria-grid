@@ -5,7 +5,7 @@ from flask import Flask, jsonify, send_from_directory, send_file, render_templat
 import json
 import os
 import tempfile
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from shapely.geometry import shape, Point, LineString
 from urllib.parse import quote
 import geopandas as gpd
@@ -384,11 +384,46 @@ def entsoe_summary():
     flows = entsoe_cross_border().get_json() if hasattr(entsoe_cross_border(), 'get_json') else {}
     
     return jsonify({
-        'timestamp': datetime.utcnow().isoformat(),
+        'timestamp': datetime.now(timezone.utc).isoformat(),
         'generation': generation,
         'prices': prices,
         'cross_border': flows,
     })
+
+
+@app.route('/api/substation-loads')
+def substation_loads():
+    """Get estimated load on each substation based on live data"""
+    cache_key = 'substation_loads'
+    cached = get_cached(cache_key)
+    if cached:
+        return jsonify(cached)
+    
+    try:
+        from substation_load_model import SubstationLoadModel
+        model = SubstationLoadModel()
+        loads = model.run()
+        
+        # Filter to high-voltage substations with significant activity
+        hv_loads = [s for s in loads if s['voltage'] >= 110]
+        
+        result = {
+            'timestamp': datetime.now(timezone.utc).isoformat(),
+            'substations': hv_loads,
+            'summary': {
+                'total': len(hv_loads),
+                'high_load': sum(1 for s in hv_loads if s['status'] == 'high'),
+                'medium_load': sum(1 for s in hv_loads if s['status'] == 'medium'),
+                'low_load': sum(1 for s in hv_loads if s['status'] == 'low'),
+                'total_generation_mw': sum(s['generation_mw'] for s in hv_loads),
+                'total_load_mw': sum(s['load_mw'] for s in hv_loads),
+            }
+        }
+        set_cached(cache_key, result)
+        return jsonify(result)
+    except Exception as e:
+        import traceback
+        return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
 
 
 @app.route('/api/district-capacity')
