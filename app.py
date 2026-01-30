@@ -92,6 +92,12 @@ def onip_powerlines():
     data = load_json('onip_powerlines_points.json')
     return jsonify(data)
 
+@app.route('/api/grid-network')
+def grid_network():
+    """380kV grid network topology with substations and connected lines"""
+    data = load_json('grid_network_380kv.json')
+    return jsonify(data)
+
 @app.route('/api/district-capacity')
 def district_capacity():
     """Calculate capacity analysis for each district using proper point-in-polygon"""
