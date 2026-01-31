@@ -460,6 +460,24 @@ def all_power_plants():
         return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
 
 
+@app.route('/api/check-location')
+def check_location():
+    """Check feasibility of wind/solar installation at a location"""
+    lat = request.args.get('lat', type=float)
+    lon = request.args.get('lon', type=float)
+    
+    if lat is None or lon is None:
+        return jsonify({'error': 'Missing lat/lon parameters'}), 400
+    
+    try:
+        from location_checker import check_location_api
+        result = check_location_api(lat, lon)
+        return jsonify(result)
+    except Exception as e:
+        import traceback
+        return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
+
+
 @app.route('/api/district-capacity')
 def district_capacity():
     """Calculate capacity analysis for each district using proper point-in-polygon"""

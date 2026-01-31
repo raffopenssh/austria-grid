@@ -707,6 +707,10 @@
                     </div>
                 </div>
                 <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #333; font-size: 0.7rem;">
+                    <a href="#" onclick="enableLocationCheck(); return false;" style="color: #00d4aa; text-decoration: none; font-weight: bold;">
+                        <i class="fas fa-map-marker-alt"></i> Standort prüfen (Klick auf Karte)
+                    </a>
+                    <br>
                     <a href="#" onclick="showSourcesModal(); return false;" style="color: #666; text-decoration: none;">
                         <i class="fas fa-info-circle"></i> Quellen & Methodik
                     </a>
@@ -715,6 +719,17 @@
                         <i class="fas fa-download"></i> GeoPackage
                     </a>
                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Location Check Modal -->
+    <div id="location-modal" class="modal-overlay">
+        <div class="modal" style="max-width: 500px; padding: 20px;">
+            <span class="modal-close" onclick="closeLocationModal()">&times;</span>
+            <h2 style="color: #00d4aa; margin-bottom: 15px;"><i class="fas fa-map-marker-alt"></i> Standortanalyse</h2>
+            <div id="location-result">
+                <p style="color: #888;">Klicken Sie auf die Karte um einen Standort zu prüfen...</p>
             </div>
         </div>
     </div>
@@ -2051,6 +2066,150 @@
         }
         
         init();
+        
+        // Location Check functionality
+        let locationCheckEnabled = false;
+        let locationMarker = null;
+        
+        function enableLocationCheck() {
+            locationCheckEnabled = true;
+            document.getElementById('location-modal').classList.add('active');
+            document.getElementById('location-result').innerHTML = `
+                <p style="color: #00d4aa;"><i class="fas fa-mouse-pointer"></i> Klicken Sie auf einen Punkt in Österreich...</p>
+                <p style="color: #888; font-size: 0.8rem;">Die Analyse zeigt Netzanschluss-Möglichkeiten, regionale Faktoren und geschätzte Erträge für Wind- und Solaranlagen.</p>
+            `;
+            map.getContainer().style.cursor = 'crosshair';
+        }
+        
+        function closeLocationModal() {
+            document.getElementById('location-modal').classList.remove('active');
+            locationCheckEnabled = false;
+            map.getContainer().style.cursor = '';
+            if (locationMarker) {
+                map.removeLayer(locationMarker);
+                locationMarker = null;
+            }
+        }
+        
+        async function checkLocation(lat, lon) {
+            document.getElementById('location-result').innerHTML = `
+                <p style="color: #888;"><i class="fas fa-spinner fa-spin"></i> Analysiere Standort...</p>
+            `;
+            
+            try {
+                const response = await fetch(`/api/check-location?lat=${lat}&lon=${lon}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    document.getElementById('location-result').innerHTML = `<p style="color: #ff5252;">Fehler: ${data.error}</p>`;
+                    return;
+                }
+                
+                const gc = data.grid_connection;
+                const nearby = data.nearby_installations;
+                const rf = data.regional_factors;
+                const est = data.estimates;
+                
+                let html = `
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-size: 0.8rem; color: #888;">Koordinaten: ${lat.toFixed(4)}, ${lon.toFixed(4)}</div>
+                        <div style="font-size: 1.1rem; color: #fff;"><strong>${data.location.region}</strong></div>
+                    </div>
+                    
+                    <div style="background: #1a1a2e; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${gc.color};">
+                        <div style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Netzanschluss</div>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: ${gc.color};">
+                            ${gc.difficulty === 'easy' ? 'Einfach' : gc.difficulty === 'medium' ? 'Machbar' : gc.difficulty === 'challenging' ? 'Herausfordernd' : 'Schwierig'}
+                        </div>
+                        ${gc.nearest_transformer ? `
+                            <div style="margin-top: 8px; font-size: 0.85rem;">
+                                <div><strong>${gc.nearest_transformer.name}</strong> (${gc.nearest_transformer.distance_km} km)</div>
+                                <div style="color: ${gc.nearest_transformer.available_mw > 5 ? '#00e676' : '#ff5252'};">
+                                    ${gc.nearest_transformer.available_mw.toFixed(1)} MW verfügbar
+                                </div>
+                                <div style="color: #888; font-size: 0.75rem;">Netzbetreiber: ${gc.grid_operator}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                        <div style="flex: 1; background: #1a1a2e; padding: 10px; border-radius: 8px;">
+                            <div style="font-size: 0.7rem; color: #888;">SOLAR (10 kW Dach)</div>
+                            <div style="font-size: 1.1rem; color: #ffeb3b;">${(est.solar_10kw_annual_kwh/1000).toFixed(1)} MWh/Jahr</div>
+                            <div style="font-size: 0.75rem; color: #888;">~${est.solar_10kw_annual_eur.toLocaleString('de-AT')} €/Jahr</div>
+                            <div style="font-size: 0.65rem; color: #666;">${(rf.solar_capacity_factor*100).toFixed(0)}% Kapazitätsfaktor</div>
+                        </div>
+                        <div style="flex: 1; background: #1a1a2e; padding: 10px; border-radius: 8px;">
+                            <div style="font-size: 0.7rem; color: #888;">WIND (3 MW Anlage)</div>
+                            <div style="font-size: 1.1rem; color: #4caf50;">${(est.wind_3mw_annual_mwh/1000).toFixed(1)} GWh/Jahr</div>
+                            <div style="font-size: 0.75rem; color: #888;">~${(est.wind_3mw_annual_eur/1000).toFixed(0)}k €/Jahr</div>
+                            <div style="font-size: 0.65rem; color: #666;">${(rf.wind_capacity_factor*100).toFixed(0)}% Kapazitätsfaktor</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #1a1a2e; padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+                        <div style="font-size: 0.7rem; color: #888;">ANLAGEN IM UMKREIS (10 km)</div>
+                        <div style="display: flex; gap: 15px; margin-top: 5px;">
+                            <div><span style="color: #4caf50;">${nearby.wind_turbines}</span> Windkraftanlagen (${nearby.wind_capacity_mw} MW)</div>
+                            <div><span style="color: #ffeb3b;">${nearby.solar_plants}</span> Solaranlagen</div>
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 0.75rem; color: #666; border-top: 1px solid #333; padding-top: 10px;">
+                        <i class="fas fa-sun"></i> ${rf.sunshine_hours_year} Sonnenstunden/Jahr in ${data.location.region}
+                    </div>
+                `;
+                
+                // Add recommendations
+                if (data.recommendations && data.recommendations.length > 0) {
+                    html += `<div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #333;">`;
+                    html += `<div style="font-size: 0.75rem; color: #888; margin-bottom: 8px;">EMPFEHLUNGEN</div>`;
+                    for (const rec of data.recommendations) {
+                        const color = rec.rating === 'good' || rec.rating === 'excellent' ? '#00e676' : 
+                                      rec.rating === 'warning' ? '#ff9800' : '#888';
+                        html += `<div style="font-size: 0.8rem; color: ${color}; margin-bottom: 4px;">
+                            <i class="fas fa-${rec.rating === 'warning' ? 'exclamation-triangle' : 'check-circle'}"></i> ${rec.text}
+                        </div>`;
+                    }
+                    html += `</div>`;
+                }
+                
+                document.getElementById('location-result').innerHTML = html;
+                
+            } catch (error) {
+                document.getElementById('location-result').innerHTML = `<p style="color: #ff5252;">Fehler: ${error.message}</p>`;
+            }
+        }
+        
+        // Map click handler for location check
+        map.on('click', function(e) {
+            if (!locationCheckEnabled) return;
+            
+            const lat = e.latlng.lat;
+            const lon = e.latlng.lng;
+            
+            // Check if within Austria bounds (roughly)
+            if (lat < 46.3 || lat > 49.1 || lon < 9.5 || lon > 17.2) {
+                alert('Bitte wählen Sie einen Punkt in Österreich.');
+                return;
+            }
+            
+            // Add/move marker
+            if (locationMarker) {
+                locationMarker.setLatLng([lat, lon]);
+            } else {
+                locationMarker = L.marker([lat, lon], {
+                    icon: L.divIcon({
+                        className: 'location-check-marker',
+                        html: '<i class="fas fa-map-pin" style="color: #00d4aa; font-size: 24px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>',
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 24],
+                    })
+                }).addTo(map);
+            }
+            
+            checkLocation(lat, lon);
+        });
     </script>
 </body>
 </html>
