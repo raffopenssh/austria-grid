@@ -1,79 +1,85 @@
-# Austria Grid - Next Session Instructions
+# Austria Grid - Session Notes
 
-## Current State (2026-01-30)
+## Current State (2026-01-31)
 
-### Completed Features
+### Features Implemented
 
-1. **OSM Infrastructure Data**
-   - 1,291 transmission line segments (460× 380kV, 831× 220kV)
-   - 514 substations (85 HV from OSM + 429 from transformer data)
-   - 41 nodes, 460 edges network topology
+1. **Live ENTSO-E Data** ✅
+   - Real-time generation by source (calibrated to 100% match)
+   - Day-ahead electricity prices
+   - Cross-border flows with 7 neighbors
+   - 5-minute refresh, SQLite storage
 
-2. **Power Plant Data** ✅
-   - 688 power plants with capacity data (from 4,700+ OSM elements)
-   - Total: 26,825 MW capacity
-   - By source:
-     - Hydro run-of-river: 404 plants, 14,697 MW
-     - Gas: 35 plants, 8,005 MW
-     - Wind: 121 plants, 2,902 MW
-     - Solar: 93 plants, 581 MW
-     - Coal: 1 plant, 225 MW
-     - Biomass: 24 plants, 113 MW
-     - Waste: 6 plants, 277 MW
+2. **Power Plants** ✅
+   - 2,296 plants loaded (41.9 GW total capacity)
+   - Production calibrated to ENTSO-E totals
+   - Color-coded by source type on map
+   - Live production estimates
 
-3. **ENTSO-E Live Data Integration** ✅
-   - Real-time generation by source type
-   - Day-ahead electricity prices (€/MWh)
-   - Cross-border physical flows with DE, CZ, SK, HU, SI, IT, CH
-   - SQLite database for historical storage
-   - Cron job fetching every 15 minutes
+3. **Substation Load Model** ✅
+   - 514 substations with load estimates
+   - Plants assigned to nearest substation
+   - Regional load distribution
+   - Cross-border flow assignment
 
-4. **Substation Load Model** ✅
-   - Estimates load on each substation based on:
-     - Nearby power plants assigned to substations
-     - Current production calculated from ENTSO-E utilization
-     - Regional load distribution factors
-     - Cross-border flows at border substations
-   - Displays load percentage with color coding
-
-### Map Layers
-- ✅ District heatmap (capacity analysis)
-- ✅ Wind turbines (1,578 individual turbines)
-- ✅ Transformers (Umspannwerke)
-- ✅ UW Lastanzeige (live substation load)
-- ✅ Alle Kraftwerke (688 power plants with live production)
-- ✅ Transmission lines (OSM 380/220kV)
-- ✅ Wasserkraftwerke (156 major hydro)
-- ✅ Cross-border connections
-- ⚠️ ÖNIP 2030 (approximate georeferencing)
+4. **Location Check Tool** ✅ (NEW)
+   - Click anywhere on map to analyze location
+   - Grid connection feasibility (Easy/Medium/Hard)
+   - Nearest substation with available capacity
+   - Grid operator identification
+   - Wind/Solar production estimates:
+     - 10 kW rooftop solar: ~9,600 kWh/year
+     - 3 MW wind turbine: ~5,000-7,000 MWh/year
+   - Regional capacity factors
+   - Nearby installations count
+   - Recommendations
 
 ### API Endpoints
-- `/api/entsoe/generation` - Live generation by type
-- `/api/entsoe/prices` - Day-ahead prices
-- `/api/entsoe/cross-border-flows` - Physical flows
-- `/api/substation-loads` - Substation load estimates
-- `/api/power-plants` - All plants with production
 
-### Potential Improvements
-1. **Price history chart**: 24h trend visualization
-2. **Generation mix chart**: Real-time pie/donut chart
-3. **Individual plant pages**: SEO pages for major plants
-4. **Flow animation**: Animate power flow on map
-5. **Forecasting**: Day-ahead generation forecast
-6. **Grid operator districts**: Replace political Bezirke with Netzgebiete
+| Endpoint | Description |
+|----------|-------------|
+| `/api/entsoe/generation` | Live generation by type |
+| `/api/entsoe/prices` | Day-ahead prices |
+| `/api/entsoe/cross-border-flows` | Physical flows |
+| `/api/substation-loads` | Substation load estimates |
+| `/api/power-plants` | All plants with production |
+| `/api/check-location?lat=X&lon=Y` | Location feasibility check |
 
-### Key Commands
-```bash
-cd /home/exedev/austria-grid
-sudo systemctl restart austria-grid
-python3 fetch_power_plants.py  # Refresh OSM data
-python3 entsoe_fetcher.py fetch 24  # Fetch 24h of data
-```
+### Potential Future Improvements
 
-### Live URLs
-- App: https://austria-power.exe.xyz:8000/
-- GitHub: https://github.com/raffopenssh/austria-grid
+1. **Wind Atlas Integration**
+   - Actual wind speed data at location
+   - Historical wind data
+   - More accurate capacity factor estimation
 
-### ENTSO-E API
-- Key: `35efd923-6969-4470-b2bd-0155b2254346`
-- Austria bidding zone: `10YAT-APG------L`
+2. **Solar Irradiation Data**
+   - GHI (Global Horizontal Irradiance)
+   - Optimal panel angles
+   - Shading analysis
+
+3. **Economics Calculator**
+   - Investment cost estimates
+   - Payback period calculation
+   - Feed-in tariff vs. self-consumption
+   - Financing options
+
+4. **Permit Information**
+   - Building permit requirements by region
+   - Environmental impact assessment needs
+   - Grid connection process timeline
+
+5. **Price Forecasting**
+   - Day-ahead price predictions
+   - Best hours to sell/consume
+   - Battery storage optimization
+
+6. **Community Features**
+   - Success stories from installers
+   - Local installer directory
+   - Q&A forum
+
+### Live Site
+https://austria-power.exe.xyz:8000/
+
+### Repository
+https://github.com/raffopenssh/austria-grid
