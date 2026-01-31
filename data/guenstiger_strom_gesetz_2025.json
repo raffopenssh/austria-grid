@@ -1,0 +1,117 @@
+{
+  "law": {
+    "name": "Günstiger-Strom-Gesetz",
+    "full_name": "Elektrizitätswirtschaftsgesetz (ElWG)",
+    "bgbl": "BGBl. I Nr. 91/2025",
+    "date": "2025-12-23",
+    "effective": "2026-01-01",
+    "source": "https://ris.bka.gv.at/Dokumente/BgblAuth/BGBLA_2025_I_91/BGBLA_2025_I_91.pdf"
+  },
+  "key_provisions": {
+    "simplified_grid_connection": {
+      "section": "§ 96",
+      "title": "Vereinfachter Netzanschluss für kleine Anlagen",
+      "details": {
+        "renewable_up_to_20kw": {
+          "description": "Stromerzeugungsanlagen auf Basis erneuerbarer Energieträger bis 20 kW",
+          "process": "Einfache Anzeige an Netzbetreiber",
+          "timeline": "4 Wochen Frist für Netzbetreiber-Entscheidung",
+          "automatic_approval": "Nach 4 Wochen ohne Antwort gilt Anschluss als genehmigt"
+        },
+        "pv_up_to_15kw": {
+          "description": "Photovoltaikanlagen bis 15 kW über bestehenden Bezugsanschluss",
+          "feed_in_right": "100% des Bezugs darf eingespeist werden (max. 15 kW)",
+          "grid_fee": "Kein zusätzliches Netzanschlussentgelt",
+          "curtailment": "Netzbetreiber behält Recht auf Spitzenkappung (§ 101)"
+        },
+        "renewable_over_15kw": {
+          "description": "Erneuerbare Anlagen über 15 kW auf Netzebenen 5-7",
+          "feed_in_right": "70% des Bezugs darf eingespeist werden",
+          "grid_fee_reduction": "85% Reduktion des Netzanschlussentgelts (über 15 kW Teil)"
+        }
+      },
+      "refusal_grounds": "Nur bei Sicherheitsbedenken oder technischer Inkompatibilität zulässig"
+    },
+    "subsidized_price": {
+      "section": "§ 36",
+      "title": "Gestützter Strompreis für begünstigte Haushalte",
+      "details": {
+        "eligible": "Haushalte mit ORF-Beitragsbefreiung (§ 5 Abs. 1 Z 1-5, 7-9 ORF-BeitragsG)",
+        "price_cap": "6 ct/kWh (ab 2027 inflationsangepasst)",
+        "consumption_quota": "2.900 kWh pro Jahr",
+        "additional_persons": "52,50 € pro Jahr für 4. und weitere Personen im Haushalt",
+        "medical_devices": "Zusätzlicher Pauschalbetrag für stromintensive medizinische Geräte"
+      }
+    },
+    "energy_communities": {
+      "section": "§ 66-67",
+      "title": "Energiegemeinschaften",
+      "types": {
+        "renewable_energy_community": "Erneuerbare-Energie-Gemeinschaft (EEG)",
+        "citizen_energy_community": "Bürgerenergiegemeinschaft (BEG)"
+      }
+    },
+    "shared_energy_use": {
+      "section": "§ 68",
+      "title": "Gemeinsame Energienutzung (Energy Sharing)",
+      "details": {
+        "participants": "Aktive Kunden können Energie untereinander teilen",
+        "peer_to_peer": "Peer-to-Peer-Verträge zwischen Nachbarn möglich",
+        "organizer": "Organisator kann bestellt werden für Abwicklung",
+        "max_capacity_large_companies": "Große Unternehmen: max. 6 MW",
+        "social_provision": "Gebietskörperschaften müssen 10% für schutzbedürftige Haushalte reservieren"
+      }
+    },
+    "active_customers": {
+      "section": "§ 65",
+      "title": "Aktive Kunden",
+      "rights": [
+        "Eigenverbrauch von selbst erzeugtem Strom",
+        "Speicherung von selbst erzeugtem Strom",
+        "Verkauf von selbst erzeugtem Strom",
+        "Teilnahme an Flexibilitätsmärkten",
+        "Teilnahme an Energiegemeinschaften",
+        "Gemeinsame Energienutzung"
+      ]
+    },
+    "grid_connection_timeline": {
+      "section": "§ 95-96",
+      "deadlines": {
+        "small_installations": "4 Wochen nach Anzeige",
+        "standard": "Unverzüglich (keine feste Frist, aber Regulierungsbehörde kann Fristen bestimmen)"
+      },
+      "obligation": "Netzbetreiber MUSS Netz optimieren, verstärken, ausbauen wenn nötig"
+    }
+  },
+  "practical_implications": {
+    "rooftop_solar": {
+      "up_to_15kw": {
+        "process": "Einfache Anmeldung beim Netzbetreiber",
+        "cost": "Kein Netzanschlussentgelt",
+        "feed_in": "Darf 100% einspeisen (bis max. 15 kW)",
+        "timeline": "Max. 4 Wochen bis Genehmigung"
+      },
+      "15_to_20kw": {
+        "process": "Anzeige beim Netzbetreiber",
+        "cost": "85% reduziertes Netzanschlussentgelt für Teil über 15 kW",
+        "feed_in": "70% des Bezugs",
+        "timeline": "Max. 4 Wochen"
+      }
+    },
+    "wind_turbines": {
+      "up_to_20kw": {
+        "process": "Vereinfachtes Anzeigeverfahren",
+        "timeline": "4 Wochen Genehmigungsfrist"
+      },
+      "over_20kw": {
+        "process": "Standardverfahren",
+        "grid_upgrade": "Netzbetreiber muss ggf. Netz ausbauen"
+      }
+    },
+    "energy_sharing": {
+      "neighbors": "Nachbarn können Strom untereinander teilen",
+      "apartment_buildings": "Mehrparteienhäuser können gemeinsam PV nutzen",
+      "communities": "Energiegemeinschaften mit vereinfachter Abrechnung"
+    }
+  }
+}

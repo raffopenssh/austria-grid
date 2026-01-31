@@ -767,6 +767,23 @@
                 <a href="https://www.data.gv.at" target="_blank" style="color: #4a9eff;">data.gv.at</a> – Open Government Data Austria</p>
             </div>
             
+            <h2 style="color: #00d4aa; margin: 20px 0 15px 0;"><i class="fas fa-gavel"></i> Rechtliche Grundlagen</h2>
+            <div style="font-size: 0.85rem; line-height: 1.6; color: #aaa;">
+                <p style="margin-bottom: 10px; padding: 8px; background: #0d1f3c; border-radius: 4px; border-left: 3px solid #4a9eff;">
+                    <a href="https://ris.bka.gv.at/Dokumente/BgblAuth/BGBLA_2025_I_91/BGBLA_2025_I_91.pdf" target="_blank" style="color: #4a9eff; font-weight: bold;">
+                        <i class="fas fa-file-pdf"></i> Günstiger-Strom-Gesetz (ElWG) – BGBl. I Nr. 91/2025
+                    </a><br>
+                    <span style="color: #888; font-size: 0.8rem;">In Kraft seit 1.1.2026 – Vereinfachter Netzanschluss für kleine Anlagen, Energy Sharing, gestützter Strompreis</span>
+                </p>
+                <p style="margin-bottom: 10px;"><strong>Wichtige Neuerungen für PV/Wind:</strong></p>
+                <ul style="margin-left: 15px; color: #888; font-size: 0.8rem;">
+                    <li><strong>PV bis 15 kW:</strong> Kein Netzanschlussentgelt, 100% Einspeisung, max. 4 Wochen Genehmigung (§ 96 Abs. 5)</li>
+                    <li><strong>Erneuerbare bis 20 kW:</strong> Vereinfachtes Anzeigeverfahren (§ 96 Abs. 1)</li>
+                    <li><strong>Energy Sharing:</strong> Nachbarn können Strom teilen (§ 68)</li>
+                    <li><strong>Gestützter Preis:</strong> 6 ct/kWh für begünstigte Haushalte (§ 36)</li>
+                </ul>
+            </div>
+            
             <h2 style="color: #00d4aa; margin: 20px 0 15px 0;"><i class="fas fa-book"></i> Weiterführende Quellen</h2>
             <div style="font-size: 0.85rem; line-height: 1.6; color: #aaa;">
                 <p style="margin-bottom: 10px;"><a href="https://www.bmwet.gv.at/dam/jcr:f67c2aa8-4019-4e7b-94ae-e1c847911a05/Integrierter-oesterreichischer-Netzinfrastrukturplan.pdf" target="_blank" style="color: #4a9eff;">Integrierter österreichischer Netzinfrastrukturplan (ÖNIP)</a><br>
@@ -2166,12 +2183,41 @@
                     html += `<div style="font-size: 0.75rem; color: #888; margin-bottom: 8px;">EMPFEHLUNGEN</div>`;
                     for (const rec of data.recommendations) {
                         const color = rec.rating === 'good' || rec.rating === 'excellent' ? '#00e676' : 
-                                      rec.rating === 'warning' ? '#ff9800' : '#888';
+                                      rec.rating === 'warning' ? '#ff9800' : 
+                                      rec.rating === 'info' ? '#4a9eff' : '#888';
+                        const icon = rec.rating === 'warning' ? 'exclamation-triangle' : 
+                                     rec.rating === 'info' ? 'info-circle' : 'check-circle';
                         html += `<div style="font-size: 0.8rem; color: ${color}; margin-bottom: 4px;">
-                            <i class="fas fa-${rec.rating === 'warning' ? 'exclamation-triangle' : 'check-circle'}"></i> ${rec.text}
+                            <i class="fas fa-${icon}"></i> ${rec.text}
                         </div>`;
                     }
                     html += `</div>`;
+                }
+                
+                // Add legal info (new ElWG 2025)
+                if (data.legal_info && data.legal_info.solar_10kw) {
+                    const legal = data.legal_info.solar_10kw;
+                    html += `
+                        <div style="margin-top: 12px; padding: 10px; background: #0d1f3c; border-radius: 8px; border-left: 3px solid #4a9eff;">
+                            <div style="font-size: 0.7rem; color: #4a9eff; margin-bottom: 6px;">
+                                <i class="fas fa-gavel"></i> GÜNSTIGER-STROM-GESETZ (ElWG 2025)
+                            </div>
+                            <div style="font-size: 0.8rem; color: #fff; margin-bottom: 4px;">
+                                <strong>PV bis 15 kW:</strong> Kein Netzanschlussentgelt!
+                            </div>
+                            <div style="font-size: 0.75rem; color: #aaa;">
+                                <i class="fas fa-clock"></i> Max. 4 Wochen Genehmigungsfrist<br>
+                                <i class="fas fa-bolt"></i> 100% Einspeisung erlaubt<br>
+                                <i class="fas fa-users"></i> Energy Sharing mit Nachbarn möglich
+                            </div>
+                            <div style="font-size: 0.65rem; color: #666; margin-top: 6px;">
+                                <a href="https://ris.bka.gv.at/Dokumente/BgblAuth/BGBLA_2025_I_91/BGBLA_2025_I_91.pdf" 
+                                   target="_blank" style="color: #4a9eff;">
+                                    <i class="fas fa-external-link-alt"></i> BGBl. I Nr. 91/2025
+                                </a>
+                            </div>
+                        </div>
+                    `;
                 }
                 
                 document.getElementById('location-result').innerHTML = html;

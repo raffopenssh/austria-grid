@@ -285,11 +285,23 @@ class LocationChecker:
             'recommendations': self._get_recommendations(
                 region, connection_difficulty, wind_cf, solar_cf, wind_nearby
             ),
+            'legal_info': {
+                'solar_10kw': self.get_legal_info(10, 'solar'),
+                'solar_20kw': self.get_legal_info(20, 'solar'),
+                'wind_20kw': self.get_legal_info(20, 'wind'),
+            },
         }
     
     def _get_recommendations(self, region, difficulty, wind_cf, solar_cf, wind_nearby):
-        """Generate recommendations based on analysis."""
+        """Generate recommendations based on analysis and new ElWG 2025 law."""
         recs = []
+        
+        # New law information (Günstiger-Strom-Gesetz / ElWG 2025)
+        recs.append({
+            'type': 'law',
+            'rating': 'info',
+            'text': 'NEU: Günstiger-Strom-Gesetz (ElWG) seit 1.1.2026 in Kraft',
+        })
         
         # Solar recommendations
         if solar_cf >= 0.11:
@@ -342,6 +354,99 @@ class LocationChecker:
             })
         
         return recs
+    
+    def get_legal_info(self, capacity_kw: float, installation_type: str = 'solar') -> dict:
+        """
+        Get legal information based on the new ElWG 2025 (Günstiger-Strom-Gesetz).
+        
+        Args:
+            capacity_kw: Planned installation capacity in kW
+            installation_type: 'solar', 'wind', or 'storage'
+        
+        Returns:
+            Dictionary with legal requirements and benefits
+        """
+        info = {
+            'law': 'Elektrizitätswirtschaftsgesetz (ElWG) - BGBl. I Nr. 91/2025',
+            'effective_date': '2026-01-01',
+            'capacity_kw': capacity_kw,
+            'installation_type': installation_type,
+        }
+        
+        if installation_type == 'solar':
+            if capacity_kw <= 15:
+                info['category'] = 'Kleine PV-Anlage (§ 96 Abs. 5 ElWG)'
+                info['process'] = 'Vereinfachtes Anzeigeverfahren'
+                info['timeline'] = 'Max. 4 Wochen bis Genehmigung'
+                info['grid_fee'] = 'Kein zusätzliches Netzanschlussentgelt'
+                info['feed_in_right'] = '100% des Bezugs (max. 15 kW)'
+                info['advantages'] = [
+                    'Kein Netzanschlussentgelt',
+                    'Automatische Genehmigung nach 4 Wochen',
+                    'Volle Einspeisemöglichkeit bis 15 kW',
+                    'Netzbetreiber kann nur bei Sicherheitsbedenken ablehnen',
+                ]
+            elif capacity_kw <= 20:
+                info['category'] = 'Kleine Erneuerbare-Anlage (§ 96 Abs. 1 & 6 ElWG)'
+                info['process'] = 'Vereinfachtes Anzeigeverfahren'
+                info['timeline'] = 'Max. 4 Wochen bis Genehmigung'
+                info['grid_fee'] = '85% Reduktion für Leistung über 15 kW'
+                info['feed_in_right'] = '70% des Bezugs'
+                info['advantages'] = [
+                    '85% reduziertes Netzanschlussentgelt (über 15 kW)',
+                    'Automatische Genehmigung nach 4 Wochen',
+                    '70% Einspeiserecht',
+                ]
+            else:
+                info['category'] = 'Größere Anlage (Standard-Verfahren)'
+                info['process'] = 'Netzanschlussvertrag mit Netzbetreiber'
+                info['timeline'] = 'Abhängig von Netzkapazität'
+                info['grid_fee'] = 'Volles Netzanschlussentgelt'
+                info['feed_in_right'] = 'Nach Vereinbarung'
+                info['advantages'] = [
+                    'Netzbetreiber muss Netz ausbauen wenn nötig (§ 95 Abs. 2)',
+                    'Ablehnung nur bei Sicherheitsbedenken möglich',
+                ]
+        
+        elif installation_type == 'wind':
+            if capacity_kw <= 20:
+                info['category'] = 'Kleine Windkraftanlage (§ 96 Abs. 1 ElWG)'
+                info['process'] = 'Vereinfachtes Anzeigeverfahren'
+                info['timeline'] = 'Max. 4 Wochen bis Genehmigung'
+                info['advantages'] = [
+                    'Automatische Genehmigung nach 4 Wochen',
+                    'Netzbetreiber kann nur bei Sicherheitsbedenken ablehnen',
+                ]
+            else:
+                info['category'] = 'Größere Windkraftanlage'
+                info['process'] = 'Netzanschlussvertrag + Genehmigungsverfahren'
+                info['timeline'] = 'Projektabhängig'
+                info['advantages'] = [
+                    'Netzbetreiber muss Netz ausbauen wenn nötig',
+                    'Allgemeine Anschlusspflicht (§ 95 Abs. 1)',
+                ]
+        
+        # Energy sharing options (new in ElWG)
+        info['energy_sharing'] = {
+            'enabled': True,
+            'description': 'Gemeinsame Energienutzung (§ 68 ElWG)',
+            'options': [
+                'Nachbarn können Strom untereinander teilen (Peer-to-Peer)',
+                'Energiegemeinschaften (EEG/BEG) möglich',
+                'Mehrparteienhäuser können gemeinsam PV nutzen',
+                'Organisator kann für Abwicklung bestellt werden',
+            ],
+        }
+        
+        # Subsidized price info
+        info['subsidized_price'] = {
+            'eligible': 'Haushalte mit ORF-Beitragsbefreiung',
+            'price': '6 ct/kWh (inflationsangepasst ab 2027)',
+            'quota': '2.900 kWh/Jahr',
+            'source': '§ 36 ElWG',
+        }
+        
+        return info
     
     def get_district_summary(self, district_name: str) -> Dict:
         """Get summary statistics for a district."""
