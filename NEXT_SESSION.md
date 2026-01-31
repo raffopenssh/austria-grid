@@ -1,5 +1,39 @@
 # Austria Grid - Session Notes
 
+## Changes Made (2026-01-31 Session 2)
+
+### Standortanalyse UX Improvements
+1. **New icon button on map** - Crosshairs icon button next to zoom controls
+2. **Clear visual feedback** - Button turns orange and pulses when active
+3. **Tooltip instructions** - Shows explanation when mode is enabled
+4. **Modal only on click** - Modal opens after clicking location, not before
+5. **Toggle behavior** - Click button again to cancel
+
+### Layer Controls Cleanup
+**Main layers (always visible):**
+- Netzkapazität (Bezirke) - District capacity heatmap
+- Windkraftanlagen - Wind turbines  
+- Umspannwerke (+Auslastung) - Substations with live load data (merged)
+- Hochspannungsleitungen - High voltage lines
+
+**Secondary layers (in expandable section):**
+- Wasserkraftwerke
+- Alle Kraftwerke (Live)
+- Grenzübergänge
+
+**Removed:**
+- ÖNIP 2030 (inaccurate georeferencing)
+- Separate UW Lastanzeige toggle (merged with Umspannwerke)
+
+### Use Cases Documented
+1. **Primary: Find locations for new installations** (Standortanalyse)
+2. **Primary: Explore existing wind infrastructure**
+3. **Secondary: Check regional grid capacity** 
+4. **Secondary: View live energy data**
+5. **Tertiary: View detailed infrastructure layers**
+
+---
+
 ## Current State (2026-01-31)
 
 ### Features Implemented
