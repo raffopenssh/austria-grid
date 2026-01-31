@@ -170,6 +170,82 @@
             border: 1px solid #333;
         }
         
+        /* Location check button - prominent on map */
+        .location-check-btn {
+            position: absolute;
+            top: 80px;
+            left: 10px;
+            z-index: 1000;
+            background: linear-gradient(135deg, #00d4aa 0%, #00a88a 100%);
+            border: none;
+            border-radius: 8px;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 212, 170, 0.4);
+            transition: all 0.2s ease;
+        }
+        
+        .location-check-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 212, 170, 0.6);
+        }
+        
+        .location-check-btn.active {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            box-shadow: 0 2px 8px rgba(255, 152, 0, 0.4);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .location-check-btn i {
+            font-size: 20px;
+            color: #fff;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 2px 8px rgba(255, 152, 0, 0.4); }
+            50% { box-shadow: 0 4px 16px rgba(255, 152, 0, 0.7); }
+            100% { box-shadow: 0 2px 8px rgba(255, 152, 0, 0.4); }
+        }
+        
+        .location-check-tooltip {
+            position: absolute;
+            top: 80px;
+            left: 60px;
+            z-index: 1001;
+            background: rgba(26, 26, 46, 0.95);
+            border: 1px solid #00d4aa;
+            border-radius: 8px;
+            padding: 10px 15px;
+            max-width: 220px;
+            display: none;
+        }
+        
+        .location-check-tooltip.visible {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .location-check-tooltip h4 {
+            color: #00d4aa;
+            margin: 0 0 5px 0;
+            font-size: 0.9rem;
+        }
+        
+        .location-check-tooltip p {
+            color: #aaa;
+            margin: 0;
+            font-size: 0.8rem;
+        }
+        
         .legend h4 {
             color: #00d4aa;
             margin-bottom: 10px;
@@ -607,46 +683,62 @@
                 <div class="layer-controls">
                     <label class="layer-toggle">
                         <input type="checkbox" id="layer-heatmap" checked>
-                        Kapazitäts-Heatmap
+                        <i class="fas fa-map" style="color: #00d4aa; width: 16px;"></i>
+                        Netzkapazität (Bezirke)
                     </label>
                     <label class="layer-toggle">
                         <input type="checkbox" id="layer-windparks" checked>
+                        <i class="fas fa-wind" style="color: #4caf50; width: 16px;"></i>
                         Windkraftanlagen
                     </label>
                     <label class="layer-toggle">
                         <input type="checkbox" id="layer-transformers">
-                        Umspannwerke
-                    </label>
-                    <label class="layer-toggle">
-                        <input type="checkbox" id="layer-substation-load">
-                        UW Lastanzeige <span style="font-size: 0.65rem; color: #888;">(Live)</span>
+                        <i class="fas fa-bolt" style="color: #ffc107; width: 16px;"></i>
+                        Umspannwerke <span style="font-size: 0.65rem; color: #888;">(+Auslastung)</span>
                     </label>
                     <label class="layer-toggle">
                         <input type="checkbox" id="layer-transmission">
+                        <i class="fas fa-project-diagram" style="color: #ff0066; width: 16px;"></i>
                         Hochspannungsleitungen
                     </label>
-                    <label class="layer-toggle">
-                        <input type="checkbox" id="layer-hydropower">
-                        Wasserkraftwerke
-                    </label>
-                    <label class="layer-toggle">
-                        <input type="checkbox" id="layer-power-plants">
-                        Alle Kraftwerke <span style="font-size: 0.65rem; color: #888;">(Live)</span>
-                    </label>
-                    <label class="layer-toggle">
-                        <input type="checkbox" id="layer-crossborder">
-                        Grenzübergänge
-                    </label>
-                    <label class="layer-toggle" title="Ungenaue Georeferenzierung - nur zur Orientierung">
-                        <input type="checkbox" id="layer-onip">
-                        ÖNIP 2030 <span style="color: #888; font-size: 0.7rem;">(~approx)</span>
-                    </label>
+                </div>
+                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #333;">
+                    <details style="cursor: pointer;">
+                        <summary style="color: #888; font-size: 0.8rem;"><i class="fas fa-plus-circle"></i> Mehr Ebenen</summary>
+                        <div class="layer-controls" style="margin-top: 8px;">
+                            <label class="layer-toggle">
+                                <input type="checkbox" id="layer-hydropower">
+                                <i class="fas fa-water" style="color: #00bcd4; width: 16px;"></i>
+                                Wasserkraftwerke
+                            </label>
+                            <label class="layer-toggle">
+                                <input type="checkbox" id="layer-power-plants">
+                                <i class="fas fa-industry" style="color: #9c27b0; width: 16px;"></i>
+                                Alle Kraftwerke <span style="font-size: 0.65rem; color: #888;">(Live)</span>
+                            </label>
+                            <label class="layer-toggle">
+                                <input type="checkbox" id="layer-crossborder">
+                                <i class="fas fa-exchange-alt" style="color: #ff9800; width: 16px;"></i>
+                                Grenzübergänge
+                            </label>
+                        </div>
+                    </details>
                 </div>
             </div>
         </div>
         
         <div class="map-container">
             <div id="map"></div>
+            
+            <!-- Location Check Button - Prominent on Map -->
+            <button class="location-check-btn" id="location-check-btn" title="Standort für Wind/Solar prüfen">
+                <i class="fas fa-crosshairs"></i>
+            </button>
+            <div class="location-check-tooltip" id="location-check-tooltip">
+                <h4><i class="fas fa-mouse-pointer"></i> Standortanalyse</h4>
+                <p>Klicken Sie auf einen Punkt in Österreich um Wind/Solar-Eignung zu prüfen</p>
+            </div>
+            
             <div class="legend">
                 <div class="heatmap-legend">
                     <h4>Kapazität für Zubau</h4>
@@ -707,15 +799,11 @@
                     </div>
                 </div>
                 <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #333; font-size: 0.7rem;">
-                    <a href="#" onclick="enableLocationCheck(); return false;" style="color: #00d4aa; text-decoration: none; font-weight: bold;">
-                        <i class="fas fa-map-marker-alt"></i> Standort prüfen (Klick auf Karte)
-                    </a>
-                    <br>
-                    <a href="#" onclick="showSourcesModal(); return false;" style="color: #666; text-decoration: none;">
+                    <a href="#" onclick="showSourcesModal(); return false;" style="color: #888; text-decoration: none;">
                         <i class="fas fa-info-circle"></i> Quellen & Methodik
                     </a>
-                    <br>
-                    <a href="/data.gpkg" style="color: #555; text-decoration: none;" title="Alle Daten herunterladen">
+                    &nbsp;|&nbsp;
+                    <a href="/data.gpkg" style="color: #888; text-decoration: none;" title="Alle Daten herunterladen">
                         <i class="fas fa-download"></i> GeoPackage
                     </a>
                 </div>
@@ -1915,19 +2003,14 @@
             const legend = document.querySelector('.transformers-legend');
             if (this.checked) {
                 map.addLayer(transformersLayer);
+                // Also load live substation data
+                loadSubstationLoads();
+                map.addLayer(substationLoadLayer);
                 if (legend) legend.style.display = 'flex';
             } else {
                 map.removeLayer(transformersLayer);
-                if (legend) legend.style.display = 'none';
-            }
-        });
-        
-        document.getElementById('layer-substation-load').addEventListener('change', function() {
-            if (this.checked) {
-                loadSubstationLoads();
-                map.addLayer(substationLoadLayer);
-            } else {
                 map.removeLayer(substationLoadLayer);
+                if (legend) legend.style.display = 'none';
             }
         });
         
@@ -1967,14 +2050,6 @@
                 map.addLayer(crossBorderLayer);
             } else {
                 map.removeLayer(crossBorderLayer);
-            }
-        });
-        
-        document.getElementById('layer-onip').addEventListener('change', function() {
-            if (this.checked) {
-                map.addLayer(onipLayer);
-            } else {
-                map.removeLayer(onipLayer);
             }
         });
         
@@ -2071,8 +2146,7 @@
                 loadProduction(),
                 loadTransmissionLines(),
                 loadHydropower(),
-                loadCrossBorder(),
-                loadOnipPowerlines()
+                loadCrossBorder()
             ]);
             
             // Load live data after main init
@@ -2090,23 +2164,48 @@
         
         function enableLocationCheck() {
             locationCheckEnabled = true;
-            document.getElementById('location-modal').classList.add('active');
-            document.getElementById('location-result').innerHTML = `
-                <p style="color: #00d4aa;"><i class="fas fa-mouse-pointer"></i> Klicken Sie auf einen Punkt in Österreich...</p>
-                <p style="color: #888; font-size: 0.8rem;">Die Analyse zeigt Netzanschluss-Möglichkeiten, regionale Faktoren und geschätzte Erträge für Wind- und Solaranlagen.</p>
-            `;
+            const btn = document.getElementById('location-check-btn');
+            const tooltip = document.getElementById('location-check-tooltip');
+            btn.classList.add('active');
+            btn.innerHTML = '<i class="fas fa-times"></i>';
+            tooltip.classList.add('visible');
             map.getContainer().style.cursor = 'crosshair';
+            
+            // Hide tooltip after 5 seconds
+            setTimeout(() => {
+                tooltip.classList.remove('visible');
+            }, 5000);
+        }
+        
+        function disableLocationCheck() {
+            locationCheckEnabled = false;
+            const btn = document.getElementById('location-check-btn');
+            const tooltip = document.getElementById('location-check-tooltip');
+            btn.classList.remove('active');
+            btn.innerHTML = '<i class="fas fa-crosshairs"></i>';
+            tooltip.classList.remove('visible');
+            map.getContainer().style.cursor = '';
+        }
+        
+        function toggleLocationCheck() {
+            if (locationCheckEnabled) {
+                disableLocationCheck();
+            } else {
+                enableLocationCheck();
+            }
         }
         
         function closeLocationModal() {
             document.getElementById('location-modal').classList.remove('active');
-            locationCheckEnabled = false;
-            map.getContainer().style.cursor = '';
+            disableLocationCheck();
             if (locationMarker) {
                 map.removeLayer(locationMarker);
                 locationMarker = null;
             }
         }
+        
+        // Set up the location check button click handler
+        document.getElementById('location-check-btn').addEventListener('click', toggleLocationCheck);
         
         async function checkLocation(lat, lon) {
             document.getElementById('location-result').innerHTML = `
@@ -2253,6 +2352,12 @@
                     })
                 }).addTo(map);
             }
+            
+            // Open modal and show loading
+            document.getElementById('location-modal').classList.add('active');
+            document.getElementById('location-result').innerHTML = `
+                <p style="color: #888;"><i class="fas fa-spinner fa-spin"></i> Analysiere Standort...</p>
+            `;
             
             checkLocation(lat, lon);
         });
