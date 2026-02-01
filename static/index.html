@@ -2254,7 +2254,7 @@
                     </div>
                     ${substationLoad.connected_plants && substationLoad.connected_plants.length > 0 ? `
                     <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,152,0,0.2); font-size: 0.7rem; color: #888;">
-                        <i class="fas fa-industry"></i> Angeschlossene Kraftwerke: ${substationLoad.connected_plants.slice(0,3).join(', ')}${substationLoad.connected_plants.length > 3 ? '...' : ''}
+                        <i class="fas fa-industry"></i> Angeschlossene Kraftwerke: ${substationLoad.connected_plants.slice(0,3).map(p => typeof p === 'object' ? p.name : p).join(', ')}${substationLoad.connected_plants.length > 3 ? '...' : ''}
                     </div>
                     ` : ''}
                 </div>
