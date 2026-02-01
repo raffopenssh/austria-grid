@@ -176,75 +176,74 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
         }
         
-        /* Standortanalyse Toolbar */
-        .standort-toolbar {
-            position: absolute;
-            top: 10px;
-            left: 50px;
-            z-index: 1000;
-            width: 320px;
-            background: rgba(22, 33, 62, 0.98);
+        /* Standortanalyse Panel in Sidebar */
+        .standort-panel {
+            background: #1a1a2e;
+            border-radius: 8px;
             border: 1px solid #00d4aa;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.2);
+            margin-bottom: 15px;
+            overflow: hidden;
         }
         
-        .standort-toolbar-header {
+        .standort-panel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 12px;
+            padding: 12px 15px;
             background: linear-gradient(135deg, #00d4aa 0%, #00a88a 100%);
-            border-radius: 9px 9px 0 0;
             cursor: pointer;
         }
         
-        .standort-toolbar-title {
+        .standort-panel-header h3 {
             color: #fff;
-            font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .standort-toolbar-toggle {
+        .standort-panel-toggle {
             background: none;
             border: none;
             color: #fff;
             cursor: pointer;
             padding: 4px;
             transition: transform 0.2s;
+            font-size: 0.9rem;
         }
         
-        .standort-toolbar.collapsed .standort-toolbar-toggle {
+        .standort-panel.collapsed .standort-panel-toggle {
             transform: rotate(180deg);
         }
         
-        .standort-toolbar-body {
-            padding: 12px;
+        .standort-panel-body {
+            padding: 15px;
         }
         
-        .standort-toolbar.collapsed .standort-toolbar-body {
+        .standort-panel.collapsed .standort-panel-body {
             display: none;
         }
         
         .standort-search-row {
             display: flex;
             gap: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
         
         .address-search-box {
             flex: 1;
             display: flex;
             align-items: center;
-            background: #1a1a2e;
+            background: #16213e;
             border: 1px solid #333;
             border-radius: 6px;
-            padding: 8px 10px;
+            padding: 10px 12px;
             gap: 8px;
         }
         
         .address-search-box i {
-            color: #888;
+            color: #666;
         }
         
         .address-search-box input {
@@ -275,16 +274,17 @@
         }
         
         .location-check-btn {
-            background: #1a1a2e;
+            background: #16213e;
             border: 1px solid #333;
             border-radius: 6px;
-            width: 38px;
-            height: 38px;
+            width: 42px;
+            height: 42px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
+            flex-shrink: 0;
         }
         
         .location-check-btn:hover {
@@ -299,7 +299,7 @@
         }
         
         .location-check-btn i {
-            font-size: 16px;
+            font-size: 18px;
             color: #888;
         }
         
@@ -312,12 +312,12 @@
         }
         
         .address-results {
-            background: #1a1a2e;
+            background: #16213e;
             border: 1px solid #333;
             border-radius: 6px;
-            max-height: 200px;
+            max-height: 150px;
             overflow-y: auto;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             display: none;
         }
         
@@ -326,7 +326,7 @@
         }
         
         .address-result-item {
-            padding: 8px 10px;
+            padding: 10px 12px;
             cursor: pointer;
             border-bottom: 1px solid #333;
             font-size: 0.8rem;
@@ -360,8 +360,8 @@
         .standort-options {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 10px;
+            margin-bottom: 12px;
         }
         
         .standort-option-row {
@@ -372,18 +372,18 @@
         
         .standort-option-row label {
             color: #888;
-            font-size: 0.8rem;
-            min-width: 80px;
+            font-size: 0.85rem;
+            min-width: 85px;
         }
         
         .standort-option-row select {
             flex: 1;
-            background: #1a1a2e;
+            background: #16213e;
             border: 1px solid #333;
             border-radius: 4px;
             color: #fff;
-            padding: 6px 8px;
-            font-size: 0.8rem;
+            padding: 8px 10px;
+            font-size: 0.85rem;
             cursor: pointer;
         }
         
@@ -400,12 +400,12 @@
         
         .capacity-input-group input {
             width: 70px;
-            background: #1a1a2e;
+            background: #16213e;
             border: 1px solid #333;
             border-radius: 4px 0 0 4px;
             color: #fff;
-            padding: 6px 8px;
-            font-size: 0.8rem;
+            padding: 8px 10px;
+            font-size: 0.85rem;
             text-align: right;
         }
         
@@ -420,16 +420,17 @@
             border-left: none;
             border-radius: 0 4px 4px 0;
             color: #888;
-            padding: 6px 10px;
-            font-size: 0.8rem;
+            padding: 8px 12px;
+            font-size: 0.85rem;
         }
         
         .standort-hint {
             background: rgba(0, 212, 170, 0.1);
-            border-radius: 4px;
-            padding: 8px 10px;
-            font-size: 0.75rem;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 0.8rem;
             color: #888;
+            text-align: center;
         }
         
         .standort-hint i {
@@ -806,11 +807,47 @@
     
     <div class="main-container">
         <div class="sidebar">
-            <div class="info-banner">
-                <strong><i class="fas fa-exclamation-triangle"></i> Hinweis zur Datenqualität</strong>
-                Die offiziellen Kapazitätsangaben der Netzbetreiber sind oft pessimistisch. 
-                Diese Analyse schätzt realistische verfügbare Kapazitäten basierend auf 
-                tatsächlicher Auslastung und internationalen Erfahrungswerten.
+            <!-- Standortanalyse Panel -->
+            <div class="standort-panel" id="standort-panel">
+                <div class="standort-panel-header" onclick="document.getElementById('standort-panel').classList.toggle('collapsed')">
+                    <h3><i class="fas fa-map-marker-alt"></i> Standortanalyse</h3>
+                    <button class="standort-panel-toggle"><i class="fas fa-chevron-up"></i></button>
+                </div>
+                <div class="standort-panel-body">
+                    <div class="standort-search-row">
+                        <div class="address-search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="address-input" placeholder="Adresse suchen..." autocomplete="off">
+                            <button id="address-clear" class="address-clear" style="display: none;">&times;</button>
+                        </div>
+                        <button class="location-check-btn" id="location-check-btn" title="Auf Karte klicken">
+                            <i class="fas fa-crosshairs"></i>
+                        </button>
+                    </div>
+                    <div class="address-results" id="address-results"></div>
+                    <div class="standort-options">
+                        <div class="standort-option-row">
+                            <label>Anlagentyp:</label>
+                            <select id="plant-type-select">
+                                <option value="solar_rooftop">PV Dachanlage</option>
+                                <option value="solar_ground">PV Freifläche</option>
+                                <option value="wind_small">Kleinwind (&lt;20 kW)</option>
+                                <option value="wind_medium">Wind 1-3 MW</option>
+                                <option value="wind_large">Wind &gt;3 MW</option>
+                            </select>
+                        </div>
+                        <div class="standort-option-row">
+                            <label>Leistung:</label>
+                            <div class="capacity-input-group">
+                                <input type="number" id="capacity-input" value="10" min="1" max="10000" step="1">
+                                <span class="capacity-unit" id="capacity-unit">kW</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="standort-hint" id="standort-hint">
+                        <i class="fas fa-info-circle"></i> Adresse eingeben oder <strong>auf Karte klicken</strong>
+                    </div>
+                </div>
             </div>
             
             <div class="panel">
@@ -995,53 +1032,6 @@
         
         <div class="map-container">
             <div id="map"></div>
-            
-            <!-- Unified Standortanalyse Toolbar -->
-            <div class="standort-toolbar" id="standort-toolbar">
-                <div class="standort-toolbar-header">
-                    <span class="standort-toolbar-title">
-                        <i class="fas fa-map-marker-alt"></i> Standortanalyse
-                    </span>
-                    <button class="standort-toolbar-toggle" id="standort-toolbar-toggle" title="Toolbar ein-/ausklappen">
-                        <i class="fas fa-chevron-up"></i>
-                    </button>
-                </div>
-                <div class="standort-toolbar-body" id="standort-toolbar-body">
-                    <div class="standort-search-row">
-                        <div class="address-search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="address-input" placeholder="Adresse oder Ort eingeben..." autocomplete="off">
-                            <button id="address-clear" class="address-clear" style="display: none;">&times;</button>
-                        </div>
-                        <button class="location-check-btn" id="location-check-btn" title="Auf Karte klicken">
-                            <i class="fas fa-crosshairs"></i>
-                        </button>
-                    </div>
-                    <div class="address-results" id="address-results"></div>
-                    <div class="standort-options">
-                        <div class="standort-option-row">
-                            <label>Anlagentyp:</label>
-                            <select id="plant-type-select">
-                                <option value="solar_rooftop">PV Dachanlage</option>
-                                <option value="solar_ground">PV Freifläche</option>
-                                <option value="wind_small">Kleinwind (&lt;20 kW)</option>
-                                <option value="wind_medium">Wind 1-3 MW</option>
-                                <option value="wind_large">Wind &gt;3 MW</option>
-                            </select>
-                        </div>
-                        <div class="standort-option-row">
-                            <label>Leistung:</label>
-                            <div class="capacity-input-group">
-                                <input type="number" id="capacity-input" value="10" min="1" max="10000" step="1">
-                                <span class="capacity-unit" id="capacity-unit">kW</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="standort-hint" id="standort-hint">
-                        <i class="fas fa-info-circle"></i> Adresse eingeben oder <strong>auf Karte klicken</strong>
-                    </div>
-                </div>
-            </div>
             
             <div class="legend">
                 <div class="heatmap-legend">
@@ -2652,16 +2642,6 @@
             }
         });
         
-        // Toolbar collapse toggle
-        document.getElementById('standort-toolbar-toggle').addEventListener('click', function(e) {
-            e.stopPropagation();
-            document.getElementById('standort-toolbar').classList.toggle('collapsed');
-        });
-        
-        document.querySelector('.standort-toolbar-header').addEventListener('click', function() {
-            document.getElementById('standort-toolbar').classList.toggle('collapsed');
-        });
-        
         // Set up the location check button click handler
         document.getElementById('location-check-btn').addEventListener('click', toggleLocationCheck);
         
@@ -2825,10 +2805,36 @@
         
         async function checkLocation(lat, lon) {
             const plantConfig = getPlantConfig();
+            const isSolarType = plantConfig.type.includes('solar');
             
+            // Show detailed loading with data sources
             document.getElementById('location-result').innerHTML = `
-                <p style="color: #888;"><i class="fas fa-spinner fa-spin"></i> Analysiere Standort für ${plantConfig.capacity_display} ${plantConfig.type.includes('solar') ? 'PV' : 'Wind'}...</p>
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 1.1rem; color: #00d4aa; margin-bottom: 15px;">
+                        <i class="fas fa-spinner fa-spin"></i> Analysiere Standort...
+                    </div>
+                    <div style="font-size: 0.8rem; color: #666; line-height: 1.8;">
+                        <div id="loading-step-1"><i class="fas fa-circle" style="color: #00d4aa; font-size: 0.5rem;"></i> Umspannwerke & Netzkapazität (E-Control)</div>
+                        <div id="loading-step-2" style="opacity: 0.5;"><i class="fas fa-circle" style="color: #666; font-size: 0.5rem;"></i> ${isSolarType ? 'Sonneneinstrahlung (Regional)' : 'Windverhältnisse (Regional)'}</div>
+                        <div id="loading-step-3" style="opacity: 0.5;"><i class="fas fa-circle" style="color: #666; font-size: 0.5rem;"></i> Strompreise (ENTSO-E Live)</div>
+                        <div id="loading-step-4" style="opacity: 0.5;"><i class="fas fa-circle" style="color: #666; font-size: 0.5rem;"></i> Bestehende Anlagen (OSM/IG Windkraft)</div>
+                    </div>
+                </div>
             `;
+            
+            // Animate loading steps
+            setTimeout(() => {
+                const step2 = document.getElementById('loading-step-2');
+                if (step2) { step2.style.opacity = '1'; step2.querySelector('i').style.color = '#00d4aa'; }
+            }, 300);
+            setTimeout(() => {
+                const step3 = document.getElementById('loading-step-3');
+                if (step3) { step3.style.opacity = '1'; step3.querySelector('i').style.color = '#00d4aa'; }
+            }, 600);
+            setTimeout(() => {
+                const step4 = document.getElementById('loading-step-4');
+                if (step4) { step4.style.opacity = '1'; step4.querySelector('i').style.color = '#00d4aa'; }
+            }, 900);
             
             try {
                 // Fetch location data and price statistics in parallel
@@ -2898,7 +2904,12 @@
                     </div>
                     
                     <div style="background: #1a1a2e; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                        <div style="font-size: 0.7rem; color: #888; margin-bottom: 8px;">ERTRAGSSCHÄTZUNG FÜR IHRE ANLAGE</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div style="font-size: 0.7rem; color: #888;">ERTRAGSSCHÄTZUNG FÜR IHRE ANLAGE</div>
+                            <div style="font-size: 0.6rem; color: #555;">
+                                <i class="fas fa-database"></i> ${isSolar ? 'Regionale Einstrahlungsdaten' : 'Regionale Winddaten'}
+                            </div>
+                        </div>
                         <div style="display: flex; gap: 15px;">
                             <div style="flex: 1;">
                                 <div style="font-size: 0.65rem; color: #666;">Jahresertrag</div>
@@ -2911,15 +2922,19 @@
                                 <div style="font-size: 1.3rem; color: #00d4aa; font-weight: bold;">
                                     ${annualRevenue >= 10000 ? (annualRevenue/1000).toFixed(0) + 'k' : annualRevenue.toFixed(0)} €/Jahr
                                 </div>
+                                <div style="font-size: 0.55rem; color: #555;">@ ${pricePerMwh}€/MWh (ENTSO-E Ø)</div>
                             </div>
                             <div style="flex: 1;">
                                 <div style="font-size: 0.65rem; color: #666;">Kapazitätsfaktor</div>
                                 <div style="font-size: 1.3rem; color: #888;">${(cf*100).toFixed(0)}%</div>
                             </div>
                         </div>
+                        <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #333; font-size: 0.65rem; color: #555;">
+                            <i class="fas fa-info-circle"></i> Berechnung: ${plantConfig.capacity_display} × ${(cf*100).toFixed(0)}% × 8.760h = ${annualMwh.toFixed(0)} MWh/Jahr
+                        </div>
                         ${isSolar && pvgis ? `
-                            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #333; font-size: 0.7rem; color: #666;">
-                                <i class="fas fa-satellite" style="color: #4a9eff;"></i> PVGIS: Optimale Neigung ${pvgis.optimal_angle}°, ${pvgis.yearly_kwh_per_kwp} kWh/kWp
+                            <div style="margin-top: 6px; font-size: 0.65rem; color: #4a9eff;">
+                                <i class="fas fa-satellite"></i> PVGIS-Daten: Optimale Neigung ${pvgis.optimal_angle}°, ${pvgis.yearly_kwh_per_kwp} kWh/kWp
                             </div>
                         ` : ''}
                     </div>
