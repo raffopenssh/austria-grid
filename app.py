@@ -683,6 +683,52 @@ def price_forecast():
     return jsonify(result)
 
 
+@app.route('/api/entsoe/price-forecast-ml')
+def price_forecast_ml():
+    """
+    ML-based price forecast using XGBoost model.
+    
+    Trained on 2+ years of historical data with features:
+    - Temporal: hour, day, month, holidays
+    - Lag prices: 1h, 24h, 168h (weekly)
+    - Load and generation mix
+    
+    Returns predictions with model performance metrics.
+    """
+    hours = min(int(request.args.get('hours', 48)), 168)
+    
+    cache_key = f'price_forecast_ml_{hours}'
+    cached = get_cached(cache_key)
+    if cached:
+        return jsonify(cached)
+    
+    try:
+        from price_forecast_model import forecast_prices, load_model
+        
+        # Check if model exists
+        model, metadata = load_model()
+        if model is None:
+            return jsonify({
+                'error': 'ML model not trained yet',
+                'hint': 'Run: python price_forecast_model.py train'
+            }), 503
+        
+        result = forecast_prices(hours)
+        
+        if 'error' in result:
+            return jsonify(result), 500
+        
+        set_cached(cache_key, result)
+        return jsonify(result)
+        
+    except Exception as e:
+        import traceback
+        return jsonify({
+            'error': str(e),
+            'trace': traceback.format_exc()
+        }), 500
+
+
 @app.route('/api/entsoe/patterns')
 def price_patterns():
     """
