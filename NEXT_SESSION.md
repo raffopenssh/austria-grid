@@ -1,5 +1,24 @@
 # Austria Grid - Session Notes
 
+## Changes Made (2026-02-01)
+
+### Persistent ENTSO-E Data Storage for ML Training
+1. **Historical data backfill** - 90 days of data being collected
+2. **Database indexes** - Efficient time-series queries for ML training
+3. **New API endpoints:**
+   - `/api/entsoe/history?type=load&days=30&aggregation=daily` - Historical data
+   - `/api/entsoe/stats` - Database statistics
+4. **Data resolution:** 15 minutes (ENTSO-E standard for Austria)
+5. **Cron job:** Runs every 5 minutes to capture latest data
+
+### Current Database Stats
+- Generation: 78+ days, 13 PSR types, ~96k records
+- Load: 78+ days, ~7.4k records
+- Prices: 78+ days, ~7.4k records
+- Database size: ~21 MB
+
+---
+
 ## Changes Made (2026-01-31 Session 2)
 
 ### Standortanalyse UX Improvements
