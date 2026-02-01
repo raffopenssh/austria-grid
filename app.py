@@ -742,5 +742,118 @@ Sitemap: {BASE_URL}/sitemap.xml
 """
     return Response(content, mimetype='text/plain')
 
+
+@app.route('/api/price-statistics')
+def price_statistics():
+    """Price volatility and statistics from historical ENTSO-E data"""
+    import sqlite3
+    from datetime import datetime, timedelta
+    
+    try:
+        conn = sqlite3.connect('data/entsoe_data.db')
+        cursor = conn.cursor()
+        
+        # Get price statistics
+        cursor.execute("""
+            SELECT 
+                COUNT(*) as count,
+                MIN(price_eur_mwh) as min_price,
+                MAX(price_eur_mwh) as max_price,
+                AVG(price_eur_mwh) as avg_price,
+                MIN(timestamp) as first_ts,
+                MAX(timestamp) as last_ts
+            FROM prices
+        """)
+        row = cursor.fetchone()
+        
+        # Get negative price hours (if any)
+        cursor.execute("""
+            SELECT timestamp, price_eur_mwh 
+            FROM prices 
+            WHERE price_eur_mwh < 0
+            ORDER BY price_eur_mwh ASC
+            LIMIT 20
+        """)
+        negative_prices = [{'timestamp': r[0], 'price': r[1]} for r in cursor.fetchall()]
+        
+        # Get price by hour of day
+        cursor.execute("""
+            SELECT 
+                CAST(strftime('%H', datetime(timestamp)) AS INTEGER) as hour,
+                AVG(price_eur_mwh) as avg_price,
+                MIN(price_eur_mwh) as min_price,
+                MAX(price_eur_mwh) as max_price
+            FROM prices
+            GROUP BY hour
+            ORDER BY hour
+        """)
+        hourly_pattern = []
+        for r in cursor.fetchall():
+            hourly_pattern.append({
+                'hour': r[0],
+                'avg': round(r[1], 2) if r[1] else 0,
+                'min': round(r[2], 2) if r[2] else 0,
+                'max': round(r[3], 2) if r[3] else 0,
+            })
+        
+        # Get recent price history (last 48 hours)
+        cursor.execute("""
+            SELECT timestamp, price_eur_mwh
+            FROM prices
+            ORDER BY timestamp DESC
+            LIMIT 192
+        """)
+        recent_prices = [{'timestamp': r[0], 'price': r[1]} for r in cursor.fetchall()]
+        recent_prices.reverse()
+        
+        # Calculate volatility (standard deviation)
+        cursor.execute("SELECT price_eur_mwh FROM prices")
+        prices = [r[0] for r in cursor.fetchall() if r[0] is not None]
+        if prices:
+            mean = sum(prices) / len(prices)
+            variance = sum((p - mean) ** 2 for p in prices) / len(prices)
+            std_dev = variance ** 0.5
+        else:
+            std_dev = 0
+        
+        conn.close()
+        
+        # Calculate best hours for storage (buy low, sell high)
+        if hourly_pattern:
+            sorted_by_price = sorted(hourly_pattern, key=lambda x: x['avg'])
+            best_charge_hours = sorted_by_price[:4]  # 4 cheapest hours
+            best_discharge_hours = sorted_by_price[-4:]  # 4 most expensive hours
+            spread = best_discharge_hours[0]['avg'] - best_charge_hours[-1]['avg']
+        else:
+            best_charge_hours = []
+            best_discharge_hours = []
+            spread = 0
+        
+        return jsonify({
+            'statistics': {
+                'count': row[0],
+                'min_price': round(row[1], 2) if row[1] else None,
+                'max_price': round(row[2], 2) if row[2] else None,
+                'avg_price': round(row[3], 2) if row[3] else None,
+                'std_deviation': round(std_dev, 2),
+                'first_timestamp': row[4],
+                'last_timestamp': row[5],
+            },
+            'negative_price_hours': negative_prices,
+            'negative_hours_count': len(negative_prices),
+            'hourly_pattern': hourly_pattern,
+            'recent_prices': recent_prices,
+            'storage_opportunity': {
+                'best_charge_hours': [h['hour'] for h in best_charge_hours],
+                'best_discharge_hours': [h['hour'] for h in best_discharge_hours],
+                'daily_spread_eur_mwh': round(spread, 2),
+                'note': 'Spread = Differenz zwischen teuersten und günstigsten Stunden',
+            },
+        })
+    except Exception as e:
+        import traceback
+        return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)

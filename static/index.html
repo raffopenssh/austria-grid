@@ -170,80 +170,283 @@
             border: 1px solid #333;
         }
         
-        /* Location check button - prominent on map */
-        .location-check-btn {
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(255, 152, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
+        }
+        
+        /* Standortanalyse Toolbar */
+        .standort-toolbar {
             position: absolute;
-            top: 80px;
-            left: 10px;
+            top: 10px;
+            left: 50px;
             z-index: 1000;
+            width: 320px;
+            background: rgba(22, 33, 62, 0.98);
+            border: 1px solid #00d4aa;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.2);
+        }
+        
+        .standort-toolbar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
             background: linear-gradient(135deg, #00d4aa 0%, #00a88a 100%);
+            border-radius: 9px 9px 0 0;
+            cursor: pointer;
+        }
+        
+        .standort-toolbar-title {
+            color: #fff;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .standort-toolbar-toggle {
+            background: none;
             border: none;
-            border-radius: 8px;
-            width: 44px;
-            height: 44px;
+            color: #fff;
+            cursor: pointer;
+            padding: 4px;
+            transition: transform 0.2s;
+        }
+        
+        .standort-toolbar.collapsed .standort-toolbar-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .standort-toolbar-body {
+            padding: 12px;
+        }
+        
+        .standort-toolbar.collapsed .standort-toolbar-body {
+            display: none;
+        }
+        
+        .standort-search-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .address-search-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 8px 10px;
+            gap: 8px;
+        }
+        
+        .address-search-box i {
+            color: #888;
+        }
+        
+        .address-search-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 0.85rem;
+            outline: none;
+            min-width: 0;
+        }
+        
+        .address-search-box input::placeholder {
+            color: #555;
+        }
+        
+        .address-clear {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0;
+        }
+        
+        .address-clear:hover {
+            color: #ff5252;
+        }
+        
+        .location-check-btn {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 6px;
+            width: 38px;
+            height: 38px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 8px rgba(0, 212, 170, 0.4);
             transition: all 0.2s ease;
         }
         
         .location-check-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(0, 212, 170, 0.6);
+            border-color: #00d4aa;
+            background: rgba(0, 212, 170, 0.1);
         }
         
         .location-check-btn.active {
             background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-            box-shadow: 0 2px 8px rgba(255, 152, 0, 0.4);
+            border-color: #ff9800;
             animation: pulse 1.5s infinite;
         }
         
         .location-check-btn i {
-            font-size: 20px;
+            font-size: 16px;
+            color: #888;
+        }
+        
+        .location-check-btn:hover i {
+            color: #00d4aa;
+        }
+        
+        .location-check-btn.active i {
             color: #fff;
         }
         
-        @keyframes pulse {
-            0% { box-shadow: 0 2px 8px rgba(255, 152, 0, 0.4); }
-            50% { box-shadow: 0 4px 16px rgba(255, 152, 0, 0.7); }
-            100% { box-shadow: 0 2px 8px rgba(255, 152, 0, 0.4); }
-        }
-        
-        .location-check-tooltip {
-            position: absolute;
-            top: 80px;
-            left: 60px;
-            z-index: 1001;
-            background: rgba(26, 26, 46, 0.95);
-            border: 1px solid #00d4aa;
-            border-radius: 8px;
-            padding: 10px 15px;
-            max-width: 220px;
+        .address-results {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 10px;
             display: none;
         }
         
-        .location-check-tooltip.visible {
+        .address-results.visible {
             display: block;
-            animation: fadeIn 0.2s ease;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        
-        .location-check-tooltip h4 {
-            color: #00d4aa;
-            margin: 0 0 5px 0;
-            font-size: 0.9rem;
-        }
-        
-        .location-check-tooltip p {
-            color: #aaa;
-            margin: 0;
+        .address-result-item {
+            padding: 8px 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #333;
             font-size: 0.8rem;
+        }
+        
+        .address-result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .address-result-item:hover {
+            background: rgba(0, 212, 170, 0.15);
+        }
+        
+        .address-result-item .main {
+            color: #fff;
+        }
+        
+        .address-result-item .secondary {
+            color: #666;
+            font-size: 0.7rem;
+            margin-top: 2px;
+        }
+        
+        .address-loading {
+            padding: 12px;
+            text-align: center;
+            color: #888;
+            font-size: 0.85rem;
+        }
+        
+        .standort-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .standort-option-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .standort-option-row label {
+            color: #888;
+            font-size: 0.8rem;
+            min-width: 80px;
+        }
+        
+        .standort-option-row select {
+            flex: 1;
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #fff;
+            padding: 6px 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        
+        .standort-option-row select:focus {
+            outline: none;
+            border-color: #00d4aa;
+        }
+        
+        .capacity-input-group {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .capacity-input-group input {
+            width: 70px;
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 4px 0 0 4px;
+            color: #fff;
+            padding: 6px 8px;
+            font-size: 0.8rem;
+            text-align: right;
+        }
+        
+        .capacity-input-group input:focus {
+            outline: none;
+            border-color: #00d4aa;
+        }
+        
+        .capacity-unit {
+            background: #333;
+            border: 1px solid #333;
+            border-left: none;
+            border-radius: 0 4px 4px 0;
+            color: #888;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+        
+        .standort-hint {
+            background: rgba(0, 212, 170, 0.1);
+            border-radius: 4px;
+            padding: 8px 10px;
+            font-size: 0.75rem;
+            color: #888;
+        }
+        
+        .standort-hint i {
+            color: #00d4aa;
+        }
+        
+        .standort-hint strong {
+            color: #00d4aa;
+        }
+        
+        .standort-hint.active {
+            background: rgba(255, 152, 0, 0.15);
+            color: #ff9800;
+        }
+        
+        .standort-hint.active i {
+            color: #ff9800;
         }
         
         .legend h4 {
@@ -392,6 +595,69 @@
         
         .modal-close:hover {
             color: #ff6b6b;
+        }
+        
+        .export-btn {
+            background: linear-gradient(135deg, #4a9eff 0%, #2196f3 100%);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .export-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(74, 158, 255, 0.4);
+        }
+        
+        /* Print styles for PDF export */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            #location-modal,
+            #location-modal * {
+                visibility: visible;
+            }
+            
+            #location-modal {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white !important;
+            }
+            
+            #location-modal .modal {
+                max-width: 100% !important;
+                width: 100% !important;
+                box-shadow: none !important;
+                border: none !important;
+                background: white !important;
+                color: black !important;
+            }
+            
+            #location-modal .modal-close,
+            #location-modal .export-btn {
+                display: none !important;
+            }
+            
+            #location-result {
+                color: black !important;
+            }
+            
+            #location-result * {
+                color: black !important;
+                background: white !important;
+            }
+            
+            #location-result div[style*="background"] {
+                border: 1px solid #ccc !important;
+            }
         }
         
         .modal-body {
@@ -730,13 +996,51 @@
         <div class="map-container">
             <div id="map"></div>
             
-            <!-- Location Check Button - Prominent on Map -->
-            <button class="location-check-btn" id="location-check-btn" title="Standort für Wind/Solar prüfen">
-                <i class="fas fa-crosshairs"></i>
-            </button>
-            <div class="location-check-tooltip" id="location-check-tooltip">
-                <h4><i class="fas fa-mouse-pointer"></i> Standortanalyse</h4>
-                <p>Klicken Sie auf einen Punkt in Österreich um Wind/Solar-Eignung zu prüfen</p>
+            <!-- Unified Standortanalyse Toolbar -->
+            <div class="standort-toolbar" id="standort-toolbar">
+                <div class="standort-toolbar-header">
+                    <span class="standort-toolbar-title">
+                        <i class="fas fa-map-marker-alt"></i> Standortanalyse
+                    </span>
+                    <button class="standort-toolbar-toggle" id="standort-toolbar-toggle" title="Toolbar ein-/ausklappen">
+                        <i class="fas fa-chevron-up"></i>
+                    </button>
+                </div>
+                <div class="standort-toolbar-body" id="standort-toolbar-body">
+                    <div class="standort-search-row">
+                        <div class="address-search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="address-input" placeholder="Adresse oder Ort eingeben..." autocomplete="off">
+                            <button id="address-clear" class="address-clear" style="display: none;">&times;</button>
+                        </div>
+                        <button class="location-check-btn" id="location-check-btn" title="Auf Karte klicken">
+                            <i class="fas fa-crosshairs"></i>
+                        </button>
+                    </div>
+                    <div class="address-results" id="address-results"></div>
+                    <div class="standort-options">
+                        <div class="standort-option-row">
+                            <label>Anlagentyp:</label>
+                            <select id="plant-type-select">
+                                <option value="solar_rooftop">PV Dachanlage</option>
+                                <option value="solar_ground">PV Freifläche</option>
+                                <option value="wind_small">Kleinwind (&lt;20 kW)</option>
+                                <option value="wind_medium">Wind 1-3 MW</option>
+                                <option value="wind_large">Wind &gt;3 MW</option>
+                            </select>
+                        </div>
+                        <div class="standort-option-row">
+                            <label>Leistung:</label>
+                            <div class="capacity-input-group">
+                                <input type="number" id="capacity-input" value="10" min="1" max="10000" step="1">
+                                <span class="capacity-unit" id="capacity-unit">kW</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="standort-hint" id="standort-hint">
+                        <i class="fas fa-info-circle"></i> Adresse eingeben oder <strong>auf Karte klicken</strong>
+                    </div>
+                </div>
             </div>
             
             <div class="legend">
@@ -814,8 +1118,15 @@
     <!-- Location Check Modal -->
     <div id="location-modal" class="modal-overlay">
         <div class="modal" style="max-width: 500px; padding: 20px;">
-            <span class="modal-close" onclick="closeLocationModal()">&times;</span>
-            <h2 style="color: #00d4aa; margin-bottom: 15px;"><i class="fas fa-map-marker-alt"></i> Standortanalyse</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="color: #00d4aa; margin: 0;"><i class="fas fa-map-marker-alt"></i> Standortanalyse</h2>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button onclick="exportToPDF()" class="export-btn" title="Als PDF exportieren">
+                        <i class="fas fa-file-pdf"></i>
+                    </button>
+                    <span class="modal-close" onclick="closeLocationModal()">&times;</span>
+                </div>
+            </div>
             <div id="location-result">
                 <p style="color: #888;">Klicken Sie auf die Karte um einen Standort zu prüfen...</p>
             </div>
@@ -2165,25 +2476,22 @@
         function enableLocationCheck() {
             locationCheckEnabled = true;
             const btn = document.getElementById('location-check-btn');
-            const tooltip = document.getElementById('location-check-tooltip');
+            const hint = document.getElementById('standort-hint');
             btn.classList.add('active');
             btn.innerHTML = '<i class="fas fa-times"></i>';
-            tooltip.classList.add('visible');
+            hint.classList.add('active');
+            hint.innerHTML = '<i class="fas fa-crosshairs"></i> <strong>Klicken Sie jetzt auf die Karte</strong>';
             map.getContainer().style.cursor = 'crosshair';
-            
-            // Hide tooltip after 5 seconds
-            setTimeout(() => {
-                tooltip.classList.remove('visible');
-            }, 5000);
         }
         
         function disableLocationCheck() {
             locationCheckEnabled = false;
             const btn = document.getElementById('location-check-btn');
-            const tooltip = document.getElementById('location-check-tooltip');
+            const hint = document.getElementById('standort-hint');
             btn.classList.remove('active');
             btn.innerHTML = '<i class="fas fa-crosshairs"></i>';
-            tooltip.classList.remove('visible');
+            hint.classList.remove('active');
+            hint.innerHTML = '<i class="fas fa-info-circle"></i> Adresse eingeben oder <strong>auf Karte klicken</strong>';
             map.getContainer().style.cursor = '';
         }
         
@@ -2204,17 +2512,243 @@
             }
         }
         
+        // Get selected plant configuration
+        function getPlantConfig() {
+            const plantType = document.getElementById('plant-type-select').value;
+            const capacityInput = document.getElementById('capacity-input').value;
+            const capacityUnit = document.getElementById('capacity-unit').textContent;
+            
+            let capacity_kw = parseFloat(capacityInput);
+            if (capacityUnit === 'MW') capacity_kw *= 1000;
+            
+            return {
+                type: plantType,
+                capacity_kw: capacity_kw,
+                capacity_display: `${capacityInput} ${capacityUnit}`
+            };
+        }
+        
+        // Update capacity unit based on plant type
+        document.getElementById('plant-type-select').addEventListener('change', function() {
+            const unitEl = document.getElementById('capacity-unit');
+            const inputEl = document.getElementById('capacity-input');
+            
+            switch(this.value) {
+                case 'solar_rooftop':
+                    unitEl.textContent = 'kW';
+                    inputEl.value = '10';
+                    inputEl.max = '100';
+                    break;
+                case 'solar_ground':
+                    unitEl.textContent = 'kW';
+                    inputEl.value = '500';
+                    inputEl.max = '50000';
+                    break;
+                case 'wind_small':
+                    unitEl.textContent = 'kW';
+                    inputEl.value = '10';
+                    inputEl.max = '20';
+                    break;
+                case 'wind_medium':
+                    unitEl.textContent = 'MW';
+                    inputEl.value = '3';
+                    inputEl.max = '5';
+                    break;
+                case 'wind_large':
+                    unitEl.textContent = 'MW';
+                    inputEl.value = '5';
+                    inputEl.max = '15';
+                    break;
+            }
+        });
+        
+        // Toolbar collapse toggle
+        document.getElementById('standort-toolbar-toggle').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('standort-toolbar').classList.toggle('collapsed');
+        });
+        
+        document.querySelector('.standort-toolbar-header').addEventListener('click', function() {
+            document.getElementById('standort-toolbar').classList.toggle('collapsed');
+        });
+        
         // Set up the location check button click handler
         document.getElementById('location-check-btn').addEventListener('click', toggleLocationCheck);
         
+        // Address search functionality (Nominatim geocoding)
+        const addressInput = document.getElementById('address-input');
+        const addressResults = document.getElementById('address-results');
+        const addressClear = document.getElementById('address-clear');
+        let searchTimeout = null;
+        
+        addressInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            addressClear.style.display = query ? 'block' : 'none';
+            
+            if (searchTimeout) clearTimeout(searchTimeout);
+            
+            if (query.length < 3) {
+                addressResults.classList.remove('visible');
+                return;
+            }
+            
+            addressResults.innerHTML = '<div class="address-loading"><i class="fas fa-spinner fa-spin"></i> Suche...</div>';
+            addressResults.classList.add('visible');
+            
+            // Debounce search
+            searchTimeout = setTimeout(() => searchAddress(query), 300);
+        });
+        
+        addressClear.addEventListener('click', function() {
+            addressInput.value = '';
+            addressResults.classList.remove('visible');
+            addressClear.style.display = 'none';
+        });
+        
+        async function searchAddress(query) {
+            try {
+                // Use Nominatim with Austria country filter
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/search?` +
+                    `q=${encodeURIComponent(query)}&` +
+                    `countrycodes=at&` +
+                    `format=json&` +
+                    `addressdetails=1&` +
+                    `limit=5`,
+                    {
+                        headers: {
+                            'Accept': 'application/json',
+                            'User-Agent': 'AustriaGridApp/1.0'
+                        }
+                    }
+                );
+                
+                const results = await response.json();
+                
+                if (results.length === 0) {
+                    addressResults.innerHTML = '<div class="address-loading">Keine Ergebnisse gefunden</div>';
+                    return;
+                }
+                
+                addressResults.innerHTML = results.map(r => {
+                    const addr = r.address || {};
+                    const main = r.display_name.split(',')[0];
+                    const secondary = [
+                        addr.road,
+                        addr.city || addr.town || addr.village || addr.municipality,
+                        addr.postcode,
+                        addr.state
+                    ].filter(Boolean).join(', ');
+                    
+                    return `
+                        <div class="address-result-item" 
+                             data-lat="${r.lat}" 
+                             data-lon="${r.lon}"
+                             data-name="${main}">
+                            <div class="main">${main}</div>
+                            <div class="secondary">${secondary}</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Add click handlers to results
+                addressResults.querySelectorAll('.address-result-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const lat = parseFloat(this.dataset.lat);
+                        const lon = parseFloat(this.dataset.lon);
+                        const name = this.dataset.name;
+                        
+                        // Update input and hide results
+                        addressInput.value = name;
+                        addressResults.classList.remove('visible');
+                        
+                        // Center map on location
+                        map.setView([lat, lon], 13);
+                        
+                        // Enable location check and trigger analysis
+                        enableLocationCheck();
+                        
+                        // Add marker and check location
+                        if (locationMarker) {
+                            locationMarker.setLatLng([lat, lon]);
+                        } else {
+                            locationMarker = L.marker([lat, lon], {
+                                icon: L.divIcon({
+                                    className: 'location-check-marker',
+                                    html: '<i class="fas fa-map-pin" style="color: #00d4aa; font-size: 24px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>',
+                                    iconSize: [24, 24],
+                                    iconAnchor: [12, 24],
+                                })
+                            }).addTo(map);
+                        }
+                        
+                        // Open modal and analyze
+                        document.getElementById('location-modal').classList.add('active');
+                        document.getElementById('location-result').innerHTML = `
+                            <p style="color: #888;"><i class="fas fa-spinner fa-spin"></i> Analysiere ${name}...</p>
+                        `;
+                        checkLocation(lat, lon);
+                    });
+                });
+            } catch (error) {
+                console.error('Address search error:', error);
+                addressResults.innerHTML = '<div class="address-loading">Fehler bei der Suche</div>';
+            }
+        }
+        
+        // Close address results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.address-search-container')) {
+                addressResults.classList.remove('visible');
+            }
+        });
+        
+        // PDF Export function
+        function exportToPDF() {
+            // Create a printable version
+            const locationResult = document.getElementById('location-result');
+            if (!locationResult.innerHTML || locationResult.innerHTML.includes('Klicken Sie')) {
+                alert('Bitte zuerst einen Standort analysieren.');
+                return;
+            }
+            
+            // Add header for print
+            const printHeader = document.createElement('div');
+            printHeader.id = 'print-header';
+            printHeader.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #00d4aa;">
+                    <h1 style="color: #00d4aa; margin: 0;">Standortanalyse - Netzkapazität Österreich</h1>
+                    <p style="color: #666; margin: 5px 0 0 0;">Erstellt am ${new Date().toLocaleDateString('de-AT')} | austria-power.exe.xyz</p>
+                </div>
+            `;
+            locationResult.insertBefore(printHeader, locationResult.firstChild);
+            
+            // Trigger print dialog
+            window.print();
+            
+            // Remove header after print
+            setTimeout(() => {
+                const header = document.getElementById('print-header');
+                if (header) header.remove();
+            }, 1000);
+        }
+        
         async function checkLocation(lat, lon) {
+            const plantConfig = getPlantConfig();
+            
             document.getElementById('location-result').innerHTML = `
-                <p style="color: #888;"><i class="fas fa-spinner fa-spin"></i> Analysiere Standort...</p>
+                <p style="color: #888;"><i class="fas fa-spinner fa-spin"></i> Analysiere Standort für ${plantConfig.capacity_display} ${plantConfig.type.includes('solar') ? 'PV' : 'Wind'}...</p>
             `;
             
             try {
-                const response = await fetch(`/api/check-location?lat=${lat}&lon=${lon}`);
+                // Fetch location data and price statistics in parallel
+                const [response, priceResponse] = await Promise.all([
+                    fetch(`/api/check-location?lat=${lat}&lon=${lon}`),
+                    fetch('/api/price-statistics')
+                ]);
+                
                 const data = await response.json();
+                const priceData = await priceResponse.json().catch(() => null);
                 
                 if (data.error) {
                     document.getElementById('location-result').innerHTML = `<p style="color: #ff5252;">Fehler: ${data.error}</p>`;
@@ -2225,11 +2759,36 @@
                 const nearby = data.nearby_installations;
                 const rf = data.regional_factors;
                 const est = data.estimates;
+                const pvgis = data.pvgis;  // May be null if PVGIS unavailable
+                
+                // Calculate custom estimates based on plant config
+                const isSolar = plantConfig.type.includes('solar');
+                const capacityKw = plantConfig.capacity_kw;
+                const capacityMw = capacityKw / 1000;
+                const cf = isSolar ? rf.solar_capacity_factor : rf.wind_capacity_factor;
+                const annualMwh = capacityMw * cf * 8760;
+                const pricePerMwh = isSolar ? 80 : 80; // €/MWh average
+                const annualRevenue = annualMwh * pricePerMwh;
+                
+                // Plant type display name
+                const plantTypeNames = {
+                    'solar_rooftop': 'PV Dachanlage',
+                    'solar_ground': 'PV Freiflächenanlage',
+                    'wind_small': 'Kleinwindkraftanlage',
+                    'wind_medium': 'Windkraftanlage (mittel)',
+                    'wind_large': 'Große Windkraftanlage'
+                };
                 
                 let html = `
                     <div style="margin-bottom: 15px;">
                         <div style="font-size: 0.8rem; color: #888;">Koordinaten: ${lat.toFixed(4)}, ${lon.toFixed(4)}</div>
                         <div style="font-size: 1.1rem; color: #fff;"><strong>${data.location.region}</strong></div>
+                        <div style="margin-top: 8px; padding: 8px; background: ${isSolar ? 'rgba(255, 235, 59, 0.1)' : 'rgba(76, 175, 80, 0.1)'}; border-radius: 6px; border-left: 3px solid ${isSolar ? '#ffeb3b' : '#4caf50'};">
+                            <div style="font-size: 0.7rem; color: #888;">GEPLANTE ANLAGE</div>
+                            <div style="font-size: 1rem; color: ${isSolar ? '#ffeb3b' : '#4caf50'}; font-weight: bold;">
+                                <i class="fas fa-${isSolar ? 'solar-panel' : 'wind'}"></i> ${plantTypeNames[plantConfig.type]} - ${plantConfig.capacity_display}
+                            </div>
+                        </div>
                     </div>
                     
                     <div style="background: #1a1a2e; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${gc.color};">
@@ -2248,18 +2807,41 @@
                         ` : ''}
                     </div>
                     
-                    <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-                        <div style="flex: 1; background: #1a1a2e; padding: 10px; border-radius: 8px;">
-                            <div style="font-size: 0.7rem; color: #888;">SOLAR (10 kW Dach)</div>
-                            <div style="font-size: 1.1rem; color: #ffeb3b;">${(est.solar_10kw_annual_kwh/1000).toFixed(1)} MWh/Jahr</div>
-                            <div style="font-size: 0.75rem; color: #888;">~${est.solar_10kw_annual_eur.toLocaleString('de-AT')} €/Jahr</div>
-                            <div style="font-size: 0.65rem; color: #666;">${(rf.solar_capacity_factor*100).toFixed(0)}% Kapazitätsfaktor</div>
+                    <div style="background: #1a1a2e; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                        <div style="font-size: 0.7rem; color: #888; margin-bottom: 8px;">ERTRAGSSCHÄTZUNG FÜR IHRE ANLAGE</div>
+                        <div style="display: flex; gap: 15px;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.65rem; color: #666;">Jahresertrag</div>
+                                <div style="font-size: 1.3rem; color: ${isSolar ? '#ffeb3b' : '#4caf50'}; font-weight: bold;">
+                                    ${annualMwh >= 1000 ? (annualMwh/1000).toFixed(1) + ' GWh' : annualMwh.toFixed(0) + ' MWh'}
+                                </div>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.65rem; color: #666;">Erlös (gesch.)</div>
+                                <div style="font-size: 1.3rem; color: #00d4aa; font-weight: bold;">
+                                    ${annualRevenue >= 10000 ? (annualRevenue/1000).toFixed(0) + 'k' : annualRevenue.toFixed(0)} €/Jahr
+                                </div>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.65rem; color: #666;">Kapazitätsfaktor</div>
+                                <div style="font-size: 1.3rem; color: #888;">${(cf*100).toFixed(0)}%</div>
+                            </div>
                         </div>
-                        <div style="flex: 1; background: #1a1a2e; padding: 10px; border-radius: 8px;">
-                            <div style="font-size: 0.7rem; color: #888;">WIND (3 MW Anlage)</div>
-                            <div style="font-size: 1.1rem; color: #4caf50;">${(est.wind_3mw_annual_mwh/1000).toFixed(1)} GWh/Jahr</div>
-                            <div style="font-size: 0.75rem; color: #888;">~${(est.wind_3mw_annual_eur/1000).toFixed(0)}k €/Jahr</div>
-                            <div style="font-size: 0.65rem; color: #666;">${(rf.wind_capacity_factor*100).toFixed(0)}% Kapazitätsfaktor</div>
+                        ${isSolar && pvgis ? `
+                            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #333; font-size: 0.7rem; color: #666;">
+                                <i class="fas fa-satellite" style="color: #4a9eff;"></i> PVGIS: Optimale Neigung ${pvgis.optimal_angle}°, ${pvgis.yearly_kwh_per_kwp} kWh/kWp
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                        <div style="flex: 1; background: #1a1a2e; padding: 8px; border-radius: 6px; text-align: center;">
+                            <div style="font-size: 0.6rem; color: #888;">REFERENZ: 10 kW PV</div>
+                            <div style="font-size: 0.9rem; color: #ffeb3b;">${(est.solar_10kw_annual_kwh/1000).toFixed(1)} MWh</div>
+                        </div>
+                        <div style="flex: 1; background: #1a1a2e; padding: 8px; border-radius: 6px; text-align: center;">
+                            <div style="font-size: 0.6rem; color: #888;">REFERENZ: 3 MW Wind</div>
+                            <div style="font-size: 0.9rem; color: #4caf50;">${(est.wind_3mw_annual_mwh/1000).toFixed(1)} GWh</div>
                         </div>
                     </div>
                     
@@ -2315,6 +2897,45 @@
                                     <i class="fas fa-external-link-alt"></i> BGBl. I Nr. 91/2025
                                 </a>
                             </div>
+                        </div>
+                    `;
+                }
+                
+                // Add price statistics section
+                if (priceData && priceData.statistics) {
+                    const stats = priceData.statistics;
+                    const storage = priceData.storage_opportunity;
+                    
+                    html += `
+                        <div style="margin-top: 12px; padding: 10px; background: #1a1a2e; border-radius: 8px;">
+                            <div style="font-size: 0.7rem; color: #ff9800; margin-bottom: 8px;">
+                                <i class="fas fa-chart-line"></i> STROMPREIS-ANALYSE (Live ENTSO-E)
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+                                <div style="flex: 1; text-align: center;">
+                                    <div style="font-size: 0.65rem; color: #888;">Aktueller Preis</div>
+                                    <div style="font-size: 1rem; color: #fff;">${stats.avg_price.toFixed(0)} €/MWh</div>
+                                </div>
+                                <div style="flex: 1; text-align: center;">
+                                    <div style="font-size: 0.65rem; color: #888;">Spanne</div>
+                                    <div style="font-size: 0.85rem; color: #888;">${stats.min_price}–${stats.max_price}</div>
+                                </div>
+                                <div style="flex: 1; text-align: center;">
+                                    <div style="font-size: 0.65rem; color: #888;">Volatilität</div>
+                                    <div style="font-size: 0.85rem; color: ${stats.std_deviation > 30 ? '#ff9800' : '#00e676'};">±${stats.std_deviation} €</div>
+                                </div>
+                            </div>
+                            ${priceData.negative_hours_count > 0 ? `
+                                <div style="font-size: 0.75rem; color: #4caf50; margin-bottom: 6px;">
+                                    <i class="fas fa-gift"></i> ${priceData.negative_hours_count} Stunden mit Negativpreisen (Geld für Stromabnahme!)
+                                </div>
+                            ` : ''}
+                            ${storage ? `
+                                <div style="font-size: 0.75rem; color: #888; margin-top: 6px; padding-top: 6px; border-top: 1px solid #333;">
+                                    <i class="fas fa-battery-half"></i> <strong>Speicher-Potenzial:</strong> ${storage.daily_spread_eur_mwh} €/MWh Tagesdifferenz<br>
+                                    <span style="font-size: 0.65rem;">Laden: ${storage.best_charge_hours.join(', ')} Uhr | Entladen: ${storage.best_discharge_hours.join(', ')} Uhr</span>
+                                </div>
+                            ` : ''}
                         </div>
                     `;
                 }

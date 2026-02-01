@@ -2,13 +2,19 @@
 """
 Location Checker for Wind/Solar Installation Feasibility.
 Provides information about grid connection possibilities at a given location.
+Includes PVGIS integration for accurate solar yield estimates.
 """
 
 import json
 import math
+import requests
 from typing import Dict, List, Optional
+from functools import lru_cache
 
 DATA_DIR = '/home/exedev/austria-grid/data'
+
+# PVGIS API configuration
+PVGIS_BASE_URL = 'https://re.jrc.ec.europa.eu/api/v5_2'
 
 def load_json(filename):
     with open(f'{DATA_DIR}/{filename}', 'r') as f:
@@ -91,6 +97,79 @@ SUNSHINE_HOURS = {
     'Tirol': 1800,
     'Vorarlberg': 1650,
 }
+
+
+def get_pvgis_data(lat: float, lon: float, peakpower: float = 10.0, loss: float = 14.0):
+    """
+    Fetch solar production estimates from EU PVGIS API.
+    
+    Args:
+        lat: Latitude
+        lon: Longitude  
+        peakpower: PV system peak power in kW (default 10)
+        loss: System losses in % (default 14%)
+    
+    Returns:
+        Dict with monthly and yearly production estimates, or None on error
+    """
+    try:
+        # Round coordinates to avoid cache misses for nearby points
+        lat_r = round(lat, 3)
+        lon_r = round(lon, 3)
+        
+        params = {
+            'lat': lat_r,
+            'lon': lon_r,
+            'peakpower': peakpower,
+            'loss': loss,
+            'outputformat': 'json',
+            'pvtechchoice': 'crystSi',  # Crystalline silicon
+            'mountingplace': 'building',  # Rooftop
+            'optimalangles': 1,  # Use optimal tilt/azimuth
+        }
+        
+        response = requests.get(
+            f'{PVGIS_BASE_URL}/PVcalc',
+            params=params,
+            timeout=15
+        )
+        
+        if response.status_code != 200:
+            print(f"PVGIS API error: {response.status_code}")
+            return None
+        
+        data = response.json()
+        outputs = data.get('outputs', {})
+        inputs = data.get('inputs', {})
+        
+        # Extract monthly data
+        monthly = []
+        for m in outputs.get('monthly', {}).get('fixed', []):
+            monthly.append({
+                'month': m['month'],
+                'E_m': round(m['E_m'], 1),  # kWh/month
+                'H_m': round(m['H(i)_m'], 2),  # kWh/m2/month irradiation
+                'SD_m': round(m.get('SD_m', 0), 1),  # Standard deviation
+            })
+        
+        # Extract totals
+        totals = outputs.get('totals', {}).get('fixed', {})
+        
+        return {
+            'yearly_kwh': round(totals.get('E_y', 0), 0),  # kWh/year
+            'yearly_kwh_per_kwp': round(totals.get('E_y', 0) / peakpower, 0) if peakpower > 0 else 0,
+            'optimal_angle': round(inputs.get('mounting_system', {}).get('fixed', {}).get('slope', {}).get('value', 35), 0),
+            'optimal_azimuth': round(inputs.get('mounting_system', {}).get('fixed', {}).get('azimuth', {}).get('value', 0), 0),
+            'monthly': monthly,
+            'irradiation_kwh_m2_year': round(sum(m.get('H_m', 0) for m in monthly), 0),
+            'source': 'PVGIS 5.2 (EU JRC)',
+        }
+    except requests.exceptions.Timeout:
+        print(f"PVGIS timeout for {lat}, {lon}")
+        return None
+    except Exception as e:
+        print(f"PVGIS error: {e}")
+        return None
 
 
 class LocationChecker:
@@ -282,6 +361,7 @@ class LocationChecker:
                 'wind_3mw_annual_mwh': round(wind_3mw_annual_mwh),
                 'wind_3mw_annual_eur': round(wind_3mw_annual_mwh * 80),  # ~80€/MWh
             },
+            'pvgis': get_pvgis_data(lat, lon, 10.0),  # Real PVGIS data for 10kW system
             'recommendations': self._get_recommendations(
                 region, connection_difficulty, wind_cf, solar_cf, wind_nearby
             ),
