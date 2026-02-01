@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+logs/
+*.log
+
+# Large data files (track schema/structure, not data)
+# data/entsoe_data.db  # Keep DB for reference
+
+# OS files
+.DS_Store

@@ -391,6 +391,215 @@ def entsoe_summary():
     })
 
 
+@app.route('/api/entsoe/history')
+def entsoe_history():
+    """
+    Query historical ENTSO-E data from the database.
+    
+    Parameters:
+        type: generation|load|prices|crossborder (required)
+        days: number of days to query (default: 7, max: 365)
+        psr_type: filter by generation type (for type=generation)
+        country: filter by country (for type=crossborder)
+        aggregation: hourly|daily (optional, default: raw 15-min data)
+    
+    Returns time-series data for ML training and analysis.
+    """
+    import sqlite3
+    
+    data_type = request.args.get('type', 'load')
+    days = min(int(request.args.get('days', 7)), 365)
+    psr_type = request.args.get('psr_type')
+    country = request.args.get('country')
+    aggregation = request.args.get('aggregation', 'raw')
+    
+    db_path = '/home/exedev/austria-grid/data/entsoe_data.db'
+    conn = sqlite3.connect(db_path)
+    
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+    
+    try:
+        if data_type == 'generation':
+            if psr_type:
+                query = f'''
+                    SELECT timestamp, psr_type, value_mw
+                    FROM generation
+                    WHERE timestamp >= ? AND psr_type = ?
+                    ORDER BY timestamp
+                '''
+                df = pd.read_sql_query(query, conn, params=[cutoff, psr_type])
+            else:
+                query = f'''
+                    SELECT timestamp, psr_type, value_mw
+                    FROM generation
+                    WHERE timestamp >= ?
+                    ORDER BY timestamp, psr_type
+                '''
+                df = pd.read_sql_query(query, conn, params=[cutoff])
+            
+            # Pivot to wide format for easier ML use
+            if not df.empty:
+                df['timestamp'] = pd.to_datetime(df['timestamp'])
+                pivot = df.pivot_table(index='timestamp', columns='psr_type', values='value_mw', aggfunc='first')
+                
+                if aggregation == 'hourly':
+                    pivot = pivot.resample('H').mean()
+                elif aggregation == 'daily':
+                    pivot = pivot.resample('D').mean()
+                
+                result = {
+                    'type': 'generation',
+                    'timestamps': [t.isoformat() for t in pivot.index],
+                    'psr_types': list(pivot.columns),
+                    'data': pivot.values.tolist(),
+                    'records': len(pivot)
+                }
+            else:
+                result = {'type': 'generation', 'timestamps': [], 'psr_types': [], 'data': [], 'records': 0}
+                
+        elif data_type == 'load':
+            query = '''
+                SELECT timestamp, load_mw
+                FROM load
+                WHERE timestamp >= ?
+                ORDER BY timestamp
+            '''
+            df = pd.read_sql_query(query, conn, params=[cutoff])
+            df['timestamp'] = pd.to_datetime(df['timestamp'])
+            df.set_index('timestamp', inplace=True)
+            
+            if aggregation == 'hourly':
+                df = df.resample('H').mean()
+            elif aggregation == 'daily':
+                df = df.resample('D').mean()
+            
+            result = {
+                'type': 'load',
+                'timestamps': [t.isoformat() for t in df.index],
+                'load_mw': df['load_mw'].tolist(),
+                'records': len(df)
+            }
+            
+        elif data_type == 'prices':
+            query = '''
+                SELECT timestamp, price_eur_mwh
+                FROM prices
+                WHERE timestamp >= ?
+                ORDER BY timestamp
+            '''
+            df = pd.read_sql_query(query, conn, params=[cutoff])
+            df['timestamp'] = pd.to_datetime(df['timestamp'])
+            df.set_index('timestamp', inplace=True)
+            
+            if aggregation == 'hourly':
+                df = df.resample('H').mean()
+            elif aggregation == 'daily':
+                df = df.resample('D').mean()
+            
+            result = {
+                'type': 'prices',
+                'timestamps': [t.isoformat() for t in df.index],
+                'price_eur_mwh': df['price_eur_mwh'].tolist(),
+                'records': len(df),
+                'stats': {
+                    'mean': float(df['price_eur_mwh'].mean()) if not df.empty else None,
+                    'min': float(df['price_eur_mwh'].min()) if not df.empty else None,
+                    'max': float(df['price_eur_mwh'].max()) if not df.empty else None,
+                    'std': float(df['price_eur_mwh'].std()) if not df.empty else None
+                }
+            }
+            
+        elif data_type == 'crossborder':
+            if country:
+                query = '''
+                    SELECT timestamp, country_code, import_mw, export_mw
+                    FROM cross_border_flows
+                    WHERE timestamp >= ? AND country_code = ?
+                    ORDER BY timestamp
+                '''
+                df = pd.read_sql_query(query, conn, params=[cutoff, country])
+            else:
+                query = '''
+                    SELECT timestamp, country_code, import_mw, export_mw
+                    FROM cross_border_flows
+                    WHERE timestamp >= ?
+                    ORDER BY timestamp, country_code
+                '''
+                df = pd.read_sql_query(query, conn, params=[cutoff])
+            
+            result = {
+                'type': 'crossborder',
+                'data': df.to_dict('records'),
+                'records': len(df)
+            }
+            
+        else:
+            return jsonify({'error': f'Unknown type: {data_type}. Use: generation, load, prices, crossborder'}), 400
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+
+@app.route('/api/entsoe/stats')
+def entsoe_stats():
+    """Get database statistics for monitoring."""
+    import sqlite3
+    import os
+    
+    db_path = '/home/exedev/austria-grid/data/entsoe_data.db'
+    conn = sqlite3.connect(db_path)
+    
+    stats = {}
+    
+    # Generation stats
+    df = pd.read_sql_query('''
+        SELECT 
+            COUNT(*) as total_records,
+            COUNT(DISTINCT psr_type) as num_types,
+            MIN(timestamp) as earliest,
+            MAX(timestamp) as latest,
+            COUNT(DISTINCT date(timestamp)) as days_covered
+        FROM generation
+    ''', conn)
+    stats['generation'] = df.iloc[0].to_dict()
+    
+    # Load stats
+    df = pd.read_sql_query('''
+        SELECT 
+            COUNT(*) as total_records,
+            MIN(timestamp) as earliest,
+            MAX(timestamp) as latest,
+            ROUND(AVG(load_mw), 1) as avg_load_mw,
+            ROUND(MIN(load_mw), 1) as min_load_mw,
+            ROUND(MAX(load_mw), 1) as max_load_mw
+        FROM load
+    ''', conn)
+    stats['load'] = df.iloc[0].to_dict()
+    
+    # Price stats
+    df = pd.read_sql_query('''
+        SELECT 
+            COUNT(*) as total_records,
+            MIN(timestamp) as earliest,
+            MAX(timestamp) as latest,
+            ROUND(AVG(price_eur_mwh), 2) as avg_price,
+            ROUND(MIN(price_eur_mwh), 2) as min_price,
+            ROUND(MAX(price_eur_mwh), 2) as max_price
+        FROM prices
+    ''', conn)
+    stats['prices'] = df.iloc[0].to_dict()
+    
+    # Database file size
+    stats['db_size_mb'] = round(os.path.getsize(db_path) / (1024 * 1024), 2)
+    
+    conn.close()
+    return jsonify(stats)
+
+
 @app.route('/api/substation-loads')
 def substation_loads():
     """Get estimated load on each substation based on live data"""

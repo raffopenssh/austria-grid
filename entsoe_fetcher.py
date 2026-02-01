@@ -2,11 +2,19 @@
 """
 ENTSO-E data fetcher and storage using entsoe-py library.
 Stores historical data in SQLite for analysis and model training.
+
+Data Resolution: 15 minutes (ENTSO-E standard for Austria)
+Storage: SQLite with indexes for efficient time-series queries
+
+Usage:
+    python entsoe_fetcher.py fetch [hours]   - Fetch recent data
+    python entsoe_fetcher.py backfill [days] - Backfill historical data
+    python entsoe_fetcher.py stats           - Show database statistics
 """
 
 import sqlite3
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from entsoe import EntsoePandasClient
 import os
 
@@ -31,7 +39,7 @@ def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
-    # Generation by type
+    # Generation by type (15-min resolution)
     c.execute('''
         CREATE TABLE IF NOT EXISTS generation (
             timestamp TEXT,
@@ -42,7 +50,7 @@ def init_db():
         )
     ''')
     
-    # Day-ahead prices
+    # Day-ahead prices (hourly)
     c.execute('''
         CREATE TABLE IF NOT EXISTS prices (
             timestamp TEXT PRIMARY KEY,
@@ -51,7 +59,7 @@ def init_db():
         )
     ''')
     
-    # Cross-border flows
+    # Cross-border flows (15-min resolution)
     c.execute('''
         CREATE TABLE IF NOT EXISTS cross_border_flows (
             timestamp TEXT,
@@ -63,7 +71,7 @@ def init_db():
         )
     ''')
     
-    # Total load
+    # Total load (15-min resolution)
     c.execute('''
         CREATE TABLE IF NOT EXISTS load (
             timestamp TEXT PRIMARY KEY,
@@ -72,7 +80,7 @@ def init_db():
         )
     ''')
     
-    # Installed capacity by type (less frequent updates)
+    # Installed capacity by type (annual)
     c.execute('''
         CREATE TABLE IF NOT EXISTS installed_capacity (
             year INTEGER,
@@ -82,6 +90,26 @@ def init_db():
             PRIMARY KEY (year, psr_type)
         )
     ''')
+    
+    # Fetch history for tracking backfills
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS fetch_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fetch_type TEXT,
+            start_time TEXT,
+            end_time TEXT,
+            records_fetched INTEGER,
+            fetched_at TEXT
+        )
+    ''')
+    
+    # Create indexes for efficient time-series queries
+    c.execute('CREATE INDEX IF NOT EXISTS idx_generation_timestamp ON generation(timestamp)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_generation_psr_type ON generation(psr_type)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_load_timestamp ON load(timestamp)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_prices_timestamp ON prices(timestamp)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_crossborder_timestamp ON cross_border_flows(timestamp)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_crossborder_country ON cross_border_flows(country_code)')
     
     conn.commit()
     conn.close()
@@ -145,7 +173,7 @@ def store_generation(df):
         return 0
     
     conn = sqlite3.connect(DB_PATH)
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     count = 0
     
     for col in df.columns:
@@ -171,7 +199,7 @@ def store_load(df):
         return 0
     
     conn = sqlite3.connect(DB_PATH)
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     count = 0
     
     # Handle both Series and DataFrame
@@ -201,7 +229,7 @@ def store_prices(df):
         return 0
     
     conn = sqlite3.connect(DB_PATH)
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     count = 0
     
     for ts, val in df.items():
@@ -222,7 +250,7 @@ def store_prices(df):
 def store_crossborder(flows_dict, timestamp_index):
     """Store cross-border flows in database."""
     conn = sqlite3.connect(DB_PATH)
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     count = 0
     
     for country, flows in flows_dict.items():
@@ -343,17 +371,204 @@ def get_latest_data():
         'crossborder': cb_df
     }
 
+def backfill_historical(days=30, batch_days=7):
+    """
+    Backfill historical data in batches.
+    ENTSO-E API has rate limits, so we fetch in chunks.
+    """
+    import time
+    
+    end = pd.Timestamp.now(tz='Europe/Vienna')
+    total_results = {'generation': 0, 'load': 0, 'prices': 0, 'crossborder': 0}
+    
+    for i in range(0, days, batch_days):
+        batch_end = end - pd.Timedelta(days=i)
+        batch_start = end - pd.Timedelta(days=min(i + batch_days, days))
+        
+        print(f"\nBackfilling {batch_start.date()} to {batch_end.date()}...")
+        
+        # Generation
+        print("  Fetching generation...")
+        gen_df = fetch_generation(batch_start, batch_end)
+        gen_count = store_generation(gen_df)
+        total_results['generation'] += gen_count
+        print(f"    Stored {gen_count} records")
+        
+        time.sleep(1)  # Rate limit
+        
+        # Load
+        print("  Fetching load...")
+        load_df = fetch_load(batch_start, batch_end)
+        load_count = store_load(load_df)
+        total_results['load'] += load_count
+        print(f"    Stored {load_count} records")
+        
+        time.sleep(1)
+        
+        # Prices
+        print("  Fetching prices...")
+        price_df = fetch_prices(batch_start, batch_end)
+        price_count = store_prices(price_df)
+        total_results['prices'] += price_count
+        print(f"    Stored {price_count} records")
+        
+        time.sleep(1)
+        
+        # Cross-border (skip for backfill - takes too long)
+        # Can be enabled if needed
+        
+        # Log the fetch
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute('''
+            INSERT INTO fetch_history (fetch_type, start_time, end_time, records_fetched, fetched_at)
+            VALUES (?, ?, ?, ?, ?)
+        ''', ('backfill', batch_start.isoformat(), batch_end.isoformat(), 
+              gen_count + load_count + price_count, datetime.now(timezone.utc).isoformat()))
+        conn.commit()
+        conn.close()
+        
+        print(f"  Batch complete, sleeping 5s...")
+        time.sleep(5)  # Longer pause between batches
+    
+    return total_results
+
+
+def get_db_stats():
+    """Get database statistics for monitoring."""
+    conn = sqlite3.connect(DB_PATH)
+    
+    stats = {}
+    
+    # Generation stats
+    df = pd.read_sql_query('''
+        SELECT 
+            COUNT(*) as total_records,
+            COUNT(DISTINCT psr_type) as num_types,
+            MIN(timestamp) as earliest,
+            MAX(timestamp) as latest,
+            COUNT(DISTINCT date(timestamp)) as days_covered
+        FROM generation
+    ''', conn)
+    stats['generation'] = df.iloc[0].to_dict()
+    
+    # Load stats
+    df = pd.read_sql_query('''
+        SELECT 
+            COUNT(*) as total_records,
+            MIN(timestamp) as earliest,
+            MAX(timestamp) as latest,
+            AVG(load_mw) as avg_load_mw,
+            MIN(load_mw) as min_load_mw,
+            MAX(load_mw) as max_load_mw
+        FROM load
+    ''', conn)
+    stats['load'] = df.iloc[0].to_dict()
+    
+    # Price stats
+    df = pd.read_sql_query('''
+        SELECT 
+            COUNT(*) as total_records,
+            MIN(timestamp) as earliest,
+            MAX(timestamp) as latest,
+            AVG(price_eur_mwh) as avg_price,
+            MIN(price_eur_mwh) as min_price,
+            MAX(price_eur_mwh) as max_price
+        FROM prices
+    ''', conn)
+    stats['prices'] = df.iloc[0].to_dict()
+    
+    # Cross-border stats
+    df = pd.read_sql_query('''
+        SELECT 
+            COUNT(*) as total_records,
+            COUNT(DISTINCT country_code) as num_countries,
+            MIN(timestamp) as earliest,
+            MAX(timestamp) as latest
+        FROM cross_border_flows
+    ''', conn)
+    stats['cross_border'] = df.iloc[0].to_dict()
+    
+    # Database file size
+    import os
+    stats['db_size_mb'] = os.path.getsize(DB_PATH) / (1024 * 1024)
+    
+    conn.close()
+    return stats
+
+
+def check_data_gaps():
+    """Check for gaps in the time series data."""
+    conn = sqlite3.connect(DB_PATH)
+    
+    # Check load data for gaps (should have 15-min intervals)
+    df = pd.read_sql_query('''
+        SELECT timestamp FROM load ORDER BY timestamp
+    ''', conn)
+    
+    if df.empty:
+        print("No load data found")
+        return
+    
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+    df['gap_minutes'] = df['timestamp'].diff().dt.total_seconds() / 60
+    
+    # Find gaps > 15 minutes
+    gaps = df[df['gap_minutes'] > 20]
+    
+    if not gaps.empty:
+        print(f"Found {len(gaps)} gaps in load data:")
+        for _, row in gaps.head(10).iterrows():
+            print(f"  {row['timestamp']}: {row['gap_minutes']:.0f} min gap")
+    else:
+        print("No significant gaps found in load data")
+    
+    conn.close()
+    return gaps
+
+
 if __name__ == '__main__':
     import sys
     
     init_db()
     
-    if len(sys.argv) > 1 and sys.argv[1] == 'fetch':
-        hours = int(sys.argv[2]) if len(sys.argv) > 2 else 24
-        results = fetch_and_store_recent(hours)
-        print(f"\nFetch complete: {results}")
+    if len(sys.argv) > 1:
+        cmd = sys.argv[1]
+        
+        if cmd == 'fetch':
+            hours = int(sys.argv[2]) if len(sys.argv) > 2 else 24
+            results = fetch_and_store_recent(hours)
+            print(f"\nFetch complete: {results}")
+            
+        elif cmd == 'backfill':
+            days = int(sys.argv[2]) if len(sys.argv) > 2 else 30
+            print(f"Backfilling {days} days of historical data...")
+            results = backfill_historical(days)
+            print(f"\nBackfill complete: {results}")
+            
+        elif cmd == 'stats':
+            stats = get_db_stats()
+            print("\n=== ENTSO-E Database Statistics ===")
+            for table, data in stats.items():
+                if isinstance(data, dict):
+                    print(f"\n{table.upper()}:")
+                    for k, v in data.items():
+                        print(f"  {k}: {v}")
+                else:
+                    print(f"\n{table}: {data}")
+                    
+        elif cmd == 'gaps':
+            print("Checking for data gaps...")
+            check_data_gaps()
+            
+        else:
+            print(f"Unknown command: {cmd}")
+            print("Usage: python entsoe_fetcher.py [fetch|backfill|stats|gaps] [arg]")
     else:
-        print("Usage: python entsoe_fetcher.py fetch [hours]")
+        print("Usage:")
+        print("  python entsoe_fetcher.py fetch [hours]   - Fetch recent data (default: 24h)")
+        print("  python entsoe_fetcher.py backfill [days] - Backfill historical data (default: 30 days)")
+        print("  python entsoe_fetcher.py stats           - Show database statistics")
+        print("  python entsoe_fetcher.py gaps            - Check for data gaps")
         print("\nGetting latest data from database...")
         data = get_latest_data()
         for key, df in data.items():
