@@ -1564,7 +1564,7 @@
         }
         
         // Show modal for wind turbine
-        function showTurbineModal(t) {
+        async function showTurbineModal(t) {
             // Find district info
             const gridInfo = getGridCapacityScore(t);
             
@@ -1580,6 +1580,27 @@
                 }
             });
             const distKm = (minDist * 111).toFixed(1); // Rough conversion to km
+            
+            // Get live ENTSO-E data for wind production estimate
+            let liveProduction = null;
+            try {
+                const genResponse = await fetch('/api/entsoe/generation');
+                const genData = await genResponse.json();
+                if (genData.generation) {
+                    const totalWindMw = (genData.generation['Wind Onshore'] || 0) + (genData.generation['Wind Offshore'] || 0);
+                    // Estimate this turbine's share based on capacity
+                    // Total wind capacity in Austria is ~3.5 GW, so calculate utilization
+                    const totalWindCapacity = 3500; // MW approximate
+                    const utilization = totalWindMw / totalWindCapacity;
+                    liveProduction = {
+                        current_mw: (t.estimated_mw * utilization).toFixed(2),
+                        utilization_pct: (utilization * 100).toFixed(0),
+                        total_wind_mw: Math.round(totalWindMw)
+                    };
+                }
+            } catch(e) {
+                console.log('Could not fetch live data:', e);
+            }
             
             document.getElementById('modal-title').innerHTML = `<i class="fas fa-wind"></i> ${t.display_name || t.name}`;
             document.getElementById('modal-body').innerHTML = `
@@ -1606,6 +1627,26 @@
                         <span class="modal-value">${t.lat.toFixed(5)}, ${t.lon.toFixed(5)}</span>
                     </div>
                 </div>
+                
+                ${liveProduction ? `
+                <div class="modal-section" style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(76, 175, 80, 0.05) 100%); border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 8px; padding: 12px;">
+                    <h3 style="color: #4caf50;"><i class="fas fa-bolt"></i> Live Produktion <span style="font-size: 0.65rem; color: #888;">(ENTSO-E)</span></h3>
+                    <div style="display: flex; gap: 15px; margin-top: 8px;">
+                        <div style="flex: 1; text-align: center;">
+                            <div style="font-size: 0.65rem; color: #888;">Österreich Wind</div>
+                            <div style="font-size: 1.1rem; color: #4caf50; font-weight: bold;">${liveProduction.total_wind_mw} MW</div>
+                        </div>
+                        <div style="flex: 1; text-align: center;">
+                            <div style="font-size: 0.65rem; color: #888;">Diese Anlage (gesch.)</div>
+                            <div style="font-size: 1.1rem; color: #00d4aa; font-weight: bold;">${liveProduction.current_mw} MW</div>
+                        </div>
+                        <div style="flex: 1; text-align: center;">
+                            <div style="font-size: 0.65rem; color: #888;">Auslastung</div>
+                            <div style="font-size: 1.1rem; color: ${liveProduction.utilization_pct > 50 ? '#4caf50' : liveProduction.utilization_pct > 20 ? '#ff9800' : '#ff5252'};">${liveProduction.utilization_pct}%</div>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
                 
                 <div class="modal-section">
                     <h3><i class="fas fa-tachometer-alt"></i> Technische Daten</h3>
@@ -2147,7 +2188,7 @@
         }
         
         // Show modal for transformer station
-        function showTransformerModal(t) {
+        async function showTransformerModal(t) {
             const available = parseFloat(t.availableCapacity) || 0;
             const booked = parseFloat(t.bookedCapacity) || 0;
             const total = available + booked;
@@ -2161,6 +2202,25 @@
                 return dist < 0.15; // Roughly 15km
             });
             const nearbyCapacity = nearbyTurbines.reduce((sum, turb) => sum + (turb.estimated_mw || 0), 0);
+            
+            // Get live substation load data
+            let substationLoad = null;
+            try {
+                const loadResponse = await fetch('/api/substation-loads');
+                const loadData = await loadResponse.json();
+                if (loadData.substations) {
+                    // Find this substation in the load data by matching name or coordinates
+                    substationLoad = loadData.substations.find(s => {
+                        const namematch = s.name && t.substationName && 
+                            (s.name.toLowerCase().includes(t.substationName.toLowerCase().split(' ')[0]) ||
+                             t.substationName.toLowerCase().includes(s.name.toLowerCase().split(' ')[0]));
+                        const distMatch = Math.abs(s.lat - t.latitude) < 0.05 && Math.abs(s.lon - t.longitude) < 0.05;
+                        return namematch || distMatch;
+                    });
+                }
+            } catch(e) {
+                console.log('Could not fetch substation load:', e);
+            }
             
             document.getElementById('modal-title').innerHTML = `<i class="fas fa-bolt"></i> ${t.substationName}`;
             document.getElementById('modal-body').innerHTML = `
@@ -2179,6 +2239,36 @@
                         <span class="modal-value">${t.latitude.toFixed(4)}, ${t.longitude.toFixed(4)}</span>
                     </div>
                 </div>
+                
+                ${substationLoad ? `
+                <div class="modal-section" style="background: linear-gradient(135deg, rgba(255, 152, 0, 0.15) 0%, rgba(255, 152, 0, 0.05) 100%); border: 1px solid rgba(255, 152, 0, 0.3); border-radius: 8px; padding: 12px;">
+                    <h3 style="color: #ff9800;"><i class="fas fa-bolt"></i> Live Lastfluss <span style="font-size: 0.65rem; color: #888;">(Modelliert)</span></h3>
+                    <div style="display: flex; gap: 15px; margin-top: 8px;">
+                        <div style="flex: 1; text-align: center;">
+                            <div style="font-size: 0.65rem; color: #888;">Netto-Fluss</div>
+                            <div style="font-size: 1.1rem; color: ${substationLoad.net_flow_mw >= 0 ? '#4caf50' : '#ff5252'}; font-weight: bold;">
+                                ${substationLoad.net_flow_mw >= 0 ? '+' : ''}${substationLoad.net_flow_mw.toFixed(0)} MW
+                            </div>
+                            <div style="font-size: 0.6rem; color: #888;">${substationLoad.net_flow_mw >= 0 ? 'Einspeisung' : 'Verbrauch'}</div>
+                        </div>
+                        <div style="flex: 1; text-align: center;">
+                            <div style="font-size: 0.65rem; color: #888;">Auslastung</div>
+                            <div style="font-size: 1.1rem; color: ${substationLoad.load_percent > 80 ? '#ff5252' : substationLoad.load_percent > 50 ? '#ff9800' : '#4caf50'}; font-weight: bold;">
+                                ${substationLoad.load_percent.toFixed(0)}%
+                            </div>
+                        </div>
+                        <div style="flex: 1; text-align: center;">
+                            <div style="font-size: 0.65rem; color: #888;">Erzeugung</div>
+                            <div style="font-size: 1.1rem; color: #4caf50; font-weight: bold;">${substationLoad.generation_mw.toFixed(0)} MW</div>
+                        </div>
+                    </div>
+                    ${substationLoad.connected_plants && substationLoad.connected_plants.length > 0 ? `
+                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,152,0,0.2); font-size: 0.7rem; color: #888;">
+                        <i class="fas fa-industry"></i> Angeschlossene Kraftwerke: ${substationLoad.connected_plants.slice(0,3).join(', ')}${substationLoad.connected_plants.length > 3 ? '...' : ''}
+                    </div>
+                    ` : ''}
+                </div>
+                ` : ''}
                 
                 <div class="modal-section">
                     <h3><i class="fas fa-plug"></i> Kapazität</h3>
