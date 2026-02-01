@@ -168,7 +168,11 @@ def fetch_crossborder(start, end):
     return results
 
 def store_generation(df):
-    """Store generation data in database."""
+    """Store generation data in database.
+    
+    ENTSO-E returns columns like ('Solar', 'Actual Aggregated') and ('Solar', 'Actual Consumption').
+    We only want 'Actual Aggregated' values (generation output, not consumption).
+    """
     if df is None or df.empty:
         return 0
     
@@ -177,9 +181,18 @@ def store_generation(df):
     count = 0
     
     for col in df.columns:
-        psr_type = col[0] if isinstance(col, tuple) else col
+        # Handle multi-level columns from ENTSO-E
+        if isinstance(col, tuple):
+            psr_type = col[0]
+            value_type = col[1] if len(col) > 1 else 'Actual Aggregated'
+            # Only store 'Actual Aggregated' (generation), not 'Actual Consumption'
+            if 'Consumption' in value_type:
+                continue
+        else:
+            psr_type = col
+        
         for ts, val in df[col].items():
-            if pd.notna(val):
+            if pd.notna(val) and val >= 0:  # Only store non-negative values
                 try:
                     conn.execute('''
                         INSERT OR REPLACE INTO generation (timestamp, psr_type, value_mw, fetched_at)

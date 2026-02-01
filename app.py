@@ -600,6 +600,134 @@ def entsoe_stats():
     return jsonify(stats)
 
 
+@app.route('/api/entsoe/price-forecast')
+def price_forecast():
+    """
+    Forecast electricity prices for the next 24-48 hours.
+    Uses historical hourly patterns (weekday/weekend) to predict prices.
+    """
+    hours = min(int(request.args.get('hours', 48)), 168)  # Max 1 week
+    
+    cache_key = f'price_forecast_{hours}'
+    cached = get_cached(cache_key)
+    if cached:
+        return jsonify(cached)
+    
+    import sqlite3
+    
+    db_path = '/home/exedev/austria-grid/data/entsoe_data.db'
+    conn = sqlite3.connect(db_path)
+    
+    # Get historical price patterns
+    df = pd.read_sql_query("""
+        SELECT timestamp, price_eur_mwh 
+        FROM prices 
+        WHERE price_eur_mwh > 0
+        ORDER BY timestamp
+    """, conn)
+    conn.close()
+    
+    if df.empty or len(df) < 100:
+        return jsonify({'error': 'Not enough historical data'}), 500
+    
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+    df['hour'] = df['timestamp'].dt.hour
+    df['is_weekend'] = df['timestamp'].dt.dayofweek >= 5
+    
+    # Calculate hourly patterns
+    weekday_pattern = df[~df['is_weekend']].groupby('hour')['price_eur_mwh'].agg(['mean', 'std'])
+    weekend_pattern = df[df['is_weekend']].groupby('hour')['price_eur_mwh'].agg(['mean', 'std'])
+    
+    # Generate forecasts
+    now = datetime.now(timezone.utc)
+    forecasts = []
+    
+    for h in range(hours):
+        future_time = now + timedelta(hours=h)
+        hour = future_time.hour
+        is_weekend = future_time.weekday() >= 5
+        
+        pattern = weekend_pattern if is_weekend else weekday_pattern
+        if hour in pattern.index:
+            mean = pattern.loc[hour, 'mean']
+            std = pattern.loc[hour, 'std']
+        else:
+            mean = df['price_eur_mwh'].mean()
+            std = df['price_eur_mwh'].std()
+        
+        forecasts.append({
+            'timestamp': future_time.isoformat(),
+            'hour': hour,
+            'day': future_time.strftime('%a'),
+            'is_weekend': is_weekend,
+            'predicted_price': round(float(mean), 2),
+            'low': round(float(mean - std), 2),
+            'high': round(float(mean + std), 2),
+        })
+    
+    result = {
+        'generated_at': now.isoformat(),
+        'model': 'historical_pattern_v1',
+        'data_range': f"{df['timestamp'].min().date()} to {df['timestamp'].max().date()}",
+        'records_used': len(df),
+        'forecasts': forecasts,
+        'summary': {
+            'avg_weekday': round(float(df[~df['is_weekend']]['price_eur_mwh'].mean()), 2),
+            'avg_weekend': round(float(df[df['is_weekend']]['price_eur_mwh'].mean()), 2),
+            'peak_hour': int(weekday_pattern['mean'].idxmax()),
+            'low_hour': int(weekday_pattern['mean'].idxmin()),
+        }
+    }
+    
+    set_cached(cache_key, result)  # Cache for 5 minutes (default)
+    return jsonify(result)
+
+
+@app.route('/api/entsoe/patterns')
+def price_patterns():
+    """
+    Get historical price and load patterns for analysis.
+    Shows hourly averages for weekdays vs weekends.
+    """
+    import sqlite3
+    
+    db_path = '/home/exedev/austria-grid/data/entsoe_data.db'
+    conn = sqlite3.connect(db_path)
+    
+    # Price patterns
+    prices = pd.read_sql_query("SELECT timestamp, price_eur_mwh FROM prices WHERE price_eur_mwh > 0", conn)
+    prices['timestamp'] = pd.to_datetime(prices['timestamp'])
+    prices['hour'] = prices['timestamp'].dt.hour
+    prices['is_weekend'] = prices['timestamp'].dt.dayofweek >= 5
+    
+    # Load patterns  
+    load = pd.read_sql_query("SELECT timestamp, load_mw FROM load", conn)
+    load['timestamp'] = pd.to_datetime(load['timestamp'])
+    load['hour'] = load['timestamp'].dt.hour
+    load['is_weekend'] = load['timestamp'].dt.dayofweek >= 5
+    
+    conn.close()
+    
+    result = {
+        'price_patterns': {
+            'weekday': prices[~prices['is_weekend']].groupby('hour')['price_eur_mwh'].mean().round(2).to_dict(),
+            'weekend': prices[prices['is_weekend']].groupby('hour')['price_eur_mwh'].mean().round(2).to_dict(),
+        },
+        'load_patterns': {
+            'weekday': load[~load['is_weekend']].groupby('hour')['load_mw'].mean().round(0).to_dict(),
+            'weekend': load[load['is_weekend']].groupby('hour')['load_mw'].mean().round(0).to_dict(),
+        },
+        'summary': {
+            'price_weekday_avg': round(float(prices[~prices['is_weekend']]['price_eur_mwh'].mean()), 2),
+            'price_weekend_avg': round(float(prices[prices['is_weekend']]['price_eur_mwh'].mean()), 2),
+            'load_weekday_avg': round(float(load[~load['is_weekend']]['load_mw'].mean()), 0),
+            'load_weekend_avg': round(float(load[load['is_weekend']]['load_mw'].mean()), 0),
+        }
+    }
+    
+    return jsonify(result)
+
+
 @app.route('/api/substation-loads')
 def substation_loads():
     """Get estimated load on each substation based on live data"""
