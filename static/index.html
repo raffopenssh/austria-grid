@@ -2890,7 +2890,7 @@
                     <div style="background: #1a1a2e; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${gc.color};">
                         <div style="font-size: 0.75rem; color: #888; text-transform: uppercase;">Netzanschluss</div>
                         <div style="font-size: 1.2rem; font-weight: bold; color: ${gc.color};">
-                            ${gc.difficulty === 'easy' ? 'Einfach' : gc.difficulty === 'medium' ? 'Machbar' : gc.difficulty === 'challenging' ? 'Herausfordernd' : 'Schwierig'}
+                            ${gc.difficulty === 'easy' ? 'Einfach' : gc.difficulty === 'medium' ? 'Machbar' : gc.difficulty === 'challenging' ? 'Herausfordernd' : gc.difficulty === 'restricted' ? '⛔ Eingeschränkt' : 'Schwierig'}
                         </div>
                         ${gc.nearest_transformer ? `
                             <div style="margin-top: 8px; font-size: 0.85rem;">
@@ -2963,6 +2963,52 @@
                     </div>
                 `;
                 
+                // Add environmental constraints section (INSPIRE data)
+                if (data.environmental) {
+                    const env = data.environmental;
+                    const hasIssues = env.protected_area || env.wind_exclusion || env.natura2000;
+                    const envColor = hasIssues ? '#ff1744' : '#00e676';
+                    const envIcon = hasIssues ? 'shield-alt' : 'shield-alt';
+                    
+                    html += `<div style="background: #1a1a2e; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${envColor};">`;
+                    html += `<div style="font-size: 0.75rem; color: #888; text-transform: uppercase; margin-bottom: 6px;">
+                        <i class="fas fa-${envIcon}"></i> UMWELT & SCHUTZGEBIETE
+                        <span style="font-size: 0.6rem; color: #555; float: right;">INSPIRE Austria</span>
+                    </div>`;
+                    
+                    if (env.protected_area) {
+                        const pa = env.protected_area;
+                        html += `<div style="font-size: 0.85rem; color: ${pa.distance_m === 0 ? '#ff1744' : '#ff9800'}; margin-bottom: 4px;">
+                            <i class="fas fa-${pa.distance_m === 0 ? 'ban' : 'exclamation-triangle'}"></i>
+                            <strong>${pa.distance_m === 0 ? 'Im Schutzgebiet' : pa.distance_m.toFixed(0) + 'm entfernt'}:</strong>
+                            ${pa.name}
+                        </div>`;
+                    }
+                    
+                    if (env.wind_exclusion) {
+                        html += `<div style="font-size: 0.85rem; color: #ff1744; margin-bottom: 4px;">
+                            <i class="fas fa-ban"></i> <strong>Windkraft-Ausschlusszone</strong> (OÖ Masterplan)
+                        </div>`;
+                    }
+                    
+                    if (env.natura2000) {
+                        const n2k = env.natura2000;
+                        html += `<div style="font-size: 0.85rem; color: ${n2k.distance_m === 0 ? '#ff1744' : '#ff9800'}; margin-bottom: 4px;">
+                            <i class="fas fa-${n2k.distance_m === 0 ? 'ban' : 'exclamation-triangle'}"></i>
+                            <strong>Natura 2000${n2k.distance_m === 0 ? '' : ' (' + n2k.distance_m.toFixed(0) + 'm)'}:</strong>
+                            ${n2k.name}
+                        </div>`;
+                    }
+                    
+                    if (!hasIssues) {
+                        html += `<div style="font-size: 0.85rem; color: #00e676;">
+                            <i class="fas fa-check-circle"></i> Keine Schutzgebiete oder Ausschlusszonen erkannt
+                        </div>`;
+                    }
+                    
+                    html += `</div>`;
+                }
+                
                 // Add recommendations
                 if (data.recommendations && data.recommendations.length > 0) {
                     html += `<div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #333;">`;
@@ -2970,10 +3016,12 @@
                     for (const rec of data.recommendations) {
                         const color = rec.rating === 'good' || rec.rating === 'excellent' ? '#00e676' : 
                                       rec.rating === 'warning' ? '#ff9800' : 
+                                      rec.rating === 'critical' ? '#ff1744' :
                                       rec.rating === 'info' ? '#4a9eff' : '#888';
-                        const icon = rec.rating === 'warning' ? 'exclamation-triangle' : 
+                        const icon = rec.rating === 'critical' ? 'ban' :
+                                     rec.rating === 'warning' ? 'exclamation-triangle' : 
                                      rec.rating === 'info' ? 'info-circle' : 'check-circle';
-                        html += `<div style="font-size: 0.8rem; color: ${color}; margin-bottom: 4px;">
+                        html += `<div style="font-size: 0.8rem; color: ${color}; margin-bottom: 4px;${rec.rating === 'critical' ? ' font-weight: bold;' : ''}">
                             <i class="fas fa-${icon}"></i> ${rec.text}
                         </div>`;
                     }

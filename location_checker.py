@@ -330,7 +330,10 @@ class LocationChecker:
         # For a typical 3 MW wind turbine
         wind_3mw_annual_mwh = 3 * wind_cf * 8760
         
-        return {
+        # INSPIRE spatial checks (protected areas, wind exclusion, Natura 2000)
+        environmental_constraints = self._check_environmental_constraints(lat, lon)
+        
+        result = {
             'location': {
                 'lat': lat,
                 'lon': lon,
@@ -362,8 +365,10 @@ class LocationChecker:
                 'wind_3mw_annual_eur': round(wind_3mw_annual_mwh * 80),  # ~80€/MWh
             },
             'pvgis': get_pvgis_data(lat, lon, 10.0),  # Real PVGIS data for 10kW system
+            'environmental': environmental_constraints,
             'recommendations': self._get_recommendations(
-                region, connection_difficulty, wind_cf, solar_cf, wind_nearby
+                region, connection_difficulty, wind_cf, solar_cf, wind_nearby,
+                environmental_constraints
             ),
             'legal_info': {
                 'solar_10kw': self.get_legal_info(10, 'solar'),
@@ -371,10 +376,84 @@ class LocationChecker:
                 'wind_20kw': self.get_legal_info(20, 'wind'),
             },
         }
+        
+        # Downgrade grid connection if in protected area or wind exclusion zone
+        if environmental_constraints.get('protected_area') and environmental_constraints['protected_area']['distance_m'] == 0:
+            if result['grid_connection']['difficulty'] in ('easy', 'medium'):
+                result['grid_connection']['difficulty'] = 'restricted'
+                result['grid_connection']['color'] = '#e91e63'
+        if environmental_constraints.get('wind_exclusion'):
+            if result['grid_connection']['difficulty'] in ('easy', 'medium'):
+                result['grid_connection']['difficulty'] = 'restricted'
+                result['grid_connection']['color'] = '#e91e63'
+        
+        return result
     
-    def _get_recommendations(self, region, difficulty, wind_cf, solar_cf, wind_nearby):
+    def _check_environmental_constraints(self, lat: float, lon: float) -> Dict:
+        """Check INSPIRE geodata for environmental constraints at location."""
+        try:
+            from inspire_data import check_point_in_zones
+            return check_point_in_zones(lat, lon)
+        except Exception as e:
+            import traceback
+            print(f"INSPIRE check failed: {e}")
+            return {
+                'protected_area': None,
+                'wind_exclusion': False,
+                'natura2000': None,
+                'error': str(e),
+            }
+    
+    def _get_recommendations(self, region, difficulty, wind_cf, solar_cf, wind_nearby,
+                               environmental=None):
         """Generate recommendations based on analysis and new ElWG 2025 law."""
         recs = []
+        
+        # Environmental constraints (from INSPIRE data) - show these FIRST
+        if environmental:
+            if environmental.get('protected_area'):
+                pa = environmental['protected_area']
+                if pa['distance_m'] == 0:
+                    recs.append({
+                        'type': 'environment',
+                        'rating': 'critical',
+                        'text': f'⛔ Standort liegt in Schutzgebiet: {pa["name"]}',
+                    })
+                else:
+                    recs.append({
+                        'type': 'environment',
+                        'rating': 'warning',
+                        'text': f'⚠️ Schutzgebiet in {pa["distance_m"]:.0f}m Entfernung: {pa["name"]}',
+                    })
+            
+            if environmental.get('wind_exclusion'):
+                recs.append({
+                    'type': 'environment',
+                    'rating': 'critical',
+                    'text': '⛔ Standort liegt in Windkraft-Ausschlusszone (OÖ Windkraftmasterplan)',
+                })
+            
+            if environmental.get('natura2000'):
+                n2k = environmental['natura2000']
+                if n2k['distance_m'] == 0:
+                    recs.append({
+                        'type': 'environment',
+                        'rating': 'critical',
+                        'text': f'⛔ Standort in Natura 2000 Gebiet: {n2k["name"]}',
+                    })
+                else:
+                    recs.append({
+                        'type': 'environment',
+                        'rating': 'warning',
+                        'text': f'⚠️ Natura 2000 Gebiet in {n2k["distance_m"]:.0f}m: {n2k["name"]}',
+                    })
+            
+            if not environmental.get('protected_area') and not environmental.get('wind_exclusion') and not environmental.get('natura2000'):
+                recs.append({
+                    'type': 'environment',
+                    'rating': 'good',
+                    'text': '✅ Keine Schutzgebiete oder Ausschlusszonen am Standort',
+                })
         
         # New law information (Günstiger-Strom-Gesetz / ElWG 2025)
         recs.append({
