@@ -122,25 +122,48 @@ def get_cadastre_info(lon, lat, retries=MAX_RETRIES):
 def main():
     log("Starting cadastre enrichment process...")
     
-    # Load power plants data
-    log(f"Loading power plants from {INPUT_FILE}...")
-    with open(INPUT_FILE, "r") as f:
-        data = json.load(f)
+    # Check if we have a checkpoint file to resume from
+    if Path(OUTPUT_FILE).exists():
+        log(f"Found checkpoint file {OUTPUT_FILE}, resuming...")
+        with open(OUTPUT_FILE, "r") as f:
+            data = json.load(f)
+    else:
+        # Load power plants data
+        log(f"Loading power plants from {INPUT_FILE}...")
+        with open(INPUT_FILE, "r") as f:
+            data = json.load(f)
     
     total = len(data["features"])
-    log(f"Found {total} power plants to process")
+    
+    # Count how many are already processed
+    already_processed = sum(1 for f in data["features"] if "cadastre" in f["properties"])
+    if already_processed > 0:
+        log(f"Already processed: {already_processed}/{total}")
+        log(f"Remaining: {total - already_processed}")
+    else:
+        log(f"Found {total} power plants to process")
     
     # Process each power plant
     success_count = 0
     no_data_count = 0
     error_count = 0
+    skipped_count = 0
     
     for idx, feature in enumerate(data["features"], 1):
+        # Skip if already processed
+        if "cadastre" in feature["properties"]:
+            skipped_count += 1
+            if feature["properties"]["cadastre"] is not None:
+                success_count += 1
+            else:
+                no_data_count += 1
+            continue
+        
         lon, lat = feature["geometry"]["coordinates"]
         plant_name = feature["properties"].get("name", "Unnamed")
         plant_id = feature["properties"]["id"]
         
-        if idx % 10 == 0 or idx == 1:
+        if idx % 10 == 0 or idx == 1 or skipped_count == 0:
             log(f"Processing {idx}/{total}: {plant_name} (ID: {plant_id})")
         
         # Fetch cadastre info
@@ -179,7 +202,8 @@ def main():
     log("\n" + "="*60)
     log("ENRICHMENT COMPLETE")
     log("="*60)
-    log(f"Total plants processed: {total}")
+    log(f"Total plants: {total}")
+    log(f"Skipped (already processed): {skipped_count}")
     log(f"Successfully enriched: {success_count} ({success_count/total*100:.1f}%)")
     log(f"No cadastre data: {no_data_count} ({no_data_count/total*100:.1f}%)")
     log(f"Errors: {error_count} ({error_count/total*100:.1f}%)")
