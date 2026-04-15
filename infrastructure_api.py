@@ -57,18 +57,47 @@ def _in_bbox(lat, lon, bbox):
 
 def _to_float(v):
     """Convert value to float, handling '47,123' comma decimals."""
+    if v is None:
+        return None
     if isinstance(v, (int, float)):
         return float(v)
     if isinstance(v, str):
-        return float(v.replace(',', '.'))
+        v = v.strip().replace(',', '.')
+        if not v or v == '---':
+            return None
+        return float(v)
     return float(v)
+
+
+def _clean_props(props):
+    """Remove None values for compact output."""
+    return {k: v for k, v in props.items() if v is not None}
+
+
+def _parse_max_voltage_kv(voltage_str):
+    """Parse voltage string like '380000;220000;110000' → 380 (kV).
+    Returns max voltage in kV as float."""
+    if not voltage_str:
+        return None
+    if isinstance(voltage_str, (int, float)):
+        v = float(voltage_str)
+        return v if v < 10000 else v / 1000  # already kV or in V
+    try:
+        parts = str(voltage_str).replace(',', '.').split(';')
+        vals = [float(p.strip()) for p in parts if p.strip()]
+        if not vals:
+            return None
+        mx = max(vals)
+        return mx if mx < 10000 else mx / 1000
+    except (ValueError, TypeError):
+        return None
 
 
 def _point_feature(lat, lon, properties):
     return {
         "type": "Feature",
         "geometry": {"type": "Point", "coordinates": [round(_to_float(lon), 7), round(_to_float(lat), 7)]},
-        "properties": properties
+        "properties": _clean_props(properties)
     }
 
 
@@ -77,7 +106,7 @@ def _line_feature(coords, properties):
     return {
         "type": "Feature",
         "geometry": {"type": "LineString", "coordinates": coords},
-        "properties": properties
+        "properties": _clean_props(properties)
     }
 
 
@@ -300,13 +329,11 @@ def _load_obstacle_features(bbox):
 
         base_props = {
             "source": "austrocontrol_obstacles",
-            "obstacle_id": obs['id'],
+            "name": obs['location'].split(' - ', 1)[1] if ' - ' in obs['location'] else obs['location'],
+            "type": type_en,
+            "category": _obstacle_category(type_en),
             "region": obs['region'],
             "district": obs['district'],
-            "location": obs['location'],
-            "type": type_en,
-            "type_de": type_de,
-            "category": _obstacle_category(type_en),
         }
 
         geom_type = obs['geometry_type']
@@ -318,19 +345,15 @@ def _load_obstacle_features(bbox):
 
             if len(non_span) >= 2 and _points_bbox_intersects(non_span, bbox):
                 coords = [[round(p['lon'], 7), round(p['lat'], 7)] for p in non_span]
-                line_props = {
+                span_h = max((p['height_agl_m'] for p in span_pts
+                              if p.get('height_agl_m')), default=None) if span_pts else None
+                features.append(_line_feature(coords, {
                     **base_props,
-                    "geometry_class": "line",
-                    "num_towers": len(non_span),
-                    "max_elev_m": obs['max_elev_m'],
-                    "max_height_agl_m": obs['max_height_agl_m'],
-                    "horizontal_extent": obs.get('horizontal_extent'),
-                }
-                if span_pts:
-                    line_props["span_height_agl_m"] = max(
-                        (p['height_agl_m'] for p in span_pts if p.get('height_agl_m')),
-                        default=None)
-                features.append(_line_feature(coords, line_props))
+                    "elev_m": obs['max_elev_m'],
+                    "height_agl_m": obs['max_height_agl_m'],
+                    "span_height_agl_m": span_h,
+                    "num_points": len(non_span),
+                }))
 
             # Each tower / pylon as individual point
             for i, pt in enumerate(non_span):
@@ -338,14 +361,8 @@ def _load_obstacle_features(bbox):
                     continue
                 features.append(_point_feature(pt['lat'], pt['lon'], {
                     **base_props,
-                    "geometry_class": "point",
-                    "sub_type": "tower" if type_en in ('Cable car', 'Catenary', 'Tramway') else "pylon",
-                    "point_index": i,
-                    "total_points": len(non_span),
-                    "parent_obstacle_id": obs['id'],
                     "elev_m": pt.get('elev_m'),
                     "height_agl_m": pt.get('height_agl_m'),
-                    "day_marked": pt.get('day_marked'),
                     "lighted": pt.get('lighted'),
                 }))
         else:
@@ -357,44 +374,34 @@ def _load_obstacle_features(bbox):
 
                 props = {
                     **base_props,
-                    "geometry_class": "point",
                     "elev_m": pt.get('elev_m'),
                     "height_agl_m": pt.get('height_agl_m'),
-                    "day_marked": pt.get('day_marked'),
                     "lighted": pt.get('lighted'),
-                    "horizontal_extent": obs.get('horizontal_extent'),
-                    "horizontal_radius_m": obs.get('horizontal_radius_m'),
                 }
-
-                if len(real_pts) > 1:
-                    props["point_index"] = i
-                    props["total_in_group"] = len(real_pts)
-                    props["parent_obstacle_id"] = obs['id']
-                    props["group_name"] = obs['location']
+                if obs.get('horizontal_radius_m'):
+                    props["radius_m"] = obs['horizontal_radius_m']
 
                 # Enrich wind turbines with capacity/year from igwindkraft
                 if is_wind:
                     key = _dedup_key(pt['lat'], pt['lon'])
                     enh = wind_idx.get(key, {})
                     if enh:
-                        props["estimated_capacity_mw"] = enh.get('estimated_capacity_mw')
-                        props["display_name"] = enh.get('display_name')
+                        props["capacity_mw"] = enh.get('estimated_capacity_mw')
+                        if enh.get('display_name'):
+                            props["name"] = enh['display_name']
                     # Match to windpark registry (spatial + name)
                     park_meta = _find_park_meta(
                         pt['lat'], pt['lon'], obs.get('location', ''),
                         park_spatial, park_by_name)
                     if park_meta:
-                        props["year_constructed"] = park_meta.get('year_constructed')
+                        props["capacity_mw"] = props.get('capacity_mw') or park_meta.get('mw_per_turbine')
+                        props["year"] = park_meta.get('year_constructed')
                         props["hub_height_m"] = park_meta.get('hub_height_m')
                         props["rotor_diameter_m"] = park_meta.get('rotor_diameter_m')
                         props["turbine_model"] = park_meta.get('turbine_model')
-                        props["mw_per_turbine"] = park_meta.get('mw_per_turbine')
-                        props["park_total_capacity_mw"] = park_meta.get('total_capacity_mw')
-                        props["park_num_turbines"] = park_meta.get('num_turbines')
                         if park_meta.get('rotor_diameter_m'):
-                            props["estimated_area_sqm"] = _estimate_windpark_area(
-                                park_meta.get('num_turbines', 1),
-                                park_meta['rotor_diameter_m'])
+                            props["area_sqm"] = _estimate_windpark_area(
+                                1, park_meta['rotor_diameter_m'])  # per-turbine footprint
 
                 features.append(_point_feature(pt['lat'], pt['lon'], props))
 
@@ -425,15 +432,14 @@ def _load_windpark_features(bbox):
             "name": wp.get('name'),
             "type": "windpark",
             "category": "wind_energy",
-            "num_turbines": wp.get('turbines'),
-            "mw_per_turbine": wp.get('mw_per_turbine'),
+            "capacity_mw": wp.get('mw_per_turbine'),
             "total_capacity_mw": wp.get('total_mw'),
-            "year_constructed": wp.get('year'),
+            "num_turbines": wp.get('turbines'),
+            "year": wp.get('year'),
             "hub_height_m": hub_height,
             "rotor_diameter_m": rotor_diameter,
             "turbine_model": turbine_type,
-            "estimated_area_sqm": _estimate_windpark_area(
-                wp.get('turbines', 1), rotor_diameter),
+            "area_sqm": _estimate_windpark_area(wp.get('turbines', 1), rotor_diameter),
         }))
     return features
 
@@ -461,18 +467,13 @@ def _load_power_plant_features(bbox):
         context = props.get('context') or {}
         features.append(_point_feature(lat, lon, {
             "source": "osm_power_plants",
-            "osm_id": props.get('id'),
-            "osm_type": props.get('osm_type'),
-            "name": props.get('name'),
+            "name": props.get('name') if props.get('name') != 'Unknown' else None,
             "type": source,
             "category": _plant_category(source),
             "capacity_mw": props.get('capacity_mw'),
             "operator": props.get('operator') or None,
-            "voltage": props.get('voltage') or None,
-            "parcel_id": cadastre.get('parcel_id'),
-            "parcel_area_sqm": cadastre.get('area_sqm'),
-            "nearby_buildings": context.get('buildings', {}).get('count'),
-            "nearby_roads": context.get('roads', {}).get('count'),
+            "voltage_kv": _parse_max_voltage_kv(props.get('voltage')),
+            "area_sqm": cadastre.get('area_sqm'),
         }))
     return features
 
@@ -514,7 +515,7 @@ def _load_substation_features(bbox):
             "name": node.get('name'),
             "type": "substation_380kv",
             "category": "substation",
-            "voltage": node.get('voltage'),
+            "voltage_kv": _parse_max_voltage_kv(node.get('voltage')),
             "operator": node.get('operator'),
         })
 
@@ -530,9 +531,8 @@ def _load_substation_features(bbox):
             "type": "substation",
             "category": "substation",
             "substation_type": p.get('substation'),
-            "voltage": p.get('voltage'),
+            "voltage_kv": _parse_max_voltage_kv(p.get('voltage')),
             "operator": p.get('operator') or None,
-            "osm_id": p.get('osm_id'),
         })
 
     # 3. Grid operator transformer stations
@@ -541,20 +541,15 @@ def _load_substation_features(bbox):
         lat, lon = s.get('latitude'), s.get('longitude')
         if not lat or not lon:
             continue
-        booked = s.get('bookedCapacity')
-        try:
-            booked_mw = float(str(booked).replace(',', '.')) if booked else None
-        except (ValueError, TypeError):
-            booked_mw = None
         _add_if_new(lat, lon, {
             "source": "grid_operator_substations",
             "name": s.get('substationName'),
             "type": "transformer_station",
             "category": "substation",
             "state": s.get('state'),
-            "network_operator": s.get('networkOperator'),
-            "booked_capacity_mw": booked_mw,
-            "available_capacity_mw": s.get('availableCapacity'),
+            "operator": s.get('networkOperator'),
+            "capacity_mw": _to_float(s.get('bookedCapacity')),
+            "available_capacity_mw": _to_float(s.get('availableCapacity')),
         })
 
     return features
@@ -605,13 +600,10 @@ def _load_transmission_line_features(bbox):
             "name": p.get('name'),
             "type": "transmission_line",
             "category": "power_line",
-            "voltage_kv": p.get('voltage'),
-            "voltage_raw": p.get('voltage_raw'),
+            "voltage_kv": _parse_max_voltage_kv(p.get('voltage_raw') or p.get('voltage')),
             "operator": p.get('operator'),
-            "cables": p.get('cables'),
-            "circuits": p.get('circuits'),
-            "ref": p.get('ref'),
-            "osm_id": p.get('osm_id'),
+            "cables": _to_float(p.get('cables')),
+            "circuits": _to_float(p.get('circuits')),
         }))
 
     # 380kV grid network edges (460 edges, high-quality topology)

@@ -5,91 +5,170 @@
 
 ## GET /api/infrastructure
 
-Returns a GeoJSON FeatureCollection of **all Austrian energy infrastructure**,
+Returns a GeoJSON FeatureCollection of all Austrian energy infrastructure,
 exploded into individual features. Every grouped obstacle (e.g. a windpark row
-with 3 turbines) is split into 3 separate Point features with their own
-coordinates, elevation, and height.
+with 3 turbines) becomes 3 separate Point features with their own coordinates.
+Null properties are omitted for compact output.
 
 ### Query parameters
 
 | param      | type   | default | description |
 |------------|--------|---------|-------------|
 | bbox       | string | (all)   | `min_lon,min_lat,max_lon,max_lat` (EPSG:4326) |
-| layers     | string | (all)   | Comma-separated layer names to include |
-| categories | string | (all)   | Comma-separated category names to include |
+| layers     | string | (all)   | Comma-separated layer names |
+| categories | string | (all)   | Comma-separated category names |
 
-### Layers
+### Layers (9)
 
-| name               | description |
-|--------------------|-------------|
-| obstacles          | AustroControl obstacle database — individual Points for each antenna, wind turbine, cable car tower, pylon, crane, stack, building, church, cooling tower, etc. Curves (cable cars, catenary, transmission lines) also emitted as LineStrings with per-tower Points. |
-| windparks          | igwindkraft.at registry — park-level centroid with `year_constructed`, `turbine_model`, `rotor_diameter_m`, `hub_height_m`, `mw_per_turbine`, `total_capacity_mw`, `num_turbines`, `estimated_area_sqm`. |
-| power_plants       | OSM power plants — solar, hydro_run_of_river, biomass, gas, coal, waste. Each with `capacity_mw`, `operator`, `parcel_id`, `parcel_area_sqm`, `nearby_buildings`, `nearby_roads`. Wind excluded (covered by obstacles). |
-| substations        | Substations / Umspannwerke — deduplicated across OSM, grid operators, 380kV network. Fields: `voltage`, `operator`, `booked_capacity_mw`, `available_capacity_mw`, `network_operator`. |
-| hydropower         | Major hydropower plants — curated list with `capacity_mw`, `type` (Laufkraftwerk/Speicherkraftwerk/Pumpspeicherkraftwerk), `river`, `region`. |
-| transmission_lines | OSM transmission lines (110–380kV) + 380kV grid topology edges as LineStrings. Fields: `voltage_kv`, `operator`, `cables`, `circuits`, `length_km`, `from_substation`, `to_substation`. |
-| onip_powerlines    | ÖNIP (national infrastructure plan) high-voltage route waypoints. Points with `voltage_kv`. |
-| cross_border       | Cross-border interconnection lines AT↔DE/CZ/SK/HU/SI/IT/CH. Fields: `capacity_mw`, `voltage_kv`, `from_country`, `to_country`. |
-| hydro_connections  | Inferred hydro plant → substation connection lines. Fields: `plant_mw`, `plant_type`, `distance_km`. |
+| name               | count  | description |
+|--------------------|--------|-------------|
+| obstacles          | 6,163  | AustroControl obstacle DB — individual Points for antennas, wind turbines, cable car towers, pylons, cranes, stacks, buildings, etc. Curves also emitted as LineStrings. |
+| windparks          | 1,381  | igwindkraft.at — per-turbine positions with year, model, capacity. |
+| power_plants       | 4,601  | OSM — solar, hydro, biomass, gas, coal, waste (wind excluded, covered by obstacles). |
+| substations        | 513    | Umspannwerke — deduplicated across OSM, grid operators, 380kV nodes. |
+| hydropower         | 156    | Major hydropower plants with MW, type, river. |
+| transmission_lines | 1,751  | OSM (110–380kV) + 380kV grid edges as LineStrings. |
+| onip_powerlines    | 5,263  | ÖNIP high-voltage route waypoints. |
+| cross_border       | 9      | Cross-border interconnections AT↔DE/CZ/SK/HU/SI/IT/CH. |
+| hydro_connections  | 32     | Inferred hydro plant → substation links. |
 
-### Categories
-
-Use `categories=` to filter across all layers by semantic type:
+### Categories (14)
 
 `wind_energy` · `solar_energy` · `hydropower` · `biomass` · `fossil` · `waste_energy` · `substation` · `telecom` · `power_line` · `cable_infrastructure` · `structure` · `industrial` · `power_generation` · `other`
 
-### Feature properties (common)
+### Common properties (every feature)
 
-Every feature has at minimum:
-- `source` — data origin (e.g. `austrocontrol_obstacles`, `osm_power_plants`, `grid_380kv`)
-- `type` — specific type (e.g. `Antenna`, `Windmill farm`, `solar`, `substation_380kv`)
-- `category` — semantic group (see list above)
+| property | type   | description |
+|----------|--------|-------------|
+| source   | string | Data origin |
+| type     | string | Specific type (e.g. `Antenna`, `Windmill farm`, `solar`, `transformer_station`) |
+| category | string | Semantic group (see list above) |
+| name     | string | Feature name (when available) |
 
-### Feature properties by source
+### Properties by source
 
-**austrocontrol_obstacles** (Points + LineStrings):
-- `obstacle_id` (UUID), `region`, `district`, `location`
-- `type` / `type_de` (English / German obstacle type)
-- `elev_m` — elevation above mean sea level (meters)
-- `height_agl_m` — height above ground level (meters)
-- `day_marked`, `lighted` (boolean)
-- `horizontal_extent`, `horizontal_radius_m`
-- `point_index`, `total_in_group`, `parent_obstacle_id`, `group_name` — for exploded groups
-- Wind turbines enriched with: `estimated_capacity_mw`, `year_constructed`, `hub_height_m`, `rotor_diameter_m`, `turbine_model`, `mw_per_turbine`, `park_total_capacity_mw`, `park_num_turbines`, `estimated_area_sqm`
-- LineStrings: `num_towers`, `max_elev_m`, `max_height_agl_m`, `span_height_agl_m`
+**austrocontrol_obstacles** — Points + LineStrings
 
-**osm_power_plants** (Points):
-- `osm_id`, `osm_type`, `name`, `capacity_mw`, `operator`, `voltage`
-- `parcel_id`, `parcel_area_sqm` (Austrian cadastre)
-- `nearby_buildings`, `nearby_roads`
+| property        | type    | description |
+|-----------------|---------|-------------|
+| name            | string  | Obstacle name (e.g. "Windpark Zagersdorf #1") |
+| elev_m          | float   | Elevation above mean sea level (meters) |
+| height_agl_m    | float   | Height above ground level (meters) |
+| lighted         | boolean | Obstacle lighting installed |
+| region          | string  | Austrian state (Bundesland) |
+| district        | string  | District (Bezirk) |
+| radius_m        | float   | Horizontal radius if applicable |
+| capacity_mw     | float   | Estimated MW (wind turbines only) |
+| year            | int     | Year of construction (wind turbines only) |
+| hub_height_m    | int     | Hub height in meters (wind turbines only) |
+| rotor_diameter_m| int     | Rotor diameter in meters (wind turbines only) |
+| turbine_model   | string  | Turbine make/model (wind turbines only) |
+| area_sqm        | int     | Estimated footprint (wind turbines only) |
+| num_points      | int     | Number of towers/pylons (LineStrings only) |
+| span_height_agl_m | float | Max cable/span height AGL (LineStrings only) |
 
-**substations** (Points):
-- `name`, `voltage`, `operator`, `substation_type`
-- `booked_capacity_mw`, `available_capacity_mw`, `network_operator`, `state`
+**igwindkraft_registry** — Points (park-level, one per turbine position)
 
-**igwindkraft_registry** (Points):
-- `name`, `num_turbines`, `mw_per_turbine`, `total_capacity_mw`
-- `year_constructed`, `hub_height_m`, `rotor_diameter_m`, `turbine_model`
-- `estimated_area_sqm`
+| property         | type   | |
+|------------------|--------|---|
+| name             | string | Park name |
+| capacity_mw      | float  | MW per turbine |
+| total_capacity_mw| float  | Total park MW |
+| num_turbines     | int    | Turbines in park |
+| year             | int    | Year of construction |
+| hub_height_m     | int    | Hub height (m) |
+| rotor_diameter_m | int    | Rotor diameter (m) |
+| turbine_model    | string | Make/model |
+| area_sqm         | int    | Estimated park footprint |
 
-**hydropower_registry** (Points):
-- `name`, `capacity_mw`, `type`, `region`, `river`
+**osm_power_plants** — Points
 
-**osm_transmission_lines** / **grid_380kv_edges** (LineStrings):
-- `name`, `voltage_kv`, `operator`, `cables`, `circuits`, `ref`, `osm_id`
-- `length_km`, `from_substation`, `to_substation` (380kV edges only)
+| property     | type   | |
+|--------------|--------|---|
+| name         | string | Plant name |
+| capacity_mw  | float  | Installed capacity |
+| operator     | string | Operator |
+| voltage_kv   | float  | Grid connection voltage (kV) |
+| area_sqm     | float  | Cadastral parcel area |
 
-### Response metadata
+**substations** (grid_380kv / osm_substations / grid_operator_substations) — Points
+
+| property             | type   | |
+|----------------------|--------|---|
+| name                 | string | Station name (e.g. "UW KLOSTERNEUBURG") |
+| voltage_kv           | float  | Max voltage level (kV) |
+| operator             | string | Network operator |
+| capacity_mw          | float  | Booked capacity (transformer stations) |
+| available_capacity_mw| float  | Available feed-in capacity (transformer stations) |
+| state                | string | Austrian state (transformer stations) |
+| substation_type      | string | transmission / distribution (OSM) |
+
+**hydropower_registry** — Points
+
+| property    | type   | |
+|-------------|--------|---|
+| capacity_mw | float  | Installed capacity |
+| type        | string | Laufkraftwerk / Speicherkraftwerk / Pumpspeicherkraftwerk |
+| region      | string | Austrian state |
+| river       | string | River name |
+
+**osm_transmission_lines** / **grid_380kv_edges** — LineStrings
+
+| property        | type   | |
+|-----------------|--------|---|
+| name            | string | Line name |
+| voltage_kv      | float  | Voltage (kV) |
+| operator        | string | Operator |
+| cables          | float  | Number of cables (OSM) |
+| circuits        | float  | Number of circuits (OSM) |
+| length_km       | float  | Length (380kV edges) |
+| from_substation | string | Origin substation (380kV edges) |
+| to_substation   | string | Destination substation (380kV edges) |
+
+**cross_border** — LineStrings
+
+| property     | type   | |
+|--------------|--------|---|
+| name         | string | e.g. "AT-DE (Bayern)" |
+| voltage_kv   | float  | |
+| capacity_mw  | float  | Transfer capacity |
+| from_country | string | ISO country code |
+| to_country   | string | ISO country code |
+
+**onip_powerlines** — Points
+
+| property   | type  | |
+|------------|-------|---|
+| voltage_kv | float | Route voltage level (kV) |
+
+### Response format
 
 ```json
 {
   "type": "FeatureCollection",
-  "features": [...],
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {"type": "Point", "coordinates": [16.5208192, 47.7485725]},
+      "properties": {
+        "source": "austrocontrol_obstacles",
+        "name": "Windpark Zagersdorf #1",
+        "type": "Windmill farm",
+        "category": "wind_energy",
+        "elev_m": 427.0,
+        "height_agl_m": 150.0,
+        "capacity_mw": 3.0,
+        "year": 2016,
+        "rotor_diameter_m": 92,
+        "turbine_model": "Enercon, E92"
+      }
+    }
+  ],
   "metadata": {
     "total_features": 19869,
-    "bbox": [min_lon, min_lat, max_lon, max_lat],
-    "layers": ["obstacles", ...],
-    "categories_filter": null
+    "bbox": [16.5, 47.74, 16.54, 47.76],
+    "layers": ["obstacles"],
+    "categories_filter": ["wind_energy"]
   }
 }
 ```
@@ -97,50 +176,48 @@ Every feature has at minimum:
 ### Examples
 
 ```
-# All infrastructure in a 10km bbox around Vienna
+# All infrastructure in a bounding box
 GET /api/infrastructure?bbox=16.2,48.1,16.5,48.3
 
-# Only wind turbines and substations
+# Wind turbines + substations only
 GET /api/infrastructure?bbox=16.2,48.1,16.5,48.3&layers=obstacles,substations&categories=wind_energy,substation
 
 # All solar plants in Burgenland area
 GET /api/infrastructure?bbox=15.8,46.8,17.2,48.2&categories=solar_energy
 
-# Everything for a LiDAR tile (1km bbox)
+# Everything for a LiDAR/ortho tile (~1km bbox)
 GET /api/infrastructure?bbox=16.35,48.20,16.36,48.21
 
 # All transmission lines nationwide
 GET /api/infrastructure?layers=transmission_lines
 
-# Just AustroControl obstacles (antennas, cranes, etc.)
-GET /api/infrastructure?bbox=16.0,48.0,16.5,48.5&layers=obstacles&categories=telecom,structure,industrial
+# Just telecom towers and industrial structures
+GET /api/infrastructure?bbox=16.0,48.0,16.5,48.5&categories=telecom,industrial
 ```
 
 ## GET /api/infrastructure/stats
 
-Returns summary counts by source, category, and type. No parameters.
-Useful to understand data distribution before querying.
+Summary counts by source, category, and type. No parameters.
 
-## Data volume
+## Data volume (~19,900 features)
 
-~19,900 total features across Austria:
-- 6,163 AustroControl obstacles (1,713 antennas, 1,620 wind turbines, 1,480+ cable infrastructure, 1,093 transmission line segments, …)
+- 6,163 AustroControl obstacles (1,713 antennas, 1,620 wind turbines, 1,212 cable car towers, 1,093 transmission line pylons, 268 catenary, 70 poles, 68 buildings, 30 stacks, 30 masts, …)
 - 5,263 ÖNIP powerline route points
-- 4,601 OSM power plants (3,513 solar, 779 hydro, 127 biomass, 70 fossil, 8 waste, 104 other)
-- 1,381 windpark registry entries
-- 1,291 OSM transmission lines
-- 460 380kV grid edges
-- 513 substations (429 grid operator + 44 OSM + 40 380kV nodes)
+- 4,601 OSM power plants (3,513 solar, 779 hydro, 127 biomass, 70 fossil, 8 waste)
+- 1,381 windpark registry turbines
+- 1,291 OSM transmission lines + 460 380kV grid edges
+- 513 substations / Umspannwerke
 - 156 major hydropower plants
-- 32 hydro-grid connections
-- 9 cross-border interconnections
+- 41 connection lines (cross-border + hydro-grid)
 
-## Usage notes for random forest / ML
+## Notes for ML / random forest usage
 
-- **height_agl_m** and **elev_m** directly correspond to LiDAR DSM/DTM signals
-- **rotor_diameter_m** and **hub_height_m** help predict wind turbine signatures in imagery
-- **estimated_area_sqm** / **parcel_area_sqm** help bound expected footprints
-- **category** field is the best coarse label for classification targets
-- Use small bbox queries (matching your tile extent) for efficient per-tile enrichment
-- LineString features (transmission lines, cable cars) indicate linear elevated structures in LiDAR/imagery
-- The `lighted` and `day_marked` fields indicate visual markers on obstacles
+- `height_agl_m` / `elev_m` directly correspond to LiDAR DSM/DTM signals
+- `rotor_diameter_m` / `hub_height_m` predict wind turbine signatures in imagery
+- `area_sqm` helps bound expected footprints
+- `category` is the best coarse label for classification targets
+- `capacity_mw` available for wind turbines, power plants, substations, hydropower
+- `year` available for ~95% of wind turbines
+- Use small bbox queries matching your tile extent for per-tile enrichment
+- LineStrings indicate linear elevated structures in LiDAR/imagery
+- `lighted` indicates night-visible markers on obstacles
