@@ -1238,5 +1238,55 @@ def price_statistics():
         return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
 
 
+# ---------------------------------------------------------------------------
+# Infrastructure GeoJSON API (for ML / LiDAR classification)
+# ---------------------------------------------------------------------------
+
+from infrastructure_api import (
+    get_infrastructure_geojson, get_infrastructure_stats,
+    AVAILABLE_LAYERS, AVAILABLE_CATEGORIES,
+)
+
+
+@app.route('/api/infrastructure')
+def infrastructure_geojson():
+    """Return all Austrian energy infrastructure as GeoJSON, filtered by bbox/layers/categories.
+
+    Query params:
+      bbox  - min_lon,min_lat,max_lon,max_lat (EPSG:4326). Omit for all Austria.
+      layers - comma-separated layer names (default: all)
+      categories - comma-separated category names (default: all)
+    """
+    try:
+        result = get_infrastructure_geojson(
+            bbox_str=request.args.get('bbox'),
+            layers=request.args.get('layers'),
+            categories=request.args.get('categories'),
+        )
+        return jsonify(result)
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        import traceback
+        return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
+
+
+@app.route('/api/infrastructure/stats')
+def infrastructure_stats():
+    """Summary statistics of all infrastructure data."""
+    try:
+        return jsonify(get_infrastructure_stats())
+    except Exception as e:
+        import traceback
+        return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
+
+
+@app.route('/llm.txt')
+def llm_txt():
+    """Machine-readable API reference for LLM agents."""
+    content = open(os.path.join(os.path.dirname(__file__), 'llm.txt')).read()
+    return Response(content, mimetype='text/plain; charset=utf-8')
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
