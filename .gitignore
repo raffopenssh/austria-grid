@@ -9,6 +9,9 @@ logs/
 
 # Large data files (track schema/structure, not data)
 # data/entsoe_data.db  # Keep DB for reference
+data/inspire/*.geojson
 
 # OS files
 .DS_Store
+data/future_grid.db*
+data/kontur_population_AT_*.gpkg
