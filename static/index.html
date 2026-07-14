@@ -1152,6 +1152,21 @@
                             <option value="wind">💨 Wind</option>
                         </select>
                     </div>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-futuregrid">
+                        <i class="fas fa-chess-board" style="color: #00e5a0; width: 16px;"></i>
+                        Zukunftskarte 2040
+                    </label>
+                    <div id="futuregrid-controls" style="display:none; margin: 4px 0 4px 24px;">
+                        <select id="futuregrid-mode" style="background:#1a1a2e; color:#eaeaea; border:1px solid #333; border-radius:5px; padding:3px 6px; font-size:0.8rem; width:100%;">
+                            <option value="gap">⚖️ Bilanz 2040 (Defizit/Überschuss)</option>
+                            <option value="tech">🏗️ Empfohlene Technologie</option>
+                            <option value="supply">⚡ Erzeugung heute</option>
+                            <option value="demand">🏠 Verbrauch heute</option>
+                        </select>
+                        <div id="futuregrid-status" style="font-size:0.7rem; color:#888; margin-top:3px;"></div>
+                        <div id="futuregrid-legend" style="font-size:0.68rem; color:#aaa; margin-top:4px; line-height:1.5;"></div>
+                    </div>
                 </div>
                 <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #333;">
                     <details style="cursor: pointer;">
@@ -1406,6 +1421,8 @@
         const crossBorderLayer = L.layerGroup();
         const onipLayer = L.layerGroup();
         const opportunityLayer = L.layerGroup();
+        const futureGridLayer = L.layerGroup();
+        const futureGridRenderer = L.canvas({ padding: 0.3 });
         
         // Create pane for transmission lines (below turbines but above heatmap)
         map.createPane('transmissionPane');
@@ -2578,6 +2595,136 @@
             }
         });
         document.getElementById('opportunity-tech').addEventListener('change', renderOpportunityLayer);
+
+        // --- Zukunftskarte 2040 (future grid planner: supply/demand per hex) ---
+        let futureGridData = null;
+        let h3lib = null;
+
+        async function loadFutureGrid() {
+            const statusEl = document.getElementById('futuregrid-status');
+            statusEl.textContent = 'Lade Zukunftskarte…';
+            if (!h3lib) {
+                h3lib = await import('https://cdn.jsdelivr.net/npm/h3-js@4.1.0/+esm');
+            }
+            if (!futureGridData) {
+                const resp = await fetch('/api/future-grid');
+                futureGridData = await resp.json();
+            }
+            const st = futureGridData.stats;
+            statusEl.innerHTML = st.progress < 1
+                ? `⏳ ${(st.progress*100).toFixed(0)}% berechnet (${st.cells_done}/${st.cells_total} Zellen)`
+                : `✓ ${st.cells_done.toLocaleString('de-AT')} Zellen · Defizit 2040: <b style="color:#ff6b6b">${st.deficit_2040_twh} TWh</b>`;
+            renderFutureGrid();
+        }
+
+        const FG_TECH_COLORS = {
+            solar_rooftop: '#ffd700', solar_ground: '#ff9800', wind: '#42a5f5',
+            battery: '#ab47bc', hydro_repowering: '#00bcd4',
+            grid_import: '#8d8d8d', grid_upgrade: '#ff1744', none: '#2e5e40'
+        };
+        const FG_TECH_LABELS = {
+            solar_rooftop: '☀️ Dach-PV', solar_ground: '🌾 Freiflächen-PV', wind: '💨 Wind',
+            battery: '🔋 Batteriespeicher', hydro_repowering: '💧 Wasserkraft-Repowering',
+            grid_import: '🔌 Netzbezug', grid_upgrade: '⚠️ Netzausbau', none: '✓ versorgt'
+        };
+
+        function fgGapColor(gap) {
+            // gap > 0: deficit (red), gap < 0: surplus (green)
+            if (gap > 100) return '#b71c1c';
+            if (gap > 30) return '#e53935';
+            if (gap > 5) return '#ff8a65';
+            if (gap > -5) return '#fff3b0';
+            if (gap > -30) return '#81c784';
+            return '#1b8a3a';
+        }
+        function fgScaleColor(v, max) {
+            const t = Math.min(Math.sqrt(v / max), 1);
+            const r = Math.round(20 + t * 235), g = Math.round(40 + t * 120);
+            return `rgb(${r},${g},60)`;
+        }
+
+        function fgLegend(mode) {
+            const el = document.getElementById('futuregrid-legend');
+            const sw = c => `<span style="display:inline-block;width:9px;height:9px;background:${c};border-radius:2px;margin-right:3px"></span>`;
+            if (mode === 'gap') {
+                el.innerHTML = sw('#b71c1c') + 'hohes Defizit &nbsp;' + sw('#fff3b0') + 'ausgeglichen &nbsp;' + sw('#1b8a3a') + 'Überschuss';
+            } else if (mode === 'tech') {
+                el.innerHTML = Object.entries(FG_TECH_COLORS)
+                    .filter(([k]) => k !== 'none')
+                    .map(([k, c]) => sw(c) + FG_TECH_LABELS[k].replace(/^\S+ /, '')).join(' &nbsp;');
+            } else {
+                el.innerHTML = sw('rgb(30,50,60)') + 'niedrig &nbsp;' + sw('rgb(255,160,60)') + 'hoch (GWh/Jahr)';
+            }
+        }
+
+        function renderFutureGrid() {
+            futureGridLayer.clearLayers();
+            if (!futureGridData || !h3lib) return;
+            const mode = document.getElementById('futuregrid-mode').value;
+            fgLegend(mode);
+            futureGridData.cells.forEach(c => {
+                let color, opacity = 0.55;
+                if (mode === 'gap') {
+                    color = fgGapColor(c.gap_2040_gwh);
+                    if (Math.abs(c.gap_2040_gwh) < 1) opacity = 0.15;
+                } else if (mode === 'tech') {
+                    // dominant tech = largest recommended MW
+                    let main = 'none', best = -1;
+                    (c.recommendations || []).forEach(r => { if ((r.mw||0) > best) { best = r.mw||0; main = r.tech; } });
+                    color = FG_TECH_COLORS[main] || '#555';
+                    if (main === 'none') opacity = 0.1;
+                } else if (mode === 'supply') {
+                    color = fgScaleColor(c.supply_gwh, 300);
+                    if (c.supply_gwh < 0.5) opacity = 0.08;
+                } else {
+                    color = fgScaleColor(c.demand_gwh, 300);
+                    if (c.demand_gwh < 0.5) opacity = 0.08;
+                }
+                const boundary = h3lib.cellToBoundary(c.h3); // [[lat,lng],...]
+                const poly = L.polygon(boundary, {
+                    renderer: futureGridRenderer,
+                    color: color, weight: 0.4, fillColor: color, fillOpacity: opacity
+                });
+                poly.on('click', () => {
+                    const supplyRows = Object.entries(c.supply_by_type || {})
+                        .sort((a,b) => b[1]-a[1])
+                        .map(([k,v]) => `${k}: <b>${v.toFixed(1)} GWh</b>`).join('<br>') || '<span style="color:#888">keine Erzeugung</span>';
+                    const recRows = (c.recommendations || []).map(r =>
+                        `<b style="color:${FG_TECH_COLORS[r.tech]||'#eee'}">${FG_TECH_LABELS[r.tech]||r.tech}</b>` +
+                        (r.mw ? ` – ${r.mw} MW` : '') + `<br><span style="color:#888;font-size:0.85em">${r.why}</span>`
+                    ).join('<br>');
+                    poly.bindPopup(`
+                        <div style="min-width:250px;max-width:300px">
+                        <b>Zelle ${c.h3}</b> · ${c.state}<br>
+                        <span style="color:#888">${Math.round(c.pop).toLocaleString('de-AT')} Einwohner · ~5 km²</span>
+                        <hr style="margin:6px 0">
+                        Verbrauch heute: <b>${c.demand_gwh.toFixed(1)} GWh/a</b> · 2040: <b>${c.demand_2040_gwh.toFixed(1)} GWh/a</b><br>
+                        Erzeugung: <b>${c.supply_gwh.toFixed(1)} GWh/a</b><br>
+                        Bilanz 2040: <b style="color:${fgGapColor(c.gap_2040_gwh)}">${c.gap_2040_gwh > 0 ? '−' : '+'}${Math.abs(c.gap_2040_gwh).toFixed(1)} GWh/a</b>
+                        <details style="margin:4px 0"><summary style="cursor:pointer;color:#888">Erzeugung nach Typ</summary>${supplyRows}</details>
+                        <hr style="margin:6px 0">
+                        <b>Empfehlung:</b><br>${recRows || '–'}
+                        <hr style="margin:6px 0">
+                        <span style="color:#888;font-size:0.85em">Umspannwerk: ${c.station || '?'} (${c.station_km != null ? c.station_km + ' km' : '?'})
+                        · frei: ${c.headroom_mw != null ? c.headroom_mw + ' MW' : '?'}${c.protected ? ' · ⚠️ Schutzgebiet' : ''}</span>
+                        </div>`).openPopup();
+                });
+                futureGridLayer.addLayer(poly);
+            });
+        }
+
+        document.getElementById('layer-futuregrid').addEventListener('change', function() {
+            const ctl = document.getElementById('futuregrid-controls');
+            if (this.checked) {
+                ctl.style.display = 'block';
+                loadFutureGrid();
+                map.addLayer(futureGridLayer);
+            } else {
+                ctl.style.display = 'none';
+                map.removeLayer(futureGridLayer);
+            }
+        });
+        document.getElementById('futuregrid-mode').addEventListener('change', renderFutureGrid);
 
         // Layer toggle handlers
         document.getElementById('layer-heatmap').addEventListener('change', function() {

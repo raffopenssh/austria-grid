@@ -236,3 +236,27 @@ cross-year comparability). All responses cached 1h server-side.
 - GET /api/analytics/import-dependency — monthly generation vs load balance, renewable share of load, fossil share, surplus hours, cross-border flows (since 2026-01)
 
 Dashboard: GET /analytics (HTML)
+
+## Future grid API (Zukunftskarte 2040)
+
+Reverse Standortanalyse: instead of scoring one address, a background job
+(future_grid_planner.py, hourly cron) walks all of Austria on an H3 hex grid
+(res 7, ~5 km2, 16,412 cells) and computes per cell:
+
+- demand_gwh / demand_2040_gwh: annual demand, national ENTSO-E load (trailing
+  365d) distributed by Kontur 400m population raster; 2040 = +45% (OeNIP)
+- supply_gwh + supply_by_type: annual generation of ALL currently used plant
+  types (hydro run-of-river/reservoir/pumped storage, wind, solar incl.
+  population-distributed rooftop share, gas, biomass, waste, coal, other),
+  calibrated so per-type totals match ENTSO-E trailing-365d generation
+- gap_gwh / gap_2040_gwh: demand minus supply (positive = deficit)
+- recommendations: sized build-out plan per cell (solar_rooftop, solar_ground,
+  wind, battery, hydro_repowering, grid_import, grid_upgrade) considering
+  state capacity factors, INSPIRE protected areas, grid headroom of the
+  nearest e-control transformer station, and existing local buildout
+
+Endpoints:
+- GET /api/future-grid?state=&tech=&min_gap=&compact=1 — all computed cells (~12 MB full, use compact=1 or filters)
+- GET /api/future-grid/stats — job progress + national aggregates (deficit TWh, recommended MW per tech)
+
+Map: enable "Zukunftskarte 2040" layer on / (modes: 2040 balance, recommended tech, supply, demand).

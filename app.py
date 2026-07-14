@@ -4,6 +4,7 @@
 from flask import Flask, jsonify, send_from_directory, send_file, render_template_string, Response, request
 import json
 import os
+import sqlite3
 import tempfile
 from datetime import datetime, timedelta, timezone
 from shapely.geometry import shape, Point, LineString
@@ -1330,6 +1331,101 @@ def opportunity_map_api():
         stations = sorted(stations, key=lambda s: -s['scores'][tech])
     return jsonify({'market_signals': data['market_signals'],
                     'count': len(stations), 'stations': stations})
+
+
+_FUTURE_GRID_DB = os.path.join(os.path.dirname(__file__), 'data', 'future_grid.db')
+_fgrid_cache = {'t': 0, 'data': None, 'stats': None}
+
+
+def _future_grid_load():
+    """Load computed future-grid cells from the planner DB (10 min cache)."""
+    if time.time() - _fgrid_cache['t'] < 600 and _fgrid_cache['data'] is not None:
+        return _fgrid_cache
+    conn = sqlite3.connect(_FUTURE_GRID_DB)
+    cells = []
+    for row in conn.execute(
+            "SELECT h3, lat, lon, state, pop, demand_gwh, demand_2040_gwh, supply_gwh, "
+            "supply_by_type, gap_gwh, gap_2040_gwh, station_name, station_km, headroom_mw, "
+            "protected, recommendation FROM hex_cells WHERE status='done'"):
+        cells.append({
+            'h3': row[0], 'lat': row[1], 'lon': row[2], 'state': row[3],
+            'pop': row[4],
+            'demand_gwh': row[5], 'demand_2040_gwh': row[6],
+            'supply_gwh': row[7],
+            'supply_by_type': json.loads(row[8]) if row[8] else {},
+            'gap_gwh': row[9], 'gap_2040_gwh': row[10],
+            'station': row[11], 'station_km': row[12], 'headroom_mw': row[13],
+            'protected': bool(row[14]),
+            'recommendations': json.loads(row[15]) if row[15] else [],
+        })
+    meta = dict(conn.execute('SELECT key, value FROM meta'))
+    total = conn.execute('SELECT COUNT(*) FROM hex_cells').fetchone()[0]
+    conn.close()
+    # aggregate build-out totals by tech
+    tech_mw = {}
+    for c in cells:
+        for r in c['recommendations']:
+            tech_mw[r['tech']] = tech_mw.get(r['tech'], 0.0) + (r.get('mw') or 0)
+    _fgrid_cache['data'] = cells
+    _fgrid_cache['stats'] = {
+        'cells_total': total, 'cells_done': len(cells),
+        'progress': round(len(cells) / total, 4) if total else 0,
+        'seeded_at': meta.get('seeded_at'), 'completed_at': meta.get('completed_at') or None,
+        'national_demand_twh': float(meta.get('national_demand_twh', 0)),
+        'demand_2040_factor': 1.45,
+        'total_supply_twh': round(sum(c['supply_gwh'] for c in cells) / 1000, 2),
+        'deficit_2040_twh': round(sum(max(c['gap_2040_gwh'], 0) for c in cells) / 1000, 2),
+        'recommended_buildout_mw': {k: round(v) for k, v in sorted(tech_mw.items(), key=lambda x: -x[1])},
+    }
+    _fgrid_cache['t'] = time.time()
+    return _fgrid_cache
+
+
+@app.route('/api/future-grid')
+def future_grid_api():
+    """Austria future power map: per-H3-hex (res 7, ~5 km2) supply/demand balance
+    and technology recommendations to close the 2040 gap.
+
+    Built incrementally by future_grid_planner.py (cron). Supply covers all
+    currently used plant types (hydro RoR/reservoir/pumped, wind, solar incl.
+    rooftop share, gas, biomass, waste, coal, other), calibrated to trailing
+    365d ENTSO-E generation. Demand = national load distributed by 400m
+    population raster (Kontur); 2040 scenario = +45% (OeNIP electrification).
+
+    Query params:
+      state    - filter by Bundesland
+      tech     - only cells recommending this tech (solar_rooftop, solar_ground,
+                 wind, battery, hydro_repowering, grid_import, grid_upgrade)
+      min_gap  - minimum 2040 gap in GWh/yr (use negative for surplus cells)
+      compact  - 1: omit supply_by_type + recommendations (smaller payload)
+    """
+    try:
+        cache = _future_grid_load()
+    except Exception as e:
+        return jsonify({'error': f'future grid not built yet: {e}'}), 503
+    cells = cache['data']
+    state = request.args.get('state')
+    if state:
+        cells = [c for c in cells if c['state'].lower() == state.lower()]
+    tech = request.args.get('tech')
+    if tech:
+        cells = [c for c in cells if any(r['tech'] == tech for r in c['recommendations'])]
+    min_gap = request.args.get('min_gap', type=float)
+    if min_gap is not None:
+        cells = [c for c in cells if c['gap_2040_gwh'] >= min_gap]
+    if request.args.get('compact') == '1':
+        cells = [{k: v for k, v in c.items() if k not in ('supply_by_type', 'recommendations')}
+                 for c in cells]
+    return jsonify({'stats': cache['stats'], 'count': len(cells), 'cells': cells})
+
+
+@app.route('/api/future-grid/stats')
+def future_grid_stats():
+    """Progress + national aggregates of the future grid planner job."""
+    try:
+        return jsonify(_future_grid_load()['stats'])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 503
 
 
 @app.route('/analytics')
