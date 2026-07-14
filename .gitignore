@@ -15,3 +15,4 @@ data/inspire/*.geojson
 .DS_Store
 data/future_grid.db*
 data/kontur_population_AT_*.gpkg
+data/agent_api_token.txt

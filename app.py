@@ -1428,6 +1428,83 @@ def future_grid_stats():
         return jsonify({'error': str(e)}), 503
 
 
+# ---- Read-only SQL access for external agents (token-protected) ----
+_AGENT_TOKEN_FILE = os.path.join(os.path.dirname(__file__), 'data', 'agent_api_token.txt')
+
+
+def _agent_token_ok():
+    try:
+        expected = open(_AGENT_TOKEN_FILE).read().strip()
+    except OSError:
+        return False
+    supplied = (request.args.get('token')
+                or request.headers.get('X-Api-Token')
+                or (request.headers.get('Authorization', '').removeprefix('Bearer ').strip()))
+    return bool(supplied) and secrets_compare(supplied, expected)
+
+
+def secrets_compare(a, b):
+    import hmac
+    return hmac.compare_digest(a.encode(), b.encode())
+
+
+@app.route('/api/entsoe/query', methods=['GET', 'POST'])
+def entsoe_readonly_query():
+    """Read-only SQL access to the ENTSO-E database for external agents.
+
+    Auth: ?token=... or Authorization: Bearer ... or X-Api-Token header.
+    Params: sql (SELECT only), format=json|csv (default json). Max 50k rows.
+
+    Tables:
+      generation(timestamp, psr_type, value_mw, fetched_at)  -- 15-min, since 2023-01
+        psr_type includes 'Hydro Pumped Storage' (generation/release) and
+        'Hydro Pumped Storage Consumption' (pumping mode, i.e. storing water)
+      load(timestamp, load_mw, fetched_at)
+      prices(timestamp, price_eur_mwh, fetched_at)
+      cross_border_flows(timestamp, country, import_mw, export_mw, fetched_at)
+    """
+    if not _agent_token_ok():
+        return jsonify({'error': 'invalid or missing token'}), 401
+    sql = (request.values.get('sql') or '').strip()
+    if not sql:
+        return jsonify({'error': 'missing sql parameter'}), 400
+    lowered = sql.lower().lstrip('( \n\t')
+    if not (lowered.startswith('select') or lowered.startswith('with')):
+        return jsonify({'error': 'only SELECT queries allowed'}), 403
+    conn = sqlite3.connect('file:' + os.path.join(os.path.dirname(__file__), 'data', 'entsoe_data.db') + '?mode=ro', uri=True)
+    conn.execute('PRAGMA query_only = ON')
+    try:
+        cur = conn.execute(sql)
+        cols = [d[0] for d in cur.description]
+        rows = cur.fetchmany(50000)
+    except sqlite3.Error as e:
+        conn.close()
+        return jsonify({'error': str(e)}), 400
+    conn.close()
+    if request.values.get('format') == 'csv':
+        import csv as _csv
+        import io as _io
+        buf = _io.StringIO()
+        w = _csv.writer(buf)
+        w.writerow(cols)
+        w.writerows(rows)
+        return Response(buf.getvalue(), mimetype='text/csv')
+    return jsonify({'columns': cols, 'rows': rows, 'row_count': len(rows), 'truncated': len(rows) == 50000})
+
+
+@app.route('/api/entsoe/schema')
+def entsoe_schema():
+    """Public: schema + row counts of the ENTSO-E DB (no token needed)."""
+    conn = sqlite3.connect('file:' + os.path.join(os.path.dirname(__file__), 'data', 'entsoe_data.db') + '?mode=ro', uri=True)
+    out = {}
+    for (name, sql_ddl) in conn.execute("SELECT name, sql FROM sqlite_master WHERE type='table'"):
+        cnt = conn.execute(f'SELECT COUNT(*) FROM "{name}"').fetchone()[0]
+        out[name] = {'ddl': sql_ddl, 'rows': cnt}
+    psr = [r[0] for r in conn.execute('SELECT DISTINCT psr_type FROM generation ORDER BY 1')]
+    conn.close()
+    return jsonify({'tables': out, 'generation_psr_types': psr})
+
+
 @app.route('/analytics')
 def analytics_page():
     return send_file('static/analytics.html')

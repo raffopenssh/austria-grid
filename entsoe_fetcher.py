@@ -185,9 +185,10 @@ def store_generation(df):
         if isinstance(col, tuple):
             psr_type = col[0]
             value_type = col[1] if len(col) > 1 else 'Actual Aggregated'
-            # Only store 'Actual Aggregated' (generation), not 'Actual Consumption'
+            # Store 'Actual Consumption' (e.g. pumped storage pumping mode)
+            # under a distinct psr_type suffix so both directions are kept.
             if 'Consumption' in value_type:
-                continue
+                psr_type = f'{psr_type} Consumption'
         else:
             psr_type = col
         
