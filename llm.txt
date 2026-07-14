@@ -221,3 +221,18 @@ Summary counts by source, category, and type. No parameters.
 - Use small bbox queries matching your tile extent for per-tile enrichment
 - LineStrings indicate linear elevated structures in LiDAR/imagery
 - `lighted` indicates night-visible markers on obstacles
+
+## Market analytics API (ENTSO-E history since 2023-01)
+
+Pre-aggregated market analytics from stored ENTSO-E data (day-ahead prices,
+generation per PSR type, load; 15-min resolution, aggregated hourly for
+cross-year comparability). All responses cached 1h server-side.
+
+- GET /api/analytics/summary — yearly KPIs: avg price, negative-price hours, hours >200 EUR, solar/wind peaks
+- GET /api/analytics/negative-prices — monthly/yearly negative-price hours + hour-of-day histogram per year
+- GET /api/analytics/capture-rates — monthly solar & wind capture prices and capture rates (value factors) vs baseload
+- GET /api/analytics/battery-arbitrage?hours=1..6 — perfect-foresight daily arbitrage spread and EUR/MW revenue for an N-hour battery (90% efficiency, 1 cycle/day)
+- GET /api/analytics/duck-curve?months=04,...,09 — avg hour-of-day profile per year of load, solar, wind, run-of-river, residual load + price profile
+- GET /api/analytics/import-dependency — monthly generation vs load balance, renewable share of load, fossil share, surplus hours, cross-border flows (since 2026-01)
+
+Dashboard: GET /analytics (HTML)

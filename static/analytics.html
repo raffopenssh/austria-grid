@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strommarkt-Analytics Österreich | 3,5 Jahre ENTSO-E Daten</title>
+<meta name="description" content="Marktanalysen für den österreichischen Strommarkt: Negative Preise, Solar-Kannibalisierung, Capture Rates, Batteriespeicher-Arbitrage, Duck Curve und Importabhängigkeit. Basierend auf ENTSO-E Daten seit 2023.">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#1a1a2e; color:#eaeaea; }
+.header { background:linear-gradient(135deg,#16213e 0%,#1a1a2e 100%); padding:20px; text-align:center; border-bottom:2px solid #00d4aa; }
+.header h1 { font-size:1.6rem; color:#00d4aa; margin-bottom:5px; }
+.header p { color:#888; font-size:.9rem; }
+.header a { color:#00d4aa; text-decoration:none; }
+.container { max-width:1200px; margin:0 auto; padding:20px; }
+.kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; margin-bottom:25px; }
+.kpi { background:#16213e; border-radius:10px; padding:18px; border:1px solid #2a2a4a; }
+.kpi .val { font-size:1.7rem; font-weight:700; color:#00d4aa; }
+.kpi .val.warn { color:#ff6b6b; }
+.kpi .lbl { color:#999; font-size:.82rem; margin-top:4px; }
+.kpi .sub { color:#666; font-size:.75rem; margin-top:2px; }
+.card { background:#16213e; border-radius:10px; padding:20px; margin-bottom:25px; border:1px solid #2a2a4a; }
+.card h2 { color:#00d4aa; font-size:1.15rem; margin-bottom:6px; }
+.card p.desc { color:#999; font-size:.85rem; margin-bottom:14px; line-height:1.5; }
+.chart-wrap { position:relative; height:340px; }
+.controls { margin-bottom:12px; }
+.controls button { background:#1a1a2e; color:#aaa; border:1px solid #2a2a4a; padding:5px 12px; border-radius:6px; cursor:pointer; margin-right:6px; font-size:.8rem; }
+.controls button.active { background:#00d4aa; color:#1a1a2e; border-color:#00d4aa; font-weight:600; }
+.footer { text-align:center; color:#666; font-size:.8rem; padding:20px; }
+.loading { text-align:center; color:#666; padding:60px 0; }
+@media (max-width:700px){ .chart-wrap{height:260px;} }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>⚡ Strommarkt-Analytics Österreich</h1>
+  <p>3,5 Jahre ENTSO-E Daten (seit Jan 2023) · <a href="/">← Zurück zur Karte</a></p>
+</div>
+<div class="container">
+  <div class="kpi-row" id="kpis"><div class="loading">Lade Daten…</div></div>
+
+  <div class="card">
+    <h2>Negative Strompreise nehmen dramatisch zu</h2>
+    <p class="desc">Stunden mit negativen Day-Ahead-Preisen pro Monat. Der Solarausbau (Mittags-Peak Juni: 1,2 GW → 4,1 GW seit 2023) drückt die Preise an sonnigen Tagen unter null — Erzeuger zahlen fürs Einspeisen.</p>
+    <div class="chart-wrap"><canvas id="negChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>Wann treten negative Preise auf?</h2>
+    <p class="desc">Anzahl negativer Preisstunden nach Tageszeit und Jahr. Klar erkennbar: das Mittags-Solarfenster weitet sich Jahr für Jahr aus.</p>
+    <div class="chart-wrap"><canvas id="negHourChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>Solar-Kannibalisierung: Capture Rate im Sinkflug</h2>
+    <p class="desc">Die Capture Rate zeigt, welchen Anteil des Durchschnittspreises Solar/Wind tatsächlich am Markt erlösen (erzeugungsgewichteter Preis ÷ Baseload-Preis). Solar erlöste im April 2026 nur noch ~24% des Durchschnittspreises — wer mittags einspeist, verdient kaum noch etwas. Wind bleibt nahe 100%.</p>
+    <div class="chart-wrap"><canvas id="captureChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>Batteriespeicher-Arbitrage: Der Business Case wächst</h2>
+    <p class="desc">Theoretischer Jahreserlös eines 1&nbsp;MW-Batteriespeichers (1 Zyklus/Tag, 90% Wirkungsgrad, perfekte Voraussicht): billigste Stunden laden, teuerste entladen. Die wachsende Preisspreizung durch Solar macht Speicher immer lukrativer.</p>
+    <div class="controls" id="batteryControls">
+      <button data-h="1">1h-Speicher</button>
+      <button data-h="2" class="active">2h-Speicher</button>
+      <button data-h="4">4h-Speicher</button>
+    </div>
+    <div class="chart-wrap"><canvas id="batteryChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>Duck Curve: Residuallast im Sommer</h2>
+    <p class="desc">Durchschnittlicher Tagesverlauf (Apr–Sep) der Residuallast (Last minus Solar &amp; Wind) je Jahr. Das Mittagstal wird jedes Jahr tiefer — die Flexibilitätsanforderung an Wasserkraft, Speicher und Import/Export steigt.</p>
+    <div class="chart-wrap"><canvas id="duckChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>Preisprofil im Tagesverlauf (Apr–Sep)</h2>
+    <p class="desc">Durchschnittlicher Day-Ahead-Preis nach Tageszeit. Das Muster kippt: Mittags früher am teuersten, heute am billigsten. Abendspitze (19–21 Uhr) wird immer ausgeprägter.</p>
+    <div class="chart-wrap"><canvas id="priceProfileChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>Erzeugung vs. Verbrauch: Erneuerbaren-Deckung</h2>
+    <p class="desc">Monatliche Erzeugung nach Kategorie vs. Last. Im Sommer decken Erneuerbare zeitweise &gt;99% der Last, im Winter bleibt Österreich auf Gas und Importe angewiesen.</p>
+    <div class="chart-wrap"><canvas id="balanceChart"></canvas></div>
+  </div>
+</div>
+<div class="footer">Datenquelle: ENTSO-E Transparency Platform · Preise = Day-Ahead (EPEX AT) · Analyse-API: <a href="/api/analytics/summary" style="color:#00d4aa">/api/analytics/*</a></div>
+<script>
+const COLORS = {2023:'#5c7cfa',2024:'#fcc419',2025:'#ff8787',2026:'#00d4aa'};
+Chart.defaults.color = '#aaa';
+Chart.defaults.borderColor = '#2a2a4a';
+const charts = {};
+
+function lineOpts(yTitle, extra={}) {
+  return Object.assign({
+    responsive:true, maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{legend:{labels:{boxWidth:12}}},
+    scales:{y:{title:{display:true,text:yTitle}}}
+  }, extra);
+}
+
+async function j(url){ const r = await fetch(url); return r.json(); }
+
+async function init(){
+  const [sum, neg, cap, duck, imp] = await Promise.all([
+    j('/api/analytics/summary'), j('/api/analytics/negative-prices'),
+    j('/api/analytics/capture-rates'), j('/api/analytics/duck-curve'),
+    j('/api/analytics/import-dependency')
+  ]);
+
+  // KPIs
+  const y26 = sum.years.find(y=>y.year==='2026') || {};
+  const y23 = sum.years.find(y=>y.year==='2023') || {};
+  const negRate26 = neg.yearly.find(y=>y.year==='2026') || {};
+  const capLast = cap.monthly.filter(m=>m.solar_capture_rate_pct!=null).slice(-1)[0] || {};
+  const solar23 = sum.solar.find(s=>s.year==='2023')||{}, solar26 = sum.solar.find(s=>s.year==='2026')||{};
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi"><div class="val warn">${negRate26.neg_hours ?? '–'} h</div><div class="lbl">Negative Preisstunden 2026</div><div class="sub">bis Mitte Juli · 2023 gesamt: ${(neg.yearly[0]||{}).neg_hours} h</div></div>
+    <div class="kpi"><div class="val warn">${capLast.solar_capture_rate_pct ?? '–'}%</div><div class="lbl">Solar Capture Rate (${capLast.month||''})</div><div class="sub">Anteil am Baseload-Preis</div></div>
+    <div class="kpi"><div class="val">${solar26.peak_solar_mw ? (solar26.peak_solar_mw/1000).toFixed(1) : '–'} GW</div><div class="lbl">Solar-Spitzenleistung 2026</div><div class="sub">2023: ${(solar23.peak_solar_mw/1000).toFixed(1)} GW</div></div>
+    <div class="kpi"><div class="val">${y26.avg_price ?? '–'} €</div><div class="lbl">Ø Day-Ahead-Preis 2026 (€/MWh)</div><div class="sub">2023: ${y23.avg_price} €/MWh</div></div>`;
+
+  // Negative prices monthly
+  const nm = neg.monthly;
+  charts.neg = new Chart(negChart, {type:'bar', data:{
+    labels: nm.map(m=>m.month),
+    datasets:[{label:'Negative Preisstunden/Monat', data:nm.map(m=>m.neg_hours),
+      backgroundColor: nm.map(m=>COLORS[m.month.slice(0,4)]||'#888')}]
+  }, options: lineOpts('Stunden < 0 €/MWh')});
+
+  // Negative prices by hour of day
+  const years = [...new Set(neg.by_hour_of_day.map(r=>r.year))];
+  charts.negHour = new Chart(negHourChart, {type:'line', data:{
+    labels:[...Array(24).keys()].map(h=>h+':00'),
+    datasets: years.map(y=>({label:y, borderColor:COLORS[y], backgroundColor:COLORS[y],
+      data: neg.by_hour_of_day.filter(r=>r.year===y).map(r=>r.neg_hours), tension:.3, pointRadius:2}))
+  }, options: lineOpts('Negative Preisstunden')});
+
+  // Capture rates
+  const cm = cap.monthly;
+  charts.capture = new Chart(captureChart, {type:'line', data:{
+    labels: cm.map(m=>m.month),
+    datasets:[
+      {label:'Solar Capture Rate %', data:cm.map(m=>m.solar_capture_rate_pct), borderColor:'#fcc419', backgroundColor:'#fcc419', tension:.3, pointRadius:2},
+      {label:'Wind Capture Rate %', data:cm.map(m=>m.wind_capture_rate_pct), borderColor:'#5c7cfa', backgroundColor:'#5c7cfa', tension:.3, pointRadius:2},
+      {label:'100% = Baseload', data:cm.map(()=>100), borderColor:'#555', borderDash:[6,4], pointRadius:0}
+    ]
+  }, options: lineOpts('% des Baseload-Preises')});
+
+  // Duck curve
+  const dYears = [...new Set(duck.profile.map(r=>r.year))];
+  charts.duck = new Chart(duckChart, {type:'line', data:{
+    labels:[...Array(24).keys()].map(h=>h+':00'),
+    datasets: dYears.map(y=>({label:'Residuallast '+y, borderColor:COLORS[y], backgroundColor:COLORS[y],
+      data: duck.profile.filter(r=>r.year===y).map(r=>r.residual_mw), tension:.3, pointRadius:2}))
+  }, options: lineOpts('MW (Last − Solar − Wind)')});
+
+  // Price profile
+  charts.pp = new Chart(priceProfileChart, {type:'line', data:{
+    labels:[...Array(24).keys()].map(h=>h+':00'),
+    datasets: dYears.map(y=>({label:y, borderColor:COLORS[y], backgroundColor:COLORS[y],
+      data: duck.price_profile.filter(r=>r.year===y).map(r=>r.price), tension:.3, pointRadius:2}))
+  }, options: lineOpts('€/MWh')});
+
+  // Balance
+  const im = imp.monthly;
+  charts.bal = new Chart(balanceChart, {type:'bar', data:{
+    labels: im.map(m=>m.month),
+    datasets:[
+      {label:'Erneuerbare (GWh)', data:im.map(m=>m.renewable_gwh), backgroundColor:'#00d4aa', stack:'g'},
+      {label:'Fossil (GWh)', data:im.map(m=>m.fossil_gwh), backgroundColor:'#ff8787', stack:'g'},
+      {label:'Pumpspeicher & Sonstige (GWh)', data:im.map(m=>+(m.gen_gwh-m.renewable_gwh-m.fossil_gwh).toFixed(1)), backgroundColor:'#5c7cfa', stack:'g'},
+      {label:'Last (GWh)', type:'line', data:im.map(m=>m.load_gwh), borderColor:'#fff', pointRadius:0, borderWidth:2}
+    ]
+  }, options: lineOpts('GWh/Monat', {scales:{x:{stacked:true},y:{stacked:true,title:{display:true,text:'GWh/Monat'}}}})});
+
+  loadBattery(2);
+}
+
+async function loadBattery(h){
+  const d = await j('/api/analytics/battery-arbitrage?hours='+h);
+  const m = d.monthly;
+  if (charts.battery) charts.battery.destroy();
+  charts.battery = new Chart(batteryChart, {type:'bar', data:{
+    labels: m.map(r=>r.month),
+    datasets:[{label:`Monatserlös €/MW (${h}h-Speicher)`, data:m.map(r=>r.monthly_revenue_eur_per_mw),
+      backgroundColor: m.map(r=>COLORS[r.month.slice(0,4)]||'#888')}]
+  }, options: lineOpts('€/MW pro Monat')});
+}
+
+document.getElementById('batteryControls').addEventListener('click', e=>{
+  if (e.target.dataset.h){
+    document.querySelectorAll('#batteryControls button').forEach(b=>b.classList.remove('active'));
+    e.target.classList.add('active');
+    loadBattery(+e.target.dataset.h);
+  }
+});
+
+init();
+</script>
+</body>
+</html>

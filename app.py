@@ -1281,6 +1281,19 @@ def infrastructure_stats():
         return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
 
 
+# ---------------------------------------------------------------------------
+# Market analytics on stored ENTSO-E history (2023 - today)
+# ---------------------------------------------------------------------------
+
+from market_analytics import analytics_bp
+app.register_blueprint(analytics_bp)
+
+
+@app.route('/analytics')
+def analytics_page():
+    return send_file('static/analytics.html')
+
+
 @app.route('/llm.txt')
 def llm_txt():
     """Machine-readable API reference for LLM agents."""
