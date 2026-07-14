@@ -1288,6 +1288,49 @@ def infrastructure_stats():
 from market_analytics import analytics_bp
 app.register_blueprint(analytics_bp)
 
+from opportunity_map import get_opportunity_map, market_signals as _market_signals
+
+_msig_cache = {'t': 0, 'data': None}
+
+
+@app.route('/api/market-signals')
+def market_signals_api():
+    """Trailing-12m market signals: baseload price, solar/wind capture prices,
+    battery arbitrage spread. Used by the Standortanalyse calculator."""
+    if time.time() - _msig_cache['t'] > 3600 or _msig_cache['data'] is None:
+        _msig_cache['data'] = _market_signals()
+        _msig_cache['t'] = time.time()
+    return jsonify(_msig_cache['data'])
+
+
+@app.route('/api/opportunity-map')
+def opportunity_map_api():
+    """Investment opportunity scores per transformer station.
+
+    Joins national market signals (trailing 12m from ENTSO-E history:
+    capture rates, battery arbitrage spreads) with local grid geography
+    (official available/booked capacity per station, existing solar/wind
+    buildout within 10 km, INSPIRE wind exclusion & protected areas).
+
+    Query params:
+      tech - optional filter: solar|wind|battery (sorts by that score)
+      min_score - optional minimum score 0-100
+      state - optional Bundesland filter
+    """
+    data = get_opportunity_map()
+    stations = data['stations']
+    state = request.args.get('state')
+    if state:
+        stations = [s for s in stations if s['state'].lower() == state.lower()]
+    tech = request.args.get('tech')
+    min_score = request.args.get('min_score', type=float)
+    if tech in ('solar', 'wind', 'battery'):
+        if min_score is not None:
+            stations = [s for s in stations if s['scores'][tech] >= min_score]
+        stations = sorted(stations, key=lambda s: -s['scores'][tech])
+    return jsonify({'market_signals': data['market_signals'],
+                    'count': len(stations), 'stations': stations})
+
 
 @app.route('/analytics')
 def analytics_page():

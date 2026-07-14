@@ -71,25 +71,53 @@
         
         .header {
             background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
-            padding: 20px;
-            text-align: center;
+            padding: 10px 20px;
             border-bottom: 2px solid #00d4aa;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
         }
         
         .header h1 {
-            font-size: 1.8rem;
+            font-size: 1.25rem;
             color: #00d4aa;
-            margin-bottom: 5px;
+            margin: 0;
+            white-space: nowrap;
         }
         
         .header p {
             color: #888;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            margin: 0;
+        }
+        
+        .header-nav {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .header-nav a {
+            color: #00d4aa;
+            text-decoration: none;
+            font-size: 0.82rem;
+            padding: 6px 12px;
+            border: 1px solid #2a2a4a;
+            border-radius: 20px;
+            background: rgba(0, 212, 170, 0.06);
+            white-space: nowrap;
+        }
+        
+        .header-nav a:hover {
+            background: rgba(0, 212, 170, 0.15);
+            border-color: #00d4aa;
         }
         
         .main-container {
             display: flex;
-            height: calc(100vh - 100px);
+            height: calc(100vh - 59px);
         }
         
         .sidebar {
@@ -423,6 +451,66 @@
             padding: 8px 12px;
             font-size: 0.85rem;
         }
+        
+        .plant-type-chips {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        
+        .plant-chip {
+            background: #1a1a2e;
+            border: 1px solid #2a2a4a;
+            border-radius: 8px;
+            color: #999;
+            padding: 8px 2px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.68rem;
+            transition: all 0.15s;
+        }
+        
+        .plant-chip i { font-size: 1rem; }
+        
+        .plant-chip.active {
+            background: rgba(0, 212, 170, 0.15);
+            border-color: #00d4aa;
+            color: #00d4aa;
+        }
+        
+        .plant-chip:hover { border-color: #00d4aa; }
+        
+        .capacity-slider-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .capacity-slider-row input[type=range] {
+            flex: 1;
+            accent-color: #00d4aa;
+            min-width: 0;
+        }
+        
+        .live-estimate {
+            background: #101024;
+            border: 1px solid #2a2a4a;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 0.75rem;
+            color: #999;
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        
+        .live-estimate b { color: #00d4aa; font-size: 0.9rem; display: block; }
+        .live-estimate .est-cell { text-align: center; flex: 1; }
         
         .standort-hint {
             background: rgba(0, 212, 170, 0.1);
@@ -776,13 +864,48 @@
         }
         
 @media (max-width: 900px) {
+            .header {
+                padding: 8px 12px;
+            }
+            .header h1 { font-size: 1.05rem; }
+            .header-sub { display: none; }
+            .header-nav a { font-size: 0.75rem; padding: 5px 10px; }
             .main-container {
                 flex-direction: column;
+                height: auto;
+            }
+            /* Map first, full attention; sidebar scrolls below */
+            .map-container {
+                order: -1;
+                height: 62vh;
+                min-height: 380px;
+                flex: none;
             }
             .sidebar {
                 width: 100%;
-                height: 300px;
+                height: auto;
+                max-height: none;
+                overflow: visible;
+                border-right: none;
+                border-top: 1px solid #333;
+                padding: 12px;
             }
+            /* Standortanalyse stays on top of the sidebar & is sticky-ish prominent */
+            .standort-panel { margin-bottom: 12px; }
+            .modal {
+                width: 96vw !important;
+                max-width: 96vw !important;
+                max-height: 88vh !important;
+            }
+            .legend {
+                font-size: 0.7rem;
+                padding: 8px 10px;
+                bottom: 20px;
+                right: 8px;
+                max-width: 46vw;
+                opacity: 0.92;
+            }
+            .legend h4 { font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -801,8 +924,14 @@
     </div>
     
     <div class="header">
-        <h1><i class="fas fa-wind"></i> Netzkapazität für Windenergie in Österreich</h1>
-        <p>Bezirksweise Analyse der verfügbaren Einspeisekapazitäten für neue Windkraftanlagen · <a href="/analytics" style="color:#00d4aa;">📊 Marktanalytics (3,5 Jahre ENTSO-E)</a></p>
+        <div>
+            <h1><i class="fas fa-bolt"></i> Netzkapazität Österreich</h1>
+            <p class="header-sub">Einspeisekapazitäten, Standortanalyse &amp; Strommarkt</p>
+        </div>
+        <div class="header-nav">
+            <a href="/" title="Interaktive Karte"><i class="fas fa-map"></i> Karte</a>
+            <a href="/analytics" title="3,5 Jahre ENTSO-E Marktdaten"><i class="fas fa-chart-line"></i> Marktanalytics</a>
+        </div>
     </div>
     
     <div class="main-container">
@@ -826,22 +955,29 @@
                     </div>
                     <div class="address-results" id="address-results"></div>
                     <div class="standort-options">
-                        <div class="standort-option-row">
-                            <label>Anlagentyp:</label>
-                            <select id="plant-type-select">
-                                <option value="solar_rooftop">PV Dachanlage</option>
-                                <option value="solar_ground">PV Freifläche</option>
-                                <option value="wind_small">Kleinwind (&lt;20 kW)</option>
-                                <option value="wind_medium">Wind 1-3 MW</option>
-                                <option value="wind_large">Wind &gt;3 MW</option>
-                            </select>
+                        <div class="plant-type-chips" id="plant-type-chips">
+                            <button class="plant-chip active" data-type="solar_rooftop" title="PV Dachanlage"><i class="fas fa-home"></i><span>PV Dach</span></button>
+                            <button class="plant-chip" data-type="solar_ground" title="PV Freifläche"><i class="fas fa-solar-panel"></i><span>PV Feld</span></button>
+                            <button class="plant-chip" data-type="wind_medium" title="Windkraftanlage"><i class="fas fa-wind"></i><span>Wind</span></button>
+                            <button class="plant-chip" data-type="battery" title="Batteriespeicher"><i class="fas fa-battery-three-quarters"></i><span>Batterie</span></button>
                         </div>
-                        <div class="standort-option-row">
-                            <label>Leistung:</label>
+                        <select id="plant-type-select" style="display:none;">
+                            <option value="solar_rooftop" selected>PV Dachanlage</option>
+                            <option value="solar_ground">PV Freifläche</option>
+                            <option value="wind_small">Kleinwind (&lt;20 kW)</option>
+                            <option value="wind_medium">Wind 1-3 MW</option>
+                            <option value="wind_large">Wind &gt;3 MW</option>
+                            <option value="battery">Batteriespeicher</option>
+                        </select>
+                        <div class="capacity-slider-row">
+                            <input type="range" id="capacity-slider" min="0" max="100" value="20">
                             <div class="capacity-input-group">
                                 <input type="number" id="capacity-input" value="10" min="1" max="10000" step="1">
                                 <span class="capacity-unit" id="capacity-unit">kW</span>
                             </div>
+                        </div>
+                        <div class="live-estimate" id="live-estimate">
+                            <!-- filled by JS -->
                         </div>
                     </div>
                     <div class="standort-hint" id="standort-hint">
@@ -1004,6 +1140,18 @@
                         <i class="fas fa-project-diagram" style="color: #ff0066; width: 16px;"></i>
                         Hochspannungsleitungen
                     </label>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-opportunity">
+                        <i class="fas fa-coins" style="color: #ffd700; width: 16px;"></i>
+                        Investment-Chancen
+                    </label>
+                    <div id="opportunity-tech-select" style="display:none; margin: 4px 0 4px 24px;">
+                        <select id="opportunity-tech" style="background:#1a1a2e; color:#eaeaea; border:1px solid #333; border-radius:5px; padding:3px 6px; font-size:0.8rem; width:100%;">
+                            <option value="battery">🔋 Batteriespeicher</option>
+                            <option value="solar">☀️ Solar</option>
+                            <option value="wind">💨 Wind</option>
+                        </select>
+                    </div>
                 </div>
                 <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #333;">
                     <details style="cursor: pointer;">
@@ -1257,6 +1405,7 @@
         const hydropowerLayer = L.layerGroup();
         const crossBorderLayer = L.layerGroup();
         const onipLayer = L.layerGroup();
+        const opportunityLayer = L.layerGroup();
         
         // Create pane for transmission lines (below turbines but above heatmap)
         map.createPane('transmissionPane');
@@ -2367,6 +2516,69 @@
             });
         }
         
+        // --- Investment opportunity layer (market signals x grid geography) ---
+        let opportunityData = null;
+
+        async function loadOpportunityLayer() {
+            if (!opportunityData) {
+                const resp = await fetch('/api/opportunity-map');
+                opportunityData = await resp.json();
+            }
+            renderOpportunityLayer();
+        }
+
+        function oppColor(score) {
+            if (score >= 70) return '#ffd700';
+            if (score >= 50) return '#ffA500';
+            if (score >= 30) return '#8a7a3a';
+            return '#555';
+        }
+
+        function renderOpportunityLayer() {
+            opportunityLayer.clearLayers();
+            if (!opportunityData) return;
+            const tech = document.getElementById('opportunity-tech').value;
+            const mkt = opportunityData.market_signals;
+            const techLabel = {battery: 'Batteriespeicher (2h)', solar: 'Solar', wind: 'Wind'}[tech];
+            opportunityData.stations.forEach(s => {
+                const score = s.scores[tech];
+                if (score < 15) return;
+                const rev = s.revenue_estimate_eur_per_mw_yr[tech === 'battery' ? 'battery_2h' : tech];
+                const marker = L.circleMarker([s.lat, s.lon], {
+                    radius: 5 + score / 12,
+                    fillColor: oppColor(score), color: '#1a1a2e', weight: 1,
+                    fillOpacity: 0.85
+                });
+                marker.bindPopup(`
+                    <div style="min-width:230px">
+                    <b>${s.name}</b><br>
+                    <span style="color:#888">${s.operator} · ${s.state}</span><hr style="margin:6px 0">
+                    <b style="color:${oppColor(score)}">${techLabel}-Score: ${score}/100</b><br>
+                    Freie Netzkapazität: <b>${s.available_mw} MW</b> (gebucht: ${s.booked_mw} MW)<br>
+                    Umkreis 10 km: ${s.nearby_solar_mw} MW Solar · ${s.nearby_wind_mw} MW Wind<br>
+                    ${s.wind_exclusion ? '⚠️ Wind-Ausschlusszone<br>' : ''}
+                    ${s.protected_area ? '⚠️ Schutzgebiet<br>' : ''}
+                    Erlösschätzung: <b>~${(rev/1000).toFixed(0)}k €/MW/Jahr</b>
+                    <span style="color:#888">(Marktpreise letzte 12 Monate${tech==='solar' ? ', Capture Rate ' + (mkt.solar_capture_rate*100).toFixed(0) + '%' : ''})</span>
+                    ${s.website ? '<br><a href="' + s.website + '" target="_blank">Netzbetreiber-Info</a>' : ''}
+                    </div>`);
+                opportunityLayer.addLayer(marker);
+            });
+        }
+
+        document.getElementById('layer-opportunity').addEventListener('change', function() {
+            const sel = document.getElementById('opportunity-tech-select');
+            if (this.checked) {
+                sel.style.display = 'block';
+                loadOpportunityLayer();
+                map.addLayer(opportunityLayer);
+            } else {
+                sel.style.display = 'none';
+                map.removeLayer(opportunityLayer);
+            }
+        });
+        document.getElementById('opportunity-tech').addEventListener('change', renderOpportunityLayer);
+
         // Layer toggle handlers
         document.getElementById('layer-heatmap').addEventListener('change', function() {
             const legend = document.querySelector('.heatmap-legend');
@@ -2608,39 +2820,88 @@
             };
         }
         
-        // Update capacity unit based on plant type
-        document.getElementById('plant-type-select').addEventListener('change', function() {
+        // Plant type configuration: sensible ranges + defaults per technology
+        const PLANT_TYPES = {
+            solar_rooftop: { unit: 'kW', def: 10,   min: 1,   max: 100,   step: 1,   cf: 0.11 },
+            solar_ground:  { unit: 'kW', def: 500,  min: 50,  max: 50000, step: 50,  cf: 0.12 },
+            wind_small:    { unit: 'kW', def: 10,   min: 1,   max: 20,    step: 1,   cf: 0.18 },
+            wind_medium:   { unit: 'MW', def: 3,    min: 1,   max: 5,     step: 0.5, cf: 0.24 },
+            wind_large:    { unit: 'MW', def: 5,    min: 3,   max: 15,    step: 0.5, cf: 0.26 },
+            battery:       { unit: 'MW', def: 1,    min: 0.1, max: 20,    step: 0.1, cf: null },
+        };
+
+        // Market signals from ENTSO-E history (trailing 12 months) for live estimates
+        let marketSignals = null;
+        fetch('/api/market-signals').then(r => r.json()).then(d => { marketSignals = d; updateLiveEstimate(); }).catch(() => {});
+
+        function applyPlantType(type) {
+            const cfg = PLANT_TYPES[type] || PLANT_TYPES.solar_rooftop;
             const unitEl = document.getElementById('capacity-unit');
             const inputEl = document.getElementById('capacity-input');
-            
-            switch(this.value) {
-                case 'solar_rooftop':
-                    unitEl.textContent = 'kW';
-                    inputEl.value = '10';
-                    inputEl.max = '100';
-                    break;
-                case 'solar_ground':
-                    unitEl.textContent = 'kW';
-                    inputEl.value = '500';
-                    inputEl.max = '50000';
-                    break;
-                case 'wind_small':
-                    unitEl.textContent = 'kW';
-                    inputEl.value = '10';
-                    inputEl.max = '20';
-                    break;
-                case 'wind_medium':
-                    unitEl.textContent = 'MW';
-                    inputEl.value = '3';
-                    inputEl.max = '5';
-                    break;
-                case 'wind_large':
-                    unitEl.textContent = 'MW';
-                    inputEl.value = '5';
-                    inputEl.max = '15';
-                    break;
-            }
+            const slider = document.getElementById('capacity-slider');
+            document.getElementById('plant-type-select').value = type;
+            unitEl.textContent = cfg.unit;
+            inputEl.min = cfg.min; inputEl.max = cfg.max; inputEl.step = cfg.step;
+            inputEl.value = cfg.def;
+            slider.min = cfg.min; slider.max = cfg.max; slider.step = cfg.step;
+            slider.value = cfg.def;
+            updateLiveEstimate();
+        }
+
+        // Chips: choose technology
+        document.querySelectorAll('#plant-type-chips .plant-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                document.querySelectorAll('#plant-type-chips .plant-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                let t = this.dataset.type;
+                applyPlantType(t);
+            });
         });
+
+        // Slider <-> number input sync
+        document.getElementById('capacity-slider').addEventListener('input', function() {
+            document.getElementById('capacity-input').value = this.value;
+            updateLiveEstimate();
+        });
+        document.getElementById('capacity-input').addEventListener('input', function() {
+            document.getElementById('capacity-slider').value = this.value;
+            updateLiveEstimate();
+        });
+
+        // Instant ballpark estimate (national averages; refined after map click)
+        function updateLiveEstimate() {
+            const el = document.getElementById('live-estimate');
+            if (!el) return;
+            const type = document.getElementById('plant-type-select').value;
+            const cfg = PLANT_TYPES[type];
+            const val = parseFloat(document.getElementById('capacity-input').value) || 0;
+            const kw = cfg.unit === 'MW' ? val * 1000 : val;
+            const mw = kw / 1000;
+            if (!marketSignals) { el.innerHTML = '<span style="color:#666">Lade Marktdaten…</span>'; return; }
+            if (type === 'battery') {
+                const rev = mw * marketSignals.battery_annual_revenue_eur_per_mw_2h;
+                el.innerHTML = `
+                    <div class="est-cell"><b>${fmtEur(rev)}</b>Arbitrage-Erlös/Jahr*</div>
+                    <div class="est-cell"><b>${marketSignals.battery_daily_spread_eur_mwh.toFixed(0)} €</b>Ø Tagesspread/MWh</div>`;
+            } else {
+                const isSolar = type.includes('solar');
+                const price = isSolar ? marketSignals.solar_capture_eur_mwh : marketSignals.wind_capture_eur_mwh;
+                const mwh = mw * cfg.cf * 8760;
+                const rev = mwh * price;
+                el.innerHTML = `
+                    <div class="est-cell"><b>${mwh >= 1000 ? (mwh/1000).toFixed(1) + ' GWh' : mwh.toFixed(0) + ' MWh'}</b>Ertrag/Jahr*</div>
+                    <div class="est-cell"><b>${fmtEur(rev)}</b>Erlös/Jahr*</div>
+                    <div class="est-cell"><b>${price.toFixed(0)} €</b>${isSolar ? 'Solar' : 'Wind'}-Capture/MWh</div>`;
+            }
+            el.title = '*Österreich-Durchschnitt, Marktpreise der letzten 12 Monate. Für Standort-genaue Werte auf Karte klicken.';
+        }
+
+        function fmtEur(v) {
+            if (v >= 1000000) return (v/1000000).toFixed(1) + ' Mio €';
+            if (v >= 1000) return (v/1000).toFixed(0) + 'k €';
+            return v.toFixed(0) + ' €';
+        }
+        applyPlantType('solar_rooftop');
         
         // Set up the location check button click handler
         document.getElementById('location-check-btn').addEventListener('click', toggleLocationCheck);
@@ -2815,7 +3076,7 @@
                     </div>
                     <div style="font-size: 0.8rem; color: #666; line-height: 1.8;">
                         <div id="loading-step-1"><i class="fas fa-circle" style="color: #00d4aa; font-size: 0.5rem;"></i> Umspannwerke & Netzkapazität (E-Control)</div>
-                        <div id="loading-step-2" style="opacity: 0.5;"><i class="fas fa-circle" style="color: #666; font-size: 0.5rem;"></i> ${isSolarType ? 'Sonneneinstrahlung (Regional)' : 'Windverhältnisse (Regional)'}</div>
+                        <div id="loading-step-2" style="opacity: 0.5;"><i class="fas fa-circle" style="color: #666; font-size: 0.5rem;"></i> ${plantConfig.type === 'battery' ? 'Preisspreads (ENTSO-E 12 Mon.)' : isSolarType ? 'Sonneneinstrahlung (Regional)' : 'Windverhältnisse (Regional)'}</div>
                         <div id="loading-step-3" style="opacity: 0.5;"><i class="fas fa-circle" style="color: #666; font-size: 0.5rem;"></i> Strompreise (ENTSO-E Live)</div>
                         <div id="loading-step-4" style="opacity: 0.5;"><i class="fas fa-circle" style="color: #666; font-size: 0.5rem;"></i> Bestehende Anlagen (OSM/IG Windkraft)</div>
                     </div>
@@ -2858,13 +3119,19 @@
                 const pvgis = data.pvgis;  // May be null if PVGIS unavailable
                 
                 // Calculate custom estimates based on plant config
+                const isBattery = plantConfig.type === 'battery';
                 const isSolar = plantConfig.type.includes('solar');
                 const capacityKw = plantConfig.capacity_kw;
                 const capacityMw = capacityKw / 1000;
                 const cf = isSolar ? rf.solar_capacity_factor : rf.wind_capacity_factor;
-                const annualMwh = capacityMw * cf * 8760;
-                const pricePerMwh = isSolar ? 80 : 80; // €/MWh average
-                const annualRevenue = annualMwh * pricePerMwh;
+                const annualMwh = isBattery ? 0 : capacityMw * cf * 8760;
+                // Real market prices (trailing 12m capture prices from ENTSO-E history)
+                const pricePerMwh = marketSignals
+                    ? (isSolar ? marketSignals.solar_capture_eur_mwh : marketSignals.wind_capture_eur_mwh)
+                    : 80;
+                const annualRevenue = isBattery
+                    ? capacityMw * (marketSignals ? marketSignals.battery_annual_revenue_eur_per_mw_2h : 70000)
+                    : annualMwh * pricePerMwh;
                 
                 // Plant type display name
                 const plantTypeNames = {
@@ -2872,7 +3139,8 @@
                     'solar_ground': 'PV Freiflächenanlage',
                     'wind_small': 'Kleinwindkraftanlage',
                     'wind_medium': 'Windkraftanlage (mittel)',
-                    'wind_large': 'Große Windkraftanlage'
+                    'wind_large': 'Große Windkraftanlage',
+                    'battery': 'Batteriespeicher (2h)'
                 };
                 
                 let html = `
@@ -2907,9 +3175,28 @@
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <div style="font-size: 0.7rem; color: #888;">ERTRAGSSCHÄTZUNG FÜR IHRE ANLAGE</div>
                             <div style="font-size: 0.6rem; color: #555;">
-                                <i class="fas fa-database"></i> ${isSolar ? 'Regionale Einstrahlungsdaten' : 'Regionale Winddaten'}
+                                <i class="fas fa-database"></i> ${isBattery ? 'ENTSO-E Preisdaten (12 Mon.)' : isSolar ? 'Regionale Einstrahlungsdaten' : 'Regionale Winddaten'}
                             </div>
                         </div>
+                        ${isBattery ? `
+                        <div style="display: flex; gap: 15px;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.65rem; color: #666;">Arbitrage-Erlös</div>
+                                <div style="font-size: 1.3rem; color: #00d4aa; font-weight: bold;">
+                                    ${annualRevenue >= 10000 ? (annualRevenue/1000).toFixed(0) + 'k' : annualRevenue.toFixed(0)} €/Jahr
+                                </div>
+                                <div style="font-size: 0.55rem; color: #555;">1 Zyklus/Tag, 90% Wirkungsgrad</div>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.65rem; color: #666;">Ø Tagesspread</div>
+                                <div style="font-size: 1.3rem; color: #888;">${marketSignals ? marketSignals.battery_daily_spread_eur_mwh.toFixed(0) : '~120'} €/MWh</div>
+                                <div style="font-size: 0.55rem; color: #555;">letzte 12 Monate</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #333; font-size: 0.65rem; color: #555;">
+                            <i class="fas fa-info-circle"></i> Batterien profitieren besonders an Standorten mit viel Solar im Umkreis (lokaler Überschuss) und freier Netzkapazität
+                        </div>
+                        ` : `
                         <div style="display: flex; gap: 15px;">
                             <div style="flex: 1;">
                                 <div style="font-size: 0.65rem; color: #666;">Jahresertrag</div>
@@ -2922,7 +3209,7 @@
                                 <div style="font-size: 1.3rem; color: #00d4aa; font-weight: bold;">
                                     ${annualRevenue >= 10000 ? (annualRevenue/1000).toFixed(0) + 'k' : annualRevenue.toFixed(0)} €/Jahr
                                 </div>
-                                <div style="font-size: 0.55rem; color: #555;">@ ${pricePerMwh}€/MWh (ENTSO-E Ø)</div>
+                                <div style="font-size: 0.55rem; color: #555;">@ ${pricePerMwh.toFixed(0)}€/MWh ${isSolar ? 'Solar' : 'Wind'}-Capture-Preis (12 Mon.)</div>
                             </div>
                             <div style="flex: 1;">
                                 <div style="font-size: 0.65rem; color: #666;">Kapazitätsfaktor</div>
@@ -2930,8 +3217,9 @@
                             </div>
                         </div>
                         <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #333; font-size: 0.65rem; color: #555;">
-                            <i class="fas fa-info-circle"></i> Berechnung: ${plantConfig.capacity_display} × ${(cf*100).toFixed(0)}% × 8.760h = ${annualMwh.toFixed(0)} MWh/Jahr
+                            <i class="fas fa-info-circle"></i> Berechnung: ${plantConfig.capacity_display} × ${(cf*100).toFixed(0)}% × 8.760h = ${annualMwh.toFixed(0)} MWh/Jahr · ${isSolar ? 'Achtung: Solar erlöst nur ~' + (marketSignals ? (marketSignals.solar_capture_rate*100).toFixed(0) : 50) + '% des Baseload-Preises (Mittags-Kannibalisierung)' : ''}
                         </div>
+                        `}
                         ${isSolar && pvgis ? `
                             <div style="margin-top: 6px; font-size: 0.65rem; color: #4a9eff;">
                                 <i class="fas fa-satellite"></i> PVGIS-Daten: Optimale Neigung ${pvgis.optimal_angle}°, ${pvgis.yearly_kwh_per_kwp} kWh/kWp
