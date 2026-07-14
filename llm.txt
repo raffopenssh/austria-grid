@@ -260,3 +260,23 @@ Endpoints:
 - GET /api/future-grid/stats — job progress + national aggregates (deficit TWh, recommended MW per tech)
 
 Map: enable "Zukunftskarte 2040" layer on / (modes: 2040 balance, recommended tech, supply, demand).
+
+## ENTSO-E read-only SQL API (for external agents)
+
+- GET/POST /api/entsoe/query?sql=SELECT...&format=json|csv — token-protected
+  (?token=, Authorization: Bearer, or X-Api-Token). SELECT/WITH only,
+  read-only DB handle, 50k row cap.
+- GET /api/entsoe/schema — public: tables, DDL, row counts, psr_types.
+
+Tables in entsoe_data.db:
+- generation(timestamp, psr_type, value_mw) — 15-min national per type since
+  2023. psr_type '... Consumption' = consumption direction, e.g.
+  'Hydro Pumped Storage Consumption' is pumping (storing water).
+- load, prices, cross_border_flows — 15-min national series
+- plant_generation(timestamp, plant, psr_type, value_mw) — ENTSO-E A73
+  per-generation-unit output, 15-min, since 2023, ~5-day publication lag.
+  Includes pumped storage turbine units (Malta, Reisseck 2, Limberg II/III,
+  Haeusling), reservoir, gas and Danube run-of-river units. Unit naming
+  changed mid-2023 from plant-level to turbine-unit-level.
+- reservoir_levels(timestamp, stored_energy_mwh) — ENTSO-E A72 weekly
+  aggregated Austrian reservoir/hydro storage filling level since 2015.

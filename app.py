@@ -1462,6 +1462,15 @@ def entsoe_readonly_query():
       load(timestamp, load_mw, fetched_at)
       prices(timestamp, price_eur_mwh, fetched_at)
       cross_border_flows(timestamp, country, import_mw, export_mw, fetched_at)
+      plant_generation(timestamp, plant, psr_type, value_mw, fetched_at)
+        -- ENTSO-E A73 per-unit generation, 15-min, since 2023 (~5 day lag).
+        -- Pumped storage units: Malta-Hauptstufe TU 1-4, Reisseck 2 TU 1-2,
+        -- Limberg II/III TU 1-2, Haeusling TU 11-12; plus reservoir, gas,
+        -- and Danube run-of-river units. Naming granularity changed mid-2023
+        -- from plant-level to turbine-unit-level.
+      reservoir_levels(timestamp, stored_energy_mwh, fetched_at)
+        -- ENTSO-E A72 weekly aggregated reservoir + hydro storage filling
+        -- level for Austria, since 2015.
     """
     if not _agent_token_ok():
         return jsonify({'error': 'invalid or missing token'}), 401
