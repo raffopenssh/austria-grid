@@ -21,29 +21,47 @@
 <meta name="twitter:description" content="3,5 Jahre ENTSO-E Marktdaten: negative Preise, Capture Rates, Speicher-Arbitrage.">
 <meta name="twitter:image" content="https://austria-power.exe.xyz/static/og-analytics.png">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+:root {
+  --bg:#0b101c; --surface:#131a2b; --surface-2:#1a2338;
+  --border:rgba(148,163,184,.14); --accent:#00d4aa;
+  --accent-soft:rgba(0,212,170,.12);
+  --text:#e7ecf4; --text-dim:#94a3b8; --text-faint:#64748b;
+  --danger:#ff6b6b;
+}
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:#1a1a2e; color:#eaeaea; }
-.header { background:linear-gradient(135deg,#16213e 0%,#1a1a2e 100%); padding:20px; text-align:center; border-bottom:2px solid #00d4aa; }
-.header h1 { font-size:1.6rem; color:#00d4aa; margin-bottom:5px; }
-.header p { color:#888; font-size:.9rem; }
-.header a { color:#00d4aa; text-decoration:none; }
-.container { max-width:1200px; margin:0 auto; padding:20px; }
-.kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; margin-bottom:25px; }
-.kpi { background:#16213e; border-radius:10px; padding:18px; border:1px solid #2a2a4a; }
-.kpi .val { font-size:1.7rem; font-weight:700; color:#00d4aa; }
-.kpi .val.warn { color:#ff6b6b; }
-.kpi .lbl { color:#999; font-size:.82rem; margin-top:4px; }
-.kpi .sub { color:#666; font-size:.75rem; margin-top:2px; }
-.card { background:#16213e; border-radius:10px; padding:20px; margin-bottom:25px; border:1px solid #2a2a4a; }
-.card h2 { color:#00d4aa; font-size:1.15rem; margin-bottom:6px; }
-.card p.desc { color:#999; font-size:.85rem; margin-bottom:14px; line-height:1.5; }
+html { -webkit-font-smoothing:antialiased; }
+body { font-family:'Inter','Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); }
+::-webkit-scrollbar { width:10px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(148,163,184,.25); border-radius:8px; border:2px solid var(--bg); }
+.header { background:rgba(13,18,32,.85); backdrop-filter:blur(12px); padding:24px 20px; text-align:center; border-bottom:1px solid var(--border); position:relative; }
+.header::after { content:''; position:absolute; left:0; right:0; bottom:-1px; height:1px; background:linear-gradient(90deg,transparent,rgba(0,212,170,.35),transparent); }
+.header h1 { font-size:1.5rem; font-weight:700; letter-spacing:-.01em; color:var(--text); margin-bottom:5px; }
+.header p { color:var(--text-faint); font-size:.9rem; }
+.header a { color:var(--accent); text-decoration:none; }
+.header a:hover { text-decoration:underline; }
+.container { max-width:1200px; margin:0 auto; padding:24px 20px; }
+.kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin-bottom:26px; }
+.kpi { background:var(--surface); border-radius:12px; padding:18px; border:1px solid var(--border); transition:border-color .18s; }
+.kpi:hover { border-color:rgba(0,212,170,.35); }
+.kpi .val { font-size:1.7rem; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+.kpi .val.warn { color:var(--danger); }
+.kpi .lbl { color:var(--text-dim); font-size:.82rem; margin-top:4px; }
+.kpi .sub { color:var(--text-faint); font-size:.75rem; margin-top:2px; }
+.card { background:var(--surface); border-radius:12px; padding:22px; margin-bottom:26px; border:1px solid var(--border); }
+.card h2 { color:var(--text); font-size:1.12rem; font-weight:600; letter-spacing:-.01em; margin-bottom:6px; }
+.card p.desc { color:var(--text-dim); font-size:.85rem; margin-bottom:14px; line-height:1.55; }
 .chart-wrap { position:relative; height:340px; }
 .controls { margin-bottom:12px; }
-.controls button { background:#1a1a2e; color:#aaa; border:1px solid #2a2a4a; padding:5px 12px; border-radius:6px; cursor:pointer; margin-right:6px; font-size:.8rem; }
-.controls button.active { background:#00d4aa; color:#1a1a2e; border-color:#00d4aa; font-weight:600; }
-.footer { text-align:center; color:#666; font-size:.8rem; padding:20px; }
-.loading { text-align:center; color:#666; padding:60px 0; }
+.controls button { background:transparent; color:var(--text-dim); border:1px solid var(--border); padding:6px 14px; border-radius:999px; cursor:pointer; margin-right:6px; font-size:.8rem; font-family:inherit; transition:all .15s; }
+.controls button:hover { border-color:var(--accent); color:var(--accent); }
+.controls button.active { background:var(--accent); color:#0b101c; border-color:var(--accent); font-weight:600; }
+.footer { text-align:center; color:var(--text-faint); font-size:.8rem; padding:20px; }
+.loading { text-align:center; color:var(--text-faint); padding:60px 0; }
 @media (max-width:700px){ .chart-wrap{height:260px;} }
 </style>
 </head>
