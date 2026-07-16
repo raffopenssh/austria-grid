@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Austrian Wind Power Grid Capacity Visualization"""
 
-from flask import Flask, jsonify, send_from_directory, send_file, render_template_string, Response, request
+from flask import Flask, jsonify, send_from_directory, send_file, render_template, render_template_string, Response, request, abort
 import json
 import os
 import sqlite3
@@ -16,10 +16,12 @@ import xml.etree.ElementTree as ET
 from functools import lru_cache
 import time
 
+import capacity_stats
+
 app = Flask(__name__, static_folder='static')
 
-# Base URL for the site
-BASE_URL = 'https://austria-power.exe.xyz:8000'
+# Base URL for the site (port 8000 is the default port on the exe.dev proxy)
+BASE_URL = 'https://austria-power.exe.xyz'
 
 # ENTSO-E API configuration
 ENTSOE_API_KEY = os.environ.get('ENTSOE_API_KEY', '35efd923-6969-4470-b2bd-0155b2254346')
@@ -864,117 +866,8 @@ def check_location():
 
 @app.route('/api/district-capacity')
 def district_capacity():
-    """Calculate capacity analysis for each district using proper point-in-polygon"""
-    windparks = load_json('windparks.json')
-    transformers = load_json('transformer_stations.json')
-    bezirke = load_json('bezirke.json')
-    
-    # Calculate district statistics
-    district_stats = {}
-    
-    # Track which windparks have been assigned to avoid double-counting
-    assigned_windparks = set()
-    assigned_transformers = set()
-    
-    for feature in bezirke['features']:
-        name = feature['properties']['name']
-        iso = feature['properties']['iso']
-        
-        # Create shapely polygon for proper point-in-polygon test
-        try:
-            district_shape = shape(feature['geometry'])
-        except:
-            continue
-            
-        # Get bounding box for rough district matching
-        min_lon, min_lat, max_lon, max_lat = district_shape.bounds
-        
-        # Find windparks in this district using point-in-polygon
-        district_windparks = []
-        for i, wp in enumerate(windparks):
-            if i in assigned_windparks:
-                continue
-            try:
-                wp_lon = float(wp.get('lon', 0) or 0)
-                wp_lat = float(wp.get('lat', 0) or 0)
-                # Quick bounding box check first
-                if not (min_lon <= wp_lon <= max_lon and min_lat <= wp_lat <= max_lat):
-                    continue
-                # Then proper point-in-polygon
-                point = Point(wp_lon, wp_lat)
-                if district_shape.contains(point):
-                    district_windparks.append(wp)
-                    assigned_windparks.add(i)
-            except (ValueError, TypeError):
-                continue
-        
-        # Find transformer stations in this district
-        district_transformers = []
-        for i, t in enumerate(transformers):
-            if i in assigned_transformers:
-                continue
-            try:
-                t_lon = float(t.get('longitude', 0) or 0)
-                t_lat = float(t.get('latitude', 0) or 0)
-                if not (min_lon <= t_lon <= max_lon and min_lat <= t_lat <= max_lat):
-                    continue
-                point = Point(t_lon, t_lat)
-                if district_shape.contains(point):
-                    district_transformers.append(t)
-                    assigned_transformers.add(i)
-            except (ValueError, TypeError):
-                continue
-        
-        # Calculate stats
-        total_installed_mw = sum(float(wp.get('total_mw', 0) or 0) for wp in district_windparks)
-        total_turbines = sum(int(wp.get('turbines', 0) or 0) for wp in district_windparks)
-        
-        # Transformer capacity
-        total_booked = 0
-        total_available = 0
-        for t in district_transformers:
-            try:
-                booked = t.get('bookedCapacity', 0)
-                available = t.get('availableCapacity', 0)
-                total_booked += float(booked) if booked else 0
-                total_available += float(available) if available else 0
-            except (ValueError, TypeError):
-                pass
-        
-        # Calculate capacity score - considering actual usage vs grid capacity
-        # Higher score = more room for new capacity
-        total_grid_capacity = total_booked + total_available
-        if total_grid_capacity > 0:
-            # Utilization based on installed wind capacity vs grid capacity
-            utilization = min(total_installed_mw / (total_grid_capacity + 0.01), 1.5)
-            capacity_score = max(0, min(100, (1 - utilization * 0.7) * 100))
-        elif total_installed_mw > 0:
-            # Has wind but no registered transformers - likely constrained
-            capacity_score = 20
-        else:
-            # No wind, no transformers - unknown potential
-            capacity_score = 50
-        
-        # Estimate actual available capacity based on realistic assumptions
-        # Government figures are often pessimistic - realistic capacity is higher
-        # Based on international studies, actual available is typically 30-50% higher
-        estimated_actual_available = total_available * 1.4 + (total_booked * 0.15)
-        
-        district_stats[iso] = {
-            'name': name,
-            'iso': iso,
-            'windparks': len(district_windparks),
-            'turbines': total_turbines,
-            'installed_mw': round(total_installed_mw, 2),
-            'transformers': len(district_transformers),
-            'booked_capacity_mw': round(total_booked, 2),
-            'official_available_mw': round(total_available, 2),
-            'estimated_available_mw': round(estimated_actual_available, 2),
-            'capacity_score': round(capacity_score, 1),
-            'bbox': [min_lon, min_lat, max_lon, max_lat]
-        }
-    
-    return jsonify(district_stats)
+    """Capacity analysis for each district (shared with SEO pages, cached 1h)"""
+    return jsonify(capacity_stats.api_district_stats())
 
 @app.route('/static/<path:filename>')
 def static_files(filename):
@@ -1074,54 +967,336 @@ def download_geopackage():
 
 # ============ SEO ROUTES ============
 
+def _fmt_mw(v):
+    try:
+        return f"{float(v):,.1f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+    except (ValueError, TypeError):
+        return '0'
+
+
+def _og_image_for(iso=None):
+    """Return URL of district OG image if it exists, else the main one."""
+    if iso:
+        fn = f"og/bezirk-{str(iso).lower().replace(' ', '-')}.png"
+        if os.path.exists(os.path.join('static', fn)):
+            return f"{BASE_URL}/static/{fn}"
+    return f"{BASE_URL}/static/og-image.png"
+
+
+def _render_seo(title, description, canonical_path, content, keywords='', structured_data=None, og_image=None):
+    return render_template(
+        'base_seo.html',
+        title=title,
+        description=description,
+        keywords=keywords or 'Windkraft, Österreich, Netzkapazität, Umspannwerk, Windenergie, Einspeisung',
+        canonical_url=BASE_URL + canonical_path,
+        og_image=og_image or _og_image_for(),
+        structured_data=json.dumps(structured_data or {}, ensure_ascii=False),
+        content=content,
+    )
+
+
+@app.route('/quellen')
+def quellen_page():
+    content = """
+    <div class="breadcrumb"><a href="/">Karte</a> › Quellen</div>
+    <h1>Quellen &amp; Methodik</h1>
+    <p>Diese Plattform kombiniert öffentlich verfügbare Datensätze zur österreichischen
+    Windkraft- und Netzinfrastruktur zu einer interaktiven Analyse der Netzkapazität
+    für neue Windenergieprojekte.</p>
+    <h2>Datenquellen</h2>
+    <div class="list-grid">
+      <div class="list-item"><strong>IG Windkraft</strong><br>Windparks, Anlagenzahl, installierte Leistung</div>
+      <div class="list-item"><strong>E-Control Austria</strong><br>Umspannwerke &amp; verfügbare Einspeisekapazitäten</div>
+      <div class="list-item"><strong>Austro Control</strong><br>Luftfahrthindernisse (Windkraftanlagen-Standorte)</div>
+      <div class="list-item"><strong>ENTSO-E Transparency</strong><br>Erzeugung, Preise, grenzüberschreitende Flüsse</div>
+      <div class="list-item"><strong>APG / ONIP</strong><br>Übertragungsnetz 220/380 kV</div>
+      <div class="list-item"><strong>OpenStreetMap</strong><br>Leitungen &amp; Umspannwerke (ODbL)</div>
+      <div class="list-item"><strong>data.gv.at</strong><br>Bezirksgrenzen, Verwaltungsdaten</div>
+      <div class="list-item"><strong>BEV Kataster (INSPIRE)</strong><br>Flurstücksdaten zur Standortanreicherung</div>
+    </div>
+    <h2>Methodik</h2>
+    <p>Windkraftanlagen und Umspannwerke werden per Punkt-in-Polygon-Test den politischen
+    Bezirken zugeordnet. Der Kapazitäts-Score eines Bezirks vergleicht die installierte
+    Windleistung mit der gebuchten und verfügbaren Netzkapazität der Umspannwerke.
+    Die „geschätzte verfügbare Kapazität" ergänzt die offiziellen (konservativen)
+    E-Control-Werte um einen Erfahrungsfaktor.</p>
+    <p><strong>Hinweis:</strong> Alle Angaben ohne Gewähr. Für konkrete Netzanschluss-Anfragen
+    wenden Sie sich an den zuständigen Netzbetreiber.</p>
+    <a class="cta-button" href="/">Zur interaktiven Karte</a>
+    """
+    return _render_seo(
+        'Quellen & Methodik | Windkraft Österreich Netzkapazität',
+        'Datenquellen und Methodik der Windkraft-Netzkapazitätsanalyse für Österreich: '
+        'IG Windkraft, E-Control, ENTSO-E, APG, OpenStreetMap und data.gv.at.',
+        '/quellen', content,
+    )
+
+
+@app.route('/bezirke')
+def bezirke_page():
+    stats = capacity_stats.compute_district_stats()
+    ranked = sorted(stats.values(), key=lambda s: s['estimated_available_mw'], reverse=True)
+    total_mw = sum(s['installed_mw'] for s in ranked)
+    total_turbines = sum(s['turbines'] for s in ranked)
+    total_avail = sum(s['official_available_mw'] for s in ranked)
+
+    items = ''.join(
+        f'<div class="list-item"><a href="/bezirk/{quote(s["iso"], safe="")}">{s["name"]}</a><br>'
+        f'<small>{s["turbines"]} Anlagen · {_fmt_mw(s["installed_mw"])} MW installiert · '
+        f'{_fmt_mw(s["official_available_mw"])} MW frei</small></div>'
+        for s in ranked
+    )
+    content = f"""
+    <div class="breadcrumb"><a href="/">Karte</a> › Bezirke</div>
+    <h1>Windkraft &amp; Netzkapazität nach Bezirk</h1>
+    <p>Übersicht aller {len(ranked)} österreichischen Bezirke mit installierter Windkraftleistung
+    und verfügbarer Netzkapazität, sortiert nach geschätzter freier Einspeisekapazität.</p>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value">{f'{total_turbines:,}'.replace(',', '.')}</div><div class="stat-label">Windkraftanlagen</div></div>
+      <div class="stat-card"><div class="stat-value">{_fmt_mw(total_mw)} MW</div><div class="stat-label">Installierte Leistung</div></div>
+      <div class="stat-card"><div class="stat-value">{_fmt_mw(total_avail)} MW</div><div class="stat-label">Offiziell verfügbare Netzkapazität</div></div>
+    </div>
+    <div class="list-grid">{items}</div>
+    <a class="cta-button" href="/">Zur interaktiven Karte</a>
+    """
+    sd = {
+        '@context': 'https://schema.org', '@type': 'Dataset',
+        'name': 'Windkraft und Netzkapazität nach Bezirk (Österreich)',
+        'description': 'Installierte Windkraftleistung und verfügbare Netzkapazität je österreichischem Bezirk.',
+        'url': BASE_URL + '/bezirke', 'license': 'https://creativecommons.org/licenses/by/4.0/',
+        'spatialCoverage': 'Österreich',
+    }
+    return _render_seo(
+        'Windkraft nach Bezirk – Netzkapazität aller österreichischen Bezirke',
+        f'Windkraftleistung und freie Netzkapazität in allen {len(ranked)} Bezirken Österreichs. '
+        'Ranking nach verfügbarer Einspeisekapazität für neue Windenergieprojekte.',
+        '/bezirke', content, structured_data=sd,
+    )
+
+
+@app.route('/bezirk/<iso>')
+def bezirk_page(iso):
+    stats = capacity_stats.compute_district_stats()
+    s = stats.get(iso)
+    if not s:
+        abort(404)
+    name = s['name']
+
+    # Dedupe windparks by name (source data has one row per phase/turbine group)
+    wp_dedup = {}
+    for w in s['windpark_list']:
+        key = w.get('name') or ''
+        if key in wp_dedup:
+            prev = wp_dedup[key]
+            prev['turbines'] = (prev.get('turbines') or 0) + (w.get('turbines') or 0)
+            prev['total_mw'] = (float(prev.get('total_mw') or 0) + float(w.get('total_mw') or 0))
+            if w.get('year') and (not prev.get('year') or w['year'] < prev['year']):
+                prev['year'] = w['year']
+        else:
+            wp_dedup[key] = dict(w)
+    wps = sorted(wp_dedup.values(), key=lambda w: float(w.get('total_mw') or 0), reverse=True)[:30]
+    wp_items = ''.join(
+        f'<div class="list-item">{w["name"]}<br><small>{w.get("turbines") or "?"} Anlagen · '
+        f'{_fmt_mw(w.get("total_mw"))} MW' + (f' · seit {w["year"]}' if w.get('year') else '') + '</small></div>'
+        for w in wps
+    ) or '<p>Keine Windparks in diesem Bezirk erfasst.</p>'
+
+    tf_items = ''.join(
+        f'<div class="list-item"><a href="/umspannwerk/{t["idx"]}">{t["name"]}</a><br>'
+        f'<small>{t.get("operator") or ""} · {_fmt_mw(t.get("available_mw"))} MW frei</small></div>'
+        for t in s['transformer_list'] if t.get('name')
+    ) or '<p>Keine Umspannwerke mit veröffentlichter Kapazität in diesem Bezirk.</p>'
+
+    score = s['capacity_score']
+    score_txt = 'hohe' if score >= 70 else ('mittlere' if score >= 30 else 'geringe')
+    content = f"""
+    <div class="breadcrumb"><a href="/">Karte</a> › <a href="/bezirke">Bezirke</a> › {name}</div>
+    <h1>Windkraft im Bezirk {name}</h1>
+    <p>Der Bezirk {name} hat eine <strong>{score_txt} Netzkapazität</strong>
+    (Score {score}/100) für neue Windenergieanlagen.</p>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value">{s['turbines']}</div><div class="stat-label">Windkraftanlagen</div></div>
+      <div class="stat-card"><div class="stat-value">{_fmt_mw(s['installed_mw'])} MW</div><div class="stat-label">Installierte Leistung</div></div>
+      <div class="stat-card"><div class="stat-value">{s['transformers']}</div><div class="stat-label">Umspannwerke</div></div>
+      <div class="stat-card"><div class="stat-value">{_fmt_mw(s['official_available_mw'])} MW</div><div class="stat-label">Offiziell verfügbar</div></div>
+      <div class="stat-card"><div class="stat-value">{_fmt_mw(s['estimated_available_mw'])} MW</div><div class="stat-label">Geschätzt verfügbar</div></div>
+    </div>
+    <h2>Windparks ({s['windparks']})</h2>
+    <div class="list-grid">{wp_items}</div>
+    <h2>Umspannwerke ({s['transformers']})</h2>
+    <div class="list-grid">{tf_items}</div>
+    <a class="cta-button" href="/#bezirk={quote(iso, safe='')}">Bezirk auf der Karte ansehen</a>
+    <p><small>Quellen: IG Windkraft, E-Control Austria · <a href="/quellen">Methodik</a></small></p>
+    """
+    sd = {
+        '@context': 'https://schema.org', '@type': 'Place',
+        'name': f'Bezirk {name}', 'address': {'@type': 'PostalAddress', 'addressCountry': 'AT'},
+        'description': f'Windkraft und Netzkapazität im Bezirk {name}: {s["turbines"]} Anlagen, '
+                       f'{s["installed_mw"]} MW installiert, {s["official_available_mw"]} MW freie Netzkapazität.',
+    }
+    return _render_seo(
+        f'Windkraft Bezirk {name} – Netzkapazität & Windparks',
+        f'Bezirk {name}: {s["turbines"]} Windkraftanlagen mit {_fmt_mw(s["installed_mw"])} MW, '
+        f'{s["transformers"]} Umspannwerke, {_fmt_mw(s["official_available_mw"])} MW freie Netzkapazität '
+        f'für neue Windenergieprojekte.',
+        f'/bezirk/{quote(iso, safe="")}', content,
+        keywords=f'Windkraft {name}, Netzkapazität {name}, Windpark {name}, Umspannwerk',
+        structured_data=sd, og_image=_og_image_for(iso),
+    )
+
+
+@app.route('/umspannwerke')
+def umspannwerke_page():
+    transformers = load_json('transformer_stations.json')
+    def avail(t):
+        try:
+            return float(t.get('availableCapacity') or 0)
+        except (ValueError, TypeError):
+            return 0
+    ranked = sorted(
+        ((i, t) for i, t in enumerate(transformers) if t.get('substationName')),
+        key=lambda x: avail(x[1]), reverse=True)
+    total_avail = sum(avail(t) for _, t in ranked)
+    items = ''.join(
+        f'<div class="list-item"><a href="/umspannwerk/{i}">{t["substationName"]}</a><br>'
+        f'<small>{t.get("state") or ""} · {t.get("networkOperator") or ""} · {_fmt_mw(avail(t))} MW frei</small></div>'
+        for i, t in ranked
+    )
+    content = f"""
+    <div class="breadcrumb"><a href="/">Karte</a> › Umspannwerke</div>
+    <h1>Umspannwerke in Österreich – Einspeisekapazität</h1>
+    <p>{len(ranked)} Umspannwerke mit von E-Control veröffentlichten Einspeisekapazitäten,
+    sortiert nach verfügbarer Kapazität für neue Erzeugungsanlagen.</p>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value">{len(ranked)}</div><div class="stat-label">Umspannwerke</div></div>
+      <div class="stat-card"><div class="stat-value">{_fmt_mw(total_avail)} MW</div><div class="stat-label">Verfügbare Einspeisekapazität</div></div>
+    </div>
+    <div class="list-grid">{items}</div>
+    <a class="cta-button" href="/">Zur interaktiven Karte</a>
+    """
+    sd = {
+        '@context': 'https://schema.org', '@type': 'Dataset',
+        'name': 'Umspannwerke Österreich mit Einspeisekapazität',
+        'description': 'Verfügbare und gebuchte Einspeisekapazität österreichischer Umspannwerke laut E-Control.',
+        'url': BASE_URL + '/umspannwerke', 'creator': {'@type': 'Organization', 'name': 'E-Control Austria'},
+    }
+    return _render_seo(
+        f'Umspannwerke Österreich – {len(ranked)} Stationen mit freier Einspeisekapazität',
+        f'{len(ranked)} österreichische Umspannwerke mit insgesamt {_fmt_mw(total_avail)} MW '
+        'verfügbarer Einspeisekapazität. Daten von E-Control, sortiert nach freier Kapazität.',
+        '/umspannwerke', content, structured_data=sd,
+    )
+
+
+@app.route('/umspannwerk/<int:idx>')
+def umspannwerk_page(idx):
+    transformers = load_json('transformer_stations.json')
+    if idx < 0 or idx >= len(transformers):
+        abort(404)
+    t = transformers[idx]
+    name = t.get('substationName')
+    if not name:
+        abort(404)
+    updated = ''
+    if t.get('updatedOn'):
+        try:
+            updated = datetime.fromtimestamp(t['updatedOn']).strftime('%d.%m.%Y')
+        except Exception:
+            pass
+    website = t.get('website') or ''
+    content = f"""
+    <div class="breadcrumb"><a href="/">Karte</a> › <a href="/umspannwerke">Umspannwerke</a> › {name}</div>
+    <h1>{name}</h1>
+    <p>Umspannwerk in {t.get('state') or 'Österreich'}, betrieben von {t.get('networkOperator') or 'unbekannt'}.</p>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value">{_fmt_mw(t.get('availableCapacity'))} MW</div><div class="stat-label">Verfügbare Kapazität</div></div>
+      <div class="stat-card"><div class="stat-value">{_fmt_mw(t.get('bookedCapacity'))} MW</div><div class="stat-label">Gebuchte Kapazität</div></div>
+      <div class="stat-card"><div class="stat-value">{t.get('state') or '–'}</div><div class="stat-label">Bundesland</div></div>
+    </div>
+    <h2>Netzanschluss</h2>
+    <p>Netzbetreiber: <strong>{t.get('networkOperator') or '–'}</strong><br>
+    Kontakt: {t.get('contact') or '–'}<br>
+    {f'Website: <a href="{website}" rel="nofollow">{website}</a><br>' if website else ''}
+    {f'Stand der Daten: {updated}' if updated else ''}</p>
+    <a class="cta-button" href="/#uw={t.get('latitude')},{t.get('longitude')}">Auf der Karte ansehen</a>
+    <p><small>Quelle: E-Control Austria · <a href="/quellen">Methodik</a></small></p>
+    """
+    sd = {
+        '@context': 'https://schema.org', '@type': 'Place',
+        'name': name,
+        'geo': {'@type': 'GeoCoordinates', 'latitude': t.get('latitude'), 'longitude': t.get('longitude')},
+        'address': {'@type': 'PostalAddress', 'addressRegion': t.get('state'), 'addressCountry': 'AT'},
+        'description': f'{name}: {t.get("availableCapacity")} MW verfügbare Einspeisekapazität, '
+                       f'Netzbetreiber {t.get("networkOperator")}.',
+    }
+    return _render_seo(
+        f'{name} – Einspeisekapazität & Netzanschluss',
+        f'{name} ({t.get("state")}): {_fmt_mw(t.get("availableCapacity"))} MW verfügbare und '
+        f'{_fmt_mw(t.get("bookedCapacity"))} MW gebuchte Einspeisekapazität. '
+        f'Netzbetreiber: {t.get("networkOperator")}.',
+        f'/umspannwerk/{idx}', content,
+        keywords=f'Umspannwerk {name}, Einspeisekapazität, Netzanschluss, {t.get("networkOperator")}',
+        structured_data=sd,
+    )
+
+
 @app.route('/sitemap.xml')
 def sitemap():
     """Generate dynamic sitemap.xml"""
     bezirke = load_json('bezirke.json')
     transformers = load_json('transformer_stations.json')
-    
+    today = datetime.now().strftime('%Y-%m-%d')
+
     pages = [
         {'loc': BASE_URL + '/', 'priority': '1.0', 'changefreq': 'weekly'},
-        {'loc': BASE_URL + '/quellen', 'priority': '0.5', 'changefreq': 'monthly'},
+        {'loc': BASE_URL + '/analytics', 'priority': '0.9', 'changefreq': 'daily'},
         {'loc': BASE_URL + '/bezirke', 'priority': '0.8', 'changefreq': 'weekly'},
         {'loc': BASE_URL + '/umspannwerke', 'priority': '0.8', 'changefreq': 'weekly'},
+        {'loc': BASE_URL + '/quellen', 'priority': '0.5', 'changefreq': 'monthly'},
     ]
-    
-    # Add district pages
+
     for feature in bezirke['features']:
         iso = feature['properties']['iso']
         pages.append({
-            'loc': f"{BASE_URL}/bezirk/{quote(iso, safe='')}",
-            'priority': '0.7',
-            'changefreq': 'monthly'
+            'loc': f"{BASE_URL}/bezirk/{quote(str(iso), safe='')}",
+            'priority': '0.7', 'changefreq': 'monthly',
         })
-    
-    # Add transformer pages
+
     for i, t in enumerate(transformers):
         if t.get('substationName'):
+            lastmod = None
+            if t.get('updatedOn'):
+                try:
+                    lastmod = datetime.fromtimestamp(t['updatedOn']).strftime('%Y-%m-%d')
+                except Exception:
+                    pass
             pages.append({
                 'loc': f"{BASE_URL}/umspannwerk/{i}",
-                'priority': '0.6',
-                'changefreq': 'monthly'
+                'priority': '0.6', 'changefreq': 'monthly',
+                'lastmod': lastmod,
             })
-    
+
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     for page in pages:
-        xml += f'''  <url>
-    <loc>{page['loc']}</loc>
-    <changefreq>{page['changefreq']}</changefreq>
-    <priority>{page['priority']}</priority>
-  </url>\n'''
+        lastmod = page.get('lastmod') or today
+        xml += (f"  <url>\n    <loc>{page['loc']}</loc>\n"
+                f"    <lastmod>{lastmod}</lastmod>\n"
+                f"    <changefreq>{page['changefreq']}</changefreq>\n"
+                f"    <priority>{page['priority']}</priority>\n  </url>\n")
     xml += '</urlset>'
-    
+
     return Response(xml, mimetype='application/xml')
+
 
 @app.route('/robots.txt')
 def robots():
     """Robots.txt for search engines"""
     content = f"""User-agent: *
 Allow: /
+Disallow: /api/
+
 Sitemap: {BASE_URL}/sitemap.xml
 """
     return Response(content, mimetype='text/plain')

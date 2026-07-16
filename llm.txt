@@ -1,7 +1,7 @@
-# austria-power.exe.xyz:8000 — Austrian Energy Infrastructure API
+# austria-power.exe.xyz — Austrian Energy Infrastructure API
 
 > Machine-readable reference for LLM agents.
-> Base URL: https://austria-power.exe.xyz:8000
+> Base URL: https://austria-power.exe.xyz
 
 ## GET /api/infrastructure
 
