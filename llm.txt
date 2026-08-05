@@ -226,7 +226,8 @@ Summary counts by source, category, and type. No parameters.
 
 Pre-aggregated market analytics from stored ENTSO-E data (day-ahead prices,
 generation per PSR type, load; 15-min resolution, aggregated hourly for
-cross-year comparability). All responses cached 1h server-side.
+cross-year comparability). All responses cached 10 min server-side; the
+underlying DB is updated every 5 minutes by cron.
 
 - GET /api/analytics/summary — yearly KPIs: avg price, negative-price hours, hours >200 EUR, solar/wind peaks
 - GET /api/analytics/negative-prices — monthly/yearly negative-price hours + hour-of-day histogram per year
@@ -234,8 +235,9 @@ cross-year comparability). All responses cached 1h server-side.
 - GET /api/analytics/battery-arbitrage?hours=1..6 — perfect-foresight daily arbitrage spread and EUR/MW revenue for an N-hour battery (90% efficiency, 1 cycle/day)
 - GET /api/analytics/duck-curve?months=04,...,09 — avg hour-of-day profile per year of load, solar, wind, run-of-river, residual load + price profile
 - GET /api/analytics/import-dependency — monthly generation vs load balance, renewable share of load, fossil share, surplus hours, cross-border flows (since 2026-01)
+- GET /api/analytics/hydro-drought — drought monitor for hydropower: trailing 7/30-day run-of-river, reservoir and pumped-storage output vs. the same calendar window in every earlier year (`comparison[].deviation_pct`); monthly hydro output per year; daily run-of-river + net imports + day-ahead price for the current year; weekly Alpine reservoir stored energy (ENTSO-E A72, day-of-year aligned, ~2-3 week publication lag) with deviation from the multi-year normal; per-block Jun/Jul generation vs. previous year (ENTSO-E A73) showing which gas and pumped-storage units substitute the missing hydro
 
-Dashboard: GET /analytics (HTML)
+Dashboard: GET /analytics (HTML, live — auto-refreshes every 5 min)
 
 ## Future grid API (Zukunftskarte 2040)
 

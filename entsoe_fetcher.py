@@ -22,6 +22,9 @@ import os
 API_KEY = os.environ.get('ENTSOE_API_KEY', '35efd923-6969-4470-b2bd-0155b2254346')
 DB_PATH = '/home/exedev/austria-grid/data/entsoe_data.db'
 AUSTRIA_BZ = '10YAT-APG------L'
+# Plausibility ceiling for a single cross-border flow value (MW).
+# Austria's total interconnection capacity is well below this.
+MAX_BORDER_MW = 10000
 
 # Country codes for cross-border
 COUNTRY_CODES = {
@@ -223,7 +226,8 @@ def store_load(df):
         series = df
     
     for ts, val in series.items():
-        if pd.notna(val):
+        # Austrian load never drops to zero; zeros are ENTSO-E publication gaps.
+        if pd.notna(val) and float(val) > 0:
             try:
                 conn.execute('''
                     INSERT OR REPLACE INTO load (timestamp, load_mw, fetched_at)
@@ -287,20 +291,22 @@ def store_crossborder(flows_dict, timestamp_index):
         for ts in timestamps:
             imp_val = imp_series.get(ts, 0) if imp_series is not None else 0
             exp_val = exp_series.get(ts, 0) if exp_series is not None else 0
-            
-            if pd.notna(imp_val) or pd.notna(exp_val):
-                try:
-                    conn.execute('''
-                        INSERT OR REPLACE INTO cross_border_flows 
-                        (timestamp, country_code, import_mw, export_mw, fetched_at)
-                        VALUES (?, ?, ?, ?, ?)
-                    ''', (ts.isoformat(), country, 
-                          float(imp_val) if pd.notna(imp_val) else 0,
-                          float(exp_val) if pd.notna(exp_val) else 0,
-                          now))
-                    count += 1
-                except Exception as e:
-                    print(f"Error storing crossborder: {e}")
+            imp_val = float(imp_val) if pd.notna(imp_val) else 0.0
+            exp_val = float(exp_val) if pd.notna(exp_val) else 0.0
+            # Sanity guard: no single AT interconnector exceeds a few GW.
+            # ENTSO-E occasionally publishes corrupt spikes (seen: 3.9 million MW).
+            if not (0 <= imp_val <= MAX_BORDER_MW) or not (0 <= exp_val <= MAX_BORDER_MW):
+                print(f"Skipping implausible flow {country} {ts}: imp={imp_val} exp={exp_val}")
+                continue
+            try:
+                conn.execute('''
+                    INSERT OR REPLACE INTO cross_border_flows 
+                    (timestamp, country_code, import_mw, export_mw, fetched_at)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (ts.isoformat(), country, imp_val, exp_val, now))
+                count += 1
+            except Exception as e:
+                print(f"Error storing crossborder: {e}")
     
     conn.commit()
     conn.close()

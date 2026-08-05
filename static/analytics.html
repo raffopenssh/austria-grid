@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Strommarkt-Analytics Österreich | 3,5 Jahre ENTSO-E Daten</title>
-<meta name="description" content="Marktanalysen für den österreichischen Strommarkt: Negative Preise, Solar-Kannibalisierung, Capture Rates, Batteriespeicher-Arbitrage, Duck Curve und Importabhängigkeit. Basierend auf ENTSO-E Daten seit 2023.">
+<title>Strommarkt-Analytics Österreich | Live-Daten aus der ENTSO-E-Historie seit 2023</title>
+<meta name="description" content="Live-Marktanalysen für den österreichischen Strommarkt: Dürre-Monitor der Wasserkraft, Speicherfüllstände, negative Preise, Solar-Kannibalisierung, Capture Rates, Batteriespeicher-Arbitrage, Duck Curve und Importabhängigkeit. ENTSO-E-Daten seit 2023, alle 5 Minuten aktualisiert.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://austria-power.exe.xyz/analytics">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://austria-power.exe.xyz/analytics">
-<meta property="og:title" content="Strommarkt-Analytics Österreich | 3,5 Jahre ENTSO-E Daten">
-<meta property="og:description" content="Negative Preise, Solar-Kannibalisierung, Capture Rates, Batteriespeicher-Arbitrage und Duck Curve am österreichischen Strommarkt seit 2023.">
+<meta property="og:title" content="Strommarkt-Analytics Österreich | Live-Daten seit 2023">
+<meta property="og:description" content="Dürre-Monitor der Wasserkraft, Speicherfüllstände, negative Preise, Capture Rates und Speicher-Arbitrage am österreichischen Strommarkt — live.">
 <meta property="og:image" content="https://austria-power.exe.xyz/static/og-analytics.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -18,7 +18,7 @@
 <meta property="og:site_name" content="Windkraft Österreich">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Strommarkt-Analytics Österreich">
-<meta name="twitter:description" content="3,5 Jahre ENTSO-E Marktdaten: negative Preise, Capture Rates, Speicher-Arbitrage.">
+<meta name="twitter:description" content="Live-ENTSO-E-Marktdaten: Dürre-Monitor Wasserkraft, negative Preise, Capture Rates, Speicher-Arbitrage.">
 <meta name="twitter:image" content="https://austria-power.exe.xyz/static/og-analytics.png">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -62,20 +62,58 @@ body { font-family:'Inter','Segoe UI',system-ui,sans-serif; background:var(--bg)
 .controls button.active { background:var(--accent); color:#0b101c; border-color:var(--accent); font-weight:600; }
 .footer { text-align:center; color:var(--text-faint); font-size:.8rem; padding:20px; }
 .loading { text-align:center; color:var(--text-faint); padding:60px 0; }
+.card.alert { border-color:rgba(255,107,107,.35); background:linear-gradient(180deg,rgba(255,107,107,.07),transparent 220px),var(--surface); }
+.badge { display:inline-block; font-size:.72rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--danger); background:rgba(255,107,107,.12); border:1px solid rgba(255,107,107,.3); padding:4px 10px; border-radius:999px; margin-bottom:10px; }
+.muted { color:var(--text-faint); }
+.live-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#00d4aa; margin-right:7px; vertical-align:middle; box-shadow:0 0 0 0 rgba(0,212,170,.7); animation:pulse 2.4s infinite; }
+@keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(0,212,170,.55);} 70%{box-shadow:0 0 0 7px rgba(0,212,170,0);} 100%{box-shadow:0 0 0 0 rgba(0,212,170,0);} }
+.card .kpi-row { margin-bottom:18px; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:.85rem; font-variant-numeric:tabular-nums; }
+th,td { text-align:right; padding:7px 10px; border-bottom:1px solid var(--border); white-space:nowrap; }
+th:first-child,td:first-child,th:nth-child(2),td:nth-child(2) { text-align:left; }
+th { color:var(--text-faint); font-weight:600; font-size:.76rem; text-transform:uppercase; letter-spacing:.03em; }
+td.up { color:var(--danger); font-weight:600; } td.down { color:var(--accent); font-weight:600; }
 @media (max-width:700px){ .chart-wrap{height:260px;} }
 </style>
 </head>
 <body>
 <div class="header">
   <h1>⚡ Strommarkt-Analytics Österreich</h1>
-  <p>3,5 Jahre ENTSO-E Daten (seit Jan 2023) · <a href="/">← Zurück zur Karte</a></p>
+  <p><span id="liveDot" class="live-dot"></span><span id="dataRange">ENTSO-E Daten seit Jän 2023</span> · <a href="/">← Zurück zur Karte</a></p>
 </div>
 <div class="container">
   <div class="kpi-row" id="kpis"><div class="loading">Lade Daten…</div></div>
 
+  <div class="card alert" id="droughtCard">
+    <div class="badge">🔴 Live-Monitor · Dürre &amp; Hitzewelle</div>
+    <h2>Wasserkraft im Dürre-Stress</h2>
+    <p class="desc">Österreichs Laufwasserkraft (Donau-, Inn- und Drau-Kette, ~5,6&nbsp;GW) liefert derzeit deutlich weniger als in allen Vorjahren. Verglichen wird das rollierende 30-Tage-Mittel mit dem gleichen Kalenderfenster der Vorjahre. <span id="droughtAsOf" class="muted"></span></p>
+    <div class="kpi-row" id="droughtKpis"><div class="loading">Lade Daten…</div></div>
+    <div class="chart-wrap"><canvas id="hydroMonthChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>Speicherfüllstand der Alpenspeicher (ENTSO-E A72)</h2>
+    <p class="desc">Gespeicherte Energie in den österreichischen Jahres- und Saisonspeichern (Kaprun, Malta, Kops, Zillertal …), Wochenwerte, nach Kalendertag übereinandergelegt. Der Schmelzwasser-Aufbau verläuft heuer flacher als üblich — die Speicher erreichen ihren Sommergipfel unter dem Normalniveau. <span class="muted">Die A72-Publikation hat 2–3 Wochen Verzug.</span></p>
+    <div class="chart-wrap"><canvas id="storageChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>Marktfolgen: Laufwasser ↓, Preis ↑, Importe ↑</h2>
+    <p class="desc">Tageswerte des laufenden Jahres: Laufwasser-Erzeugung, Nettoimport-Saldo und Day-Ahead-Durchschnittspreis. Fehlende Wasserkraft wird durch Importe, Pumpspeicher und Gas ersetzt — mit direkter Preiswirkung.</p>
+    <div class="chart-wrap"><canvas id="droughtMarketChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>Wer springt ein? Kraftwerksblöcke Jun–Jul im Jahresvergleich</h2>
+    <p class="desc">Einzelblock-Erzeugung (ENTSO-E A73) für Juni/Juli gegenüber dem Vorjahr. Gaskraft und Pumpspeicher fahren die Abendspitze, die das Laufwasser nicht mehr füllt.</p>
+    <div class="table-wrap"><table id="plantTable"><thead><tr><th>Block</th><th>Typ</th><th>Ø MW aktuell</th><th>Ø MW Vorjahr</th><th>Δ</th></tr></thead><tbody><tr><td colspan="5" class="loading">Lade Daten…</td></tr></tbody></table></div>
+  </div>
+
   <div class="card">
     <h2>Negative Strompreise nehmen dramatisch zu</h2>
-    <p class="desc">Stunden mit negativen Day-Ahead-Preisen pro Monat. Der Solarausbau (Mittags-Peak Juni: 1,2 GW → 4,1 GW seit 2023) drückt die Preise an sonnigen Tagen unter null — Erzeuger zahlen fürs Einspeisen.</p>
+    <p class="desc">Stunden mit negativen Day-Ahead-Preisen pro Monat. Der Solarausbau (<span id="solarGrowth">Mittags-Peak seit 2023 vervielfacht</span>) drückt die Preise an sonnigen Tagen unter null — Erzeuger zahlen fürs Einspeisen.</p>
     <div class="chart-wrap"><canvas id="negChart"></canvas></div>
   </div>
 
@@ -87,7 +125,7 @@ body { font-family:'Inter','Segoe UI',system-ui,sans-serif; background:var(--bg)
 
   <div class="card">
     <h2>Solar-Kannibalisierung: Capture Rate im Sinkflug</h2>
-    <p class="desc">Die Capture Rate zeigt, welchen Anteil des Durchschnittspreises Solar/Wind tatsächlich am Markt erlösen (erzeugungsgewichteter Preis ÷ Baseload-Preis). Solar erlöste im April 2026 nur noch ~24% des Durchschnittspreises — wer mittags einspeist, verdient kaum noch etwas. Wind bleibt nahe 100%.</p>
+    <p class="desc">Die Capture Rate zeigt, welchen Anteil des Durchschnittspreises Solar/Wind tatsächlich am Markt erlösen (erzeugungsgewichteter Preis ÷ Baseload-Preis). <span id="captureNote"></span> Wer mittags einspeist, verdient kaum noch etwas. Wind bleibt nahe 100%.</p>
     <div class="chart-wrap"><canvas id="captureChart"></canvas></div>
   </div>
 
@@ -122,7 +160,8 @@ body { font-family:'Inter','Segoe UI',system-ui,sans-serif; background:var(--bg)
 </div>
 <div class="footer">Datenquelle: ENTSO-E Transparency Platform · Preise = Day-Ahead (EPEX AT) · Analyse-API: <a href="/api/analytics/summary" style="color:#00d4aa">/api/analytics/*</a></div>
 <script>
-const COLORS = {2023:'#5c7cfa',2024:'#fcc419',2025:'#ff8787',2026:'#00d4aa'};
+const COLORS = new Proxy({2021:'#495a7c',2022:'#6b7fa8',2023:'#5c7cfa',2024:'#fcc419',2025:'#ff8787',2026:'#00d4aa'},
+  {get:(t,k)=> t[k] || ['#00d4aa','#c084fc','#38bdf8','#f97316','#a3e635'][(+k||0)%5]});
 Chart.defaults.color = '#aaa';
 Chart.defaults.borderColor = '#2a2a4a';
 const charts = {};
@@ -138,6 +177,78 @@ function lineOpts(yTitle, extra={}) {
 
 async function j(url){ const r = await fetch(url); return r.json(); }
 
+const MON = ['Jän','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+const MSTART = [1,32,60,91,121,152,182,213,244,274,305,335];
+const fmt = n => n==null ? '–' : n.toLocaleString('de-AT',{maximumFractionDigits:0});
+const pct = n => n==null ? '–' : (n>0?'+':'')+n.toLocaleString('de-AT',{maximumFractionDigits:1})+'%';
+
+async function initDrought(){
+  const d = await j('/api/analytics/hydro-drought');
+  const curYear = d.reference_day.slice(0,4);
+  document.getElementById('droughtAsOf').textContent =
+    `· Stand ${d.as_of.slice(8,10)}.${d.as_of.slice(5,7)}.${d.as_of.slice(0,4)}, ${d.as_of.slice(11,16)} Uhr`;
+
+  const byKey = Object.fromEntries(d.comparison.map(c=>[c.key,c]));
+  const ror = byKey.run_of_river, res = byKey.reservoir;
+  // last *complete* day for the market KPI (today is partial)
+  const complete = d.daily.filter(r=>r.ror_mw!=null && r.day < d.reference_day);
+  const lastDay = complete.slice(-1)[0] || d.daily.slice(-1)[0] || {};
+  const deDate = s => s ? `${s.slice(8,10)}.${s.slice(5,7)}.` : '';
+  document.getElementById('droughtKpis').innerHTML = `
+    <div class="kpi"><div class="val warn">${pct(ror.deviation_pct)}</div><div class="lbl">Laufwasser, 30-Tage-Mittel</div><div class="sub">${fmt(ror[curYear].d30)} MW vs. ${fmt(ror.prev_years_avg_d30)} MW Vorjahresschnitt</div></div>
+    <div class="kpi"><div class="val warn">${pct(res.deviation_pct)}</div><div class="lbl">Speicherkraftwerke, 30-Tage-Mittel</div><div class="sub">${fmt(res[curYear].d30)} MW vs. ${fmt(res.prev_years_avg_d30)} MW</div></div>
+    <div class="kpi"><div class="val warn">${pct(d.storage_deviation_pct)}</div><div class="lbl">Speicherinhalt vs. Normal</div><div class="sub">${fmt(d.storage_latest && d.storage_latest.stored_gwh)} GWh (${deDate(d.storage_latest && d.storage_latest.day)}) · Normal ${fmt(d.storage_normal_gwh)} GWh</div></div>
+    <div class="kpi"><div class="val warn">${fmt(lastDay.net_import_mw)} MW</div><div class="lbl">Nettoimport ${deDate(lastDay.day)}</div><div class="sub">Ø Preis ${lastDay.price_eur_mwh ?? '–'} €/MWh · Laufwasser ${fmt(lastDay.ror_mw)} MW</div></div>`;
+
+  // Monthly hydro output per year (ROR + reservoir stacked into one series each)
+  const years = [...new Set(d.monthly.map(r=>r.year))];
+  const sel = document.getElementById('hydroMonthChart');
+  const pick = (y,psr) => [...Array(12).keys()].map(i=>{
+    const mm = String(i+1).padStart(2,'0');
+    const r = d.monthly.find(x=>x.year===y && x.mon===mm && x.psr_type===psr);
+    return r ? r.mw : null;
+  });
+  charts.hydroMonth = new Chart(sel, {type:'line', data:{
+    labels: MON,
+    datasets: years.map(y=>({label:'Laufwasser '+y, borderColor:COLORS[y]||'#888', backgroundColor:COLORS[y]||'#888',
+      borderWidth: y===curYear?3:1.5, data:pick(y,'Hydro Run-of-river and poundage'), tension:.3, pointRadius:2}))
+  }, options: lineOpts('Ø MW pro Monat')});
+
+  // Reservoir storage, day-of-year aligned
+  const sYears = [...new Set(d.storage.map(r=>r.year))].slice(-6);
+  const PAL = {2021:'#495a7c',2022:'#6b7fa8',2023:'#5c7cfa',2024:'#fcc419',2025:'#ff8787',2026:'#00d4aa'};
+  charts.storage = new Chart(document.getElementById('storageChart'), {type:'line', data:{
+    datasets: sYears.map(y=>({label:y, borderColor:PAL[y]||'#556', backgroundColor:PAL[y]||'#556',
+      borderWidth: y===curYear?3:1.5,
+      data: d.storage.filter(r=>r.year===y).map(r=>({x:r.doy, y:r.stored_gwh})), tension:.3, pointRadius:0}))
+  }, options: Object.assign(lineOpts('GWh gespeicherte Energie'), {scales:{
+      x:{type:'linear', min:1, max:366, title:{display:true,text:'Kalendertag'},
+         ticks:{stepSize:1, autoSkip:false,
+                callback:v=>{const i=MSTART.indexOf(v); return i<0?null:MON[i];}}},
+      y:{title:{display:true,text:'GWh gespeicherte Energie'}}}})});
+
+  // Market effects: daily ROR, net imports, price
+  const dd = d.daily;
+  charts.droughtMarket = new Chart(document.getElementById('droughtMarketChart'), {type:'line', data:{
+    labels: dd.map(r=>`${r.day.slice(8,10)}.${r.day.slice(5,7)}.`),
+    datasets:[
+      {label:'Laufwasser MW', data:dd.map(r=>r.ror_mw), borderColor:'#00d4aa', backgroundColor:'#00d4aa', pointRadius:0, borderWidth:2, yAxisID:'y'},
+      {label:'Nettoimport MW', data:dd.map(r=>r.net_import_mw), borderColor:'#a06bd6', backgroundColor:'#a06bd6', pointRadius:0, borderWidth:2, yAxisID:'y'},
+      {label:'Ø Day-Ahead €/MWh', data:dd.map(r=>r.price_eur_mwh), borderColor:'#ff6b6b', backgroundColor:'#ff6b6b', pointRadius:0, borderWidth:2, yAxisID:'y1'}
+    ]}, options:{responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{boxWidth:12}}},
+      scales:{x:{ticks:{maxTicksLimit:12}}, y:{title:{display:true,text:'MW'}},
+              y1:{position:'right', grid:{drawOnChartArea:false}, title:{display:true,text:'€/MWh'}}}}});
+
+  // Plant table
+  const rows = d.plants_jun_jul.filter(p=>(p.cur_mw||0) >= 1 || (p.prev_mw||0) >= 1).slice(0,18);
+  document.querySelector('#plantTable tbody').innerHTML = rows.map(p=>`<tr>
+      <td>${p.plant}</td><td class="muted">${p.psr_type}</td>
+      <td>${p.cur_mw ?? '–'}</td><td>${p.prev_mw ?? '–'}</td>
+      <td class="${p.change_pct==null?'':(p.change_pct>0?'up':'down')}">${pct(p.change_pct)}</td></tr>`).join('');
+}
+
 async function init(){
   const [sum, neg, cap, duck, imp] = await Promise.all([
     j('/api/analytics/summary'), j('/api/analytics/negative-prices'),
@@ -146,16 +257,29 @@ async function init(){
   ]);
 
   // KPIs
-  const y26 = sum.years.find(y=>y.year==='2026') || {};
-  const y23 = sum.years.find(y=>y.year==='2023') || {};
-  const negRate26 = neg.yearly.find(y=>y.year==='2026') || {};
+  const CUR_YEAR = (sum.data_range.max_ts || '').slice(0,4) || String(new Date().getFullYear());
+  const FIRST_YEAR = (sum.data_range.min_ts || '').slice(0,4) || '2023';
+  const maxTs = sum.data_range.max_ts, minTs = sum.data_range.min_ts;
+  const lastDayLabel = `${maxTs.slice(8,10)}. ${MON[+maxTs.slice(5,7)-1]}`;
+  document.getElementById('dataRange').textContent =
+    `ENTSO-E Daten ${MON[+minTs.slice(5,7)-1]} ${FIRST_YEAR} – ${maxTs.slice(8,10)}.${maxTs.slice(5,7)}.${CUR_YEAR}, ${maxTs.slice(11,16)}`;
+  const y26 = sum.years.find(y=>y.year===CUR_YEAR) || {};
+  const y23 = sum.years.find(y=>y.year===FIRST_YEAR) || {};
+  const negRate26 = neg.yearly.find(y=>y.year===CUR_YEAR) || {};
   const capLast = cap.monthly.filter(m=>m.solar_capture_rate_pct!=null).slice(-1)[0] || {};
-  const solar23 = sum.solar.find(s=>s.year==='2023')||{}, solar26 = sum.solar.find(s=>s.year==='2026')||{};
+  const solar23 = sum.solar.find(s=>s.year===FIRST_YEAR)||{}, solar26 = sum.solar.find(s=>s.year===CUR_YEAR)||{};
   document.getElementById('kpis').innerHTML = `
-    <div class="kpi"><div class="val warn">${negRate26.neg_hours ?? '–'} h</div><div class="lbl">Negative Preisstunden 2026</div><div class="sub">bis Mitte Juli · 2023 gesamt: ${(neg.yearly[0]||{}).neg_hours} h</div></div>
+    <div class="kpi"><div class="val warn">${negRate26.neg_hours ?? '–'} h</div><div class="lbl">Negative Preisstunden ${CUR_YEAR}</div><div class="sub">Jahresverlauf bis ${lastDayLabel} · ${FIRST_YEAR} gesamt: ${(neg.yearly[0]||{}).neg_hours} h</div></div>
     <div class="kpi"><div class="val warn">${capLast.solar_capture_rate_pct ?? '–'}%</div><div class="lbl">Solar Capture Rate (${capLast.month||''})</div><div class="sub">Anteil am Baseload-Preis</div></div>
-    <div class="kpi"><div class="val">${solar26.peak_solar_mw ? (solar26.peak_solar_mw/1000).toFixed(1) : '–'} GW</div><div class="lbl">Solar-Spitzenleistung 2026</div><div class="sub">2023: ${(solar23.peak_solar_mw/1000).toFixed(1)} GW</div></div>
-    <div class="kpi"><div class="val">${y26.avg_price ?? '–'} €</div><div class="lbl">Ø Day-Ahead-Preis 2026 (€/MWh)</div><div class="sub">2023: ${y23.avg_price} €/MWh</div></div>`;
+    <div class="kpi"><div class="val">${solar26.peak_solar_mw ? (solar26.peak_solar_mw/1000).toFixed(1) : '–'} GW</div><div class="lbl">Solar-Spitzenleistung ${CUR_YEAR}</div><div class="sub">${FIRST_YEAR}: ${(solar23.peak_solar_mw/1000).toFixed(1)} GW</div></div>
+    <div class="kpi"><div class="val">${y26.avg_price ?? '–'} €</div><div class="lbl">Ø Day-Ahead-Preis ${CUR_YEAR} (€/MWh)</div><div class="sub">${FIRST_YEAR}: ${y23.avg_price} €/MWh</div></div>`;
+
+  const solarNote = document.getElementById('solarGrowth');
+  if (solarNote && solar23.peak_solar_mw && solar26.peak_solar_mw)
+    solarNote.textContent = `Spitzenleistung ${(solar23.peak_solar_mw/1000).toFixed(1)} GW (${FIRST_YEAR}) \u2192 ${(solar26.peak_solar_mw/1000).toFixed(1)} GW (${CUR_YEAR})`;
+  const capNote = document.getElementById('captureNote');
+  if (capNote && capLast.solar_capture_rate_pct != null)
+    capNote.textContent = `Solar erl\u00f6ste im ${capLast.month} nur noch ~${capLast.solar_capture_rate_pct}% des Durchschnittspreises, Wind bleibt nahe 100%.`;
 
   // Negative prices monthly
   const nm = neg.monthly;
@@ -234,6 +358,11 @@ document.getElementById('batteryControls').addEventListener('click', e=>{
 });
 
 init();
+initDrought();
+
+// live page: refresh every 5 minutes (fetcher cron runs every 5 min)
+setInterval(()=>{ Object.values(charts).forEach(c=>c&&c.destroy()); init(); initDrought(); }, 5*60*1000);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ Object.values(charts).forEach(c=>c&&c.destroy()); init(); initDrought(); }});
 </script>
 </body>
 </html>

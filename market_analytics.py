@@ -19,7 +19,7 @@ DB_PATH = '/home/exedev/austria-grid/data/entsoe_data.db'
 analytics_bp = Blueprint('analytics', __name__)
 
 _cache = {}
-CACHE_TTL = 3600
+CACHE_TTL = 600  # live page: 10 min (ENTSO-E fetcher cron runs every 5 min)
 
 
 def cached(key, fn):
@@ -270,6 +270,155 @@ def import_dependency():
         return {'monthly': rows, 'cross_border_monthly': borders,
                 'note': 'Cross-border data available since 2026-01 (15-min values, /4 => MWh)'}
     return jsonify(cached('importdep', compute))
+
+
+@analytics_bp.route('/api/analytics/hydro-drought')
+def hydro_drought():
+    """Drought monitor: hydro output vs. previous years, reservoir storage, market effects.
+
+    Live-ish: 10 min cache. Compares the trailing 7/30-day window against the
+    same calendar window in every earlier year in the DB.
+    """
+    ROR = 'Hydro Run-of-river and poundage'
+    RES = 'Hydro Water Reservoir'
+    PS = 'Hydro Pumped Storage'
+
+    def compute():
+        latest = q("SELECT MAX(timestamp) t FROM generation")[0]['t']
+        today = latest[:10]
+        year = int(today[:4])
+        md = today[5:10]  # MM-DD
+
+        # ---- monthly averages per year, for ROR / reservoir / pumped storage
+        monthly = q("""
+            SELECT substr(timestamp,1,4) year, substr(timestamp,6,2) mon, psr_type,
+                   ROUND(AVG(value_mw)) mw
+            FROM generation
+            WHERE psr_type IN (?,?,?)
+            GROUP BY year, mon, psr_type ORDER BY year, mon
+        """, (ROR, RES, PS))
+
+        # ---- trailing-window comparison vs. same window in earlier years
+        def window_avg(psr, y, days):
+            end = f'{y}-{md}'
+            start = q("SELECT date(?, ?) d", (end, f'-{days} day'))[0]['d']
+            r = q("""SELECT ROUND(AVG(value_mw),1) mw FROM generation
+                     WHERE psr_type=? AND timestamp>=? AND timestamp<?""",
+                  (psr, start, end + 'T23:59'))
+            return r[0]['mw']
+
+        years = sorted({r['year'] for r in monthly})
+        comparison = []
+        for psr, label in ((ROR, 'run_of_river'), (RES, 'reservoir'), (PS, 'pumped_storage')):
+            row = {'psr_type': psr, 'key': label}
+            for y in years:
+                row[y] = {'d7': window_avg(psr, int(y), 7), 'd30': window_avg(psr, int(y), 30)}
+            prev = [row[y]['d30'] for y in years if y != str(year) and row[y]['d30']]
+            row['prev_years_avg_d30'] = round(sum(prev) / len(prev), 1) if prev else None
+            cur = row[str(year)]['d30']
+            row['deviation_pct'] = (round((cur / row['prev_years_avg_d30'] - 1) * 100, 1)
+                                    if cur and row['prev_years_avg_d30'] else None)
+            comparison.append(row)
+
+        # ---- daily series, current year (for the live chart)
+        daily = q("""
+            WITH g AS (
+              SELECT substr(timestamp,1,10) d, psr_type, AVG(value_mw) mw
+              FROM generation WHERE psr_type IN (?,?) AND timestamp>=?
+              GROUP BY d, psr_type
+            ),
+            p AS (SELECT substr(timestamp,1,10) d, AVG(price_eur_mwh) price
+                  FROM prices WHERE timestamp>=? GROUP BY d),
+            f AS (SELECT substr(timestamp,1,10) d,
+                         AVG(net) net FROM (
+                     SELECT timestamp, SUM(import_mw)-SUM(export_mw) net
+                     FROM cross_border_flows WHERE timestamp>=? GROUP BY timestamp)
+                  GROUP BY d)
+            SELECT g.d day,
+                   ROUND(MAX(CASE WHEN psr_type=? THEN mw END)) ror_mw,
+                   ROUND(MAX(CASE WHEN psr_type=? THEN mw END)) reservoir_mw,
+                   ROUND(MAX(p.price),1) price_eur_mwh,
+                   ROUND(MAX(f.net)) net_import_mw
+            FROM g LEFT JOIN p ON p.d=g.d LEFT JOIN f ON f.d=g.d
+            GROUP BY g.d ORDER BY g.d
+        """, (ROR, RES, f'{year}-01-01', f'{year}-01-01', f'{year}-01-01', ROR, RES))
+
+        # ---- reservoir stored energy (A72), weekly, day-of-year aligned per year
+        storage = q("""
+            SELECT substr(timestamp,1,4) year,
+                   CAST(strftime('%j', substr(timestamp,1,10)) AS INTEGER) doy,
+                   substr(timestamp,1,10) day,
+                   ROUND(stored_energy_mwh/1000.0,1) stored_gwh
+            FROM reservoir_levels WHERE timestamp >= '2018-01-01' ORDER BY timestamp
+        """)
+        cur_store = [s for s in storage if s['year'] == str(year)]
+        latest_store = cur_store[-1] if cur_store else None
+        peers, peer_detail = [], []
+        if latest_store:
+            for y in sorted({s['year'] for s in storage} - {str(year)}):
+                same = [s for s in storage if s['year'] == y
+                        and abs(s['doy'] - latest_store['doy']) <= 4]
+                if same:
+                    peers.append(same[0]['stored_gwh'])
+                    peer_detail.append({'year': y, 'stored_gwh': same[0]['stored_gwh'],
+                                        'day': same[0]['day']})
+        storage_norm = round(sum(peers) / len(peers), 1) if peers else None
+
+        # ---- market effects: monthly net import share of load, monthly price
+        market = q("""
+            WITH f AS (SELECT timestamp, SUM(import_mw)-SUM(export_mw) net
+                       FROM cross_border_flows GROUP BY timestamp),
+            m AS (SELECT substr(f.timestamp,1,7) month, AVG(f.net) net, AVG(l.load_mw) load_mw
+                  FROM f JOIN load l ON l.timestamp=f.timestamp GROUP BY month)
+            SELECT month, ROUND(net) net_import_mw, ROUND(load_mw) load_mw,
+                   ROUND(net/load_mw*100,1) net_import_share_pct FROM m ORDER BY month
+        """)
+        price_monthly = q(f"""
+            WITH hp AS ({HOURLY_PRICES})
+            SELECT month, ROUND(AVG(price),1) avg_price FROM hp GROUP BY month ORDER BY month
+        """)
+
+        # ---- which plants are picking up the slack (A73 per-plant data)
+        plants = q("""
+            SELECT plant, psr_type,
+                   ROUND(AVG(CASE WHEN substr(timestamp,1,4)=? THEN value_mw END),1) cur_mw,
+                   ROUND(AVG(CASE WHEN substr(timestamp,1,4)=? THEN value_mw END),1) prev_mw
+            FROM plant_generation
+            WHERE substr(timestamp,6,2) IN ('06','07')
+              AND substr(timestamp,1,4) IN (?,?)
+            GROUP BY plant, psr_type HAVING cur_mw > 1 OR prev_mw > 1
+            ORDER BY cur_mw DESC
+        """, (str(year), str(year - 1), str(year), str(year - 1)))
+        for p in plants:
+            p['change_pct'] = (round((p['cur_mw'] / p['prev_mw'] - 1) * 100, 1)
+                               if p['cur_mw'] is not None and p['prev_mw'] else None)
+
+        return {
+            'as_of': latest,
+            'reference_day': today,
+            'monthly': monthly,
+            'comparison': comparison,
+            'daily': daily,
+            'storage': storage,
+            'storage_latest': latest_store,
+            'storage_normal_gwh': storage_norm,
+            'storage_peers': peer_detail,
+            'storage_deviation_pct': (round((latest_store['stored_gwh'] / storage_norm - 1) * 100, 1)
+                                      if latest_store and storage_norm else None),
+            'market_monthly': market,
+            'price_monthly': price_monthly,
+            'plants_jun_jul': plants,
+            'note': ('Run-of-river = Danube/Inn/Drau chain (~5.6 GW). Reservoir storage from '
+                     'ENTSO-E A72 (weekly, published with ~2-3 week lag).'),
+        }
+
+    now = time.time()
+    key = 'hydrodrought'
+    if key in _cache and now - _cache[key][0] < 600:
+        return jsonify(_cache[key][1])
+    data = compute()
+    _cache[key] = (now, data)
+    return jsonify(data)
 
 
 @analytics_bp.route('/api/analytics/summary')
