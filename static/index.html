@@ -923,6 +923,18 @@
         }
         .leaflet-control-zoom a:hover { background: var(--surface-2) !important; color: var(--accent) !important; }
         .leaflet-bar { border: 1px solid var(--border) !important; box-shadow: var(--shadow) !important; border-radius: var(--radius-sm) !important; overflow: hidden; }
+        .leaflet-control-attribution {
+            background: rgba(10, 14, 24, 0.55) !important;
+            color: rgba(148, 163, 184, 0.55) !important;
+            font-size: 9px !important;
+            line-height: 1.4 !important;
+            padding: 1px 6px !important;
+            border-radius: var(--radius-sm) 0 0 0;
+            backdrop-filter: blur(2px);
+        }
+        .leaflet-control-attribution a { color: rgba(148, 163, 184, 0.7) !important; text-decoration: none; }
+        .leaflet-control-attribution a:hover { color: var(--text-dim) !important; text-decoration: underline; }
+        .leaflet-control-attribution svg, .leaflet-attribution-flag { display: none !important; }
 
         /* Modal styles */
         .modal-overlay {
