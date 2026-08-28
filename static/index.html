@@ -171,6 +171,137 @@
             color: var(--accent);
         }
 
+        /* --- Live analytics teaser in the header --------------------------- */
+        .nav-live {
+            display: inline-flex !important;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px 6px 12px !important;
+            border-color: var(--accent) !important;
+            background: linear-gradient(135deg, var(--accent-soft), transparent) !important;
+            color: var(--text) !important;
+            position: relative;
+        }
+
+        .nav-live:hover {
+            box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .nav-live .nav-live-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .nav-live .nav-live-title i { color: var(--accent); }
+
+        .nav-live-stats {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding-left: 10px;
+            border-left: 1px solid var(--border);
+            font-variant-numeric: tabular-nums;
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            min-height: 1.1em;
+        }
+
+        .nav-live-stats b { color: var(--text); font-weight: 600; }
+        .nav-live-stats .neg { color: var(--danger); }
+        .nav-live-stats .pos { color: var(--accent); }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: livePulse 2s infinite;
+            flex: none;
+        }
+
+        .live-dot.alarm {
+            background: var(--danger);
+            animation: livePulseAlarm 2s infinite;
+        }
+
+        @keyframes livePulse {
+            0%   { box-shadow: 0 0 0 0 rgba(0, 212, 170, 0.6); }
+            70%  { box-shadow: 0 0 0 7px rgba(0, 212, 170, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 212, 170, 0); }
+        }
+
+        @keyframes livePulseAlarm {
+            0%   { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.6); }
+            70%  { box-shadow: 0 0 0 7px rgba(248, 113, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .live-dot, .live-dot.alarm { animation: none; }
+        }
+
+        /* One-time coach mark pointing at the live teaser */
+        .coach {
+            /* Anchored in JS to the live pill (the header creates a containing
+               block via backdrop-filter, so the coach lives on <body>). */
+            position: fixed;
+            top: 72px;
+            right: 14px;
+            width: 290px;
+            background: var(--surface);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 14px 14px 12px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+            z-index: 1200;
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            animation: coachIn 0.28s ease both;
+        }
+
+        .coach::before {
+            content: '';
+            position: absolute;
+            top: -7px; right: 46px;
+            width: 12px; height: 12px;
+            background: var(--surface);
+            border-left: 1px solid var(--accent);
+            border-top: 1px solid var(--accent);
+            transform: rotate(45deg);
+        }
+
+        .coach strong { display: block; color: var(--text); margin-bottom: 4px; font-size: 0.9rem; }
+        .coach-actions { display: flex; gap: 8px; margin-top: 12px; }
+        .coach-actions a, .coach-actions button {
+            flex: 1;
+            font: inherit;
+            font-weight: 600;
+            text-align: center;
+            padding: 7px 10px;
+            border-radius: 999px;
+            cursor: pointer;
+            text-decoration: none;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-dim);
+            transition: all 0.15s;
+        }
+        .coach-actions a {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #05221c;
+        }
+        .coach-actions a:hover { filter: brightness(1.08); }
+        .coach-actions button:hover { color: var(--text); border-color: var(--border-strong); }
+
+        @keyframes coachIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to   { opacity: 1; transform: none; }
+        }
+
         .main-container {
             display: flex;
             height: calc(100vh - 61px);
@@ -1039,13 +1170,22 @@
             color: var(--danger);
         }
 
-@media (max-width: 900px) {
+        @keyframes coachUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: none; }
+        }
+
+        @media (max-width: 900px) {
             .header {
                 padding: 8px 12px;
             }
             .header h1 { font-size: 1.05rem; }
             .header-sub { display: none; }
             .header-nav a { font-size: 0.75rem; padding: 5px 10px; }
+            .nav-live { padding: 6px 12px !important; gap: 8px; }
+            .nav-live-stats { font-size: 0.72rem; gap: 7px; padding-left: 8px; }
+            .coach { right: 8px; left: 8px; width: auto; }
+            .coach::before { right: 28px; }
             .sidebar-toggle { display: none; }
             body.sidebar-collapsed .sidebar { margin-left: 0; }
             .main-container {
@@ -1085,6 +1225,45 @@
             }
             .legend h4 { font-size: 0.75rem; }
         }
+
+        /* Phones: the live strip gets its own full-width row (declared after
+           the 900px block so it wins the cascade). */
+        @media (max-width: 560px) {
+            /* The live strip becomes a full-width row under the title: it is the
+               primary call to action on mobile, not a cramped chip. */
+            .header { padding-bottom: 10px; }
+            .header-nav { width: 100%; flex-wrap: wrap; }
+            /* Own full-width row: touch target >= 44px, nothing truncated. */
+            .nav-live {
+                flex: 1 1 100%;
+                min-width: 0;
+                justify-content: space-between;
+                padding: 10px 14px !important;
+                font-size: 0.85rem;
+            }
+            .nav-live-stats {
+                padding-left: 10px;
+                gap: 8px;
+                font-size: 0.76rem;
+                white-space: nowrap;
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            /* On narrow phones the coach mark becomes a bottom sheet so it
+               never covers the map or the header controls. */
+            .coach {
+                position: fixed;
+                top: auto;
+                bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+                left: 10px;
+                right: 10px;
+                width: auto;
+                animation: coachUp 0.28s ease both;
+            }
+            .coach::before { display: none; }
+        }
+
     </style>
 </head>
 <body>
@@ -1108,7 +1287,10 @@
         </div>
         <div class="header-nav">
             <a href="/" title="Interaktive Karte"><i class="fas fa-map"></i> Karte</a>
-            <a href="/analytics" title="Live-Marktanalytics: Dürre-Monitor Wasserkraft, Preise, Speicherfüllstände"><i class="fas fa-chart-line"></i> Marktanalytics</a>
+            <a href="/analytics" class="nav-live" id="nav-live" title="Live-Marktanalytics: Wasserkraft-Monitor, Preise, Speicherfüllstände">
+                <span class="nav-live-title"><span class="live-dot" id="nav-live-dot"></span>Marktanalytics</span>
+                <span class="nav-live-stats" id="nav-live-stats"><span class="skeleton" style="width:120px"></span></span>
+            </a>
         </div>
     </div>
     
@@ -1577,6 +1759,97 @@
             document.body.classList.toggle('sidebar-collapsed');
             setTimeout(() => map.invalidateSize(), 280);
         });
+
+        // --- Live teaser for the analytics page ---------------------------
+        // Pulls a tiny snapshot every 5 min so the header shows a real, live
+        // reason to click through. All wording is derived from the data.
+        (function liveTeaser() {
+            const stats = document.getElementById('nav-live-stats');
+            const dot = document.getElementById('nav-live-dot');
+            const link = document.getElementById('nav-live');
+            if (!stats) return;
+            const fmtPct = v => (v > 0 ? '+' : '') + v.toLocaleString('de-AT', { maximumFractionDigits: 0 }) + '%';
+            const narrowMQ = window.matchMedia('(max-width: 560px)');
+            let last = null;
+
+            function render(d) {
+                const narrow = narrowMQ.matches;
+                const parts = [];
+                let hydroLabel = '';
+                if (d.price_eur_mwh != null)
+                    parts.push(`<b>${d.price_eur_mwh.toLocaleString('de-AT', { maximumFractionDigits: 0 })} \u20ac</b>/MWh`);
+                if (!narrow && d.renewable_share_pct != null)
+                    parts.push(`<b>${d.renewable_share_pct}%</b> erneuerbar`);
+                if (d.hydro_deviation_pct != null) {
+                    const cls = d.hydro_deviation_pct <= -15 ? 'neg' : (d.hydro_deviation_pct >= 15 ? 'pos' : '');
+                    hydroLabel = `Wasserkraft ${fmtPct(d.hydro_deviation_pct)}`;
+                    // On phones the label is abbreviated to a droplet + value so
+                    // the pill never wraps or truncates.
+                    const shown = narrow ? `\ud83d\udca7 ${fmtPct(d.hydro_deviation_pct)}` : hydroLabel;
+                    parts.push(`<span class="${cls}">${shown}</span>`);
+                }
+                stats.innerHTML = parts.join(' \u00b7 ');
+                const alarm = d.hydro_level === 'severe' || d.hydro_level === 'stressed';
+                dot.classList.toggle('alarm', alarm);
+                link.title = `Live-Marktanalytics \u00b7 Stand ${d.as_of.slice(8, 10)}.${d.as_of.slice(5, 7)}. ${d.as_of.slice(11, 16)} Uhr`
+                    + (hydroLabel ? ` \u00b7 ${hydroLabel} gegen\u00fcber dem Mehrjahresschnitt` : '');
+                link.setAttribute('aria-label', 'Marktanalytics \u00f6ffnen \u2014 ' + link.title);
+            }
+
+            async function load() {
+                try {
+                    const d = await (await fetch('/api/analytics/pulse')).json();
+                    if (!d.ok) return;
+                    last = d;
+                    render(d);
+                    maybeCoach(d);
+                } catch (e) { stats.textContent = 'Live-Marktdaten'; }
+            }
+
+            // Re-render on rotation / resize so the compact and full variants swap.
+            (narrowMQ.addEventListener ? narrowMQ.addEventListener('change', () => last && render(last))
+                                       : narrowMQ.addListener(() => last && render(last)));
+
+            // One-time coach mark: shown once per browser, and again only if the
+            // hydro situation flips into an unusual state.
+            function maybeCoach(d) {
+                const state = d.hydro_level || 'unknown';
+                const seen = localStorage.getItem('analyticsCoachSeen');
+                if (seen === state || seen === 'dismissed-all') return;
+                if (document.getElementById('analytics-coach')) return;
+                const headline = {
+                    severe: 'Wasserkraft aktuell weit unter dem Normalniveau',
+                    stressed: 'Wasserkraft aktuell unter dem Normalniveau',
+                    wet: 'Aktuell ungewöhnlich viel Wasserkraft im Netz',
+                    normal: 'Live-Blick auf den Strommarkt',
+                    unknown: 'Live-Blick auf den Strommarkt'
+                }[state];
+                const el = document.createElement('div');
+                el.className = 'coach';
+                el.id = 'analytics-coach';
+                el.innerHTML = `<strong>${headline}</strong>
+                    Die Marktanalytics zeigen live, wie sich Wasserkraft, Speicherfüllstände,
+                    Preise und Importe entwickeln — Basis für jede Standortentscheidung.
+                    <div class="coach-actions">
+                      <a href="/analytics">Analytics öffnen</a>
+                      <button type="button">Später</button>
+                    </div>`;
+                document.body.appendChild(el);
+                if (!narrowMQ.matches) {
+                    const r = link.getBoundingClientRect();
+                    el.style.top = (r.bottom + 12) + 'px';
+                    el.style.right = Math.max(8, window.innerWidth - r.right) + 'px';
+                }
+                const close = () => { localStorage.setItem('analyticsCoachSeen', state); el.remove(); };
+                el.querySelector('button').addEventListener('click', close);
+                el.querySelector('a').addEventListener('click', close);
+                setTimeout(() => { if (document.body.contains(el)) close(); }, 15000);
+            }
+
+            load();
+            setInterval(load, 5 * 60 * 1000);
+            document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
+        })();
         
         // Dark tile layer
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_2f4r_1_641ea85562265ec4220f53fc', {

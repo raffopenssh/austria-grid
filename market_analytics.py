@@ -320,6 +320,39 @@ def hydro_drought():
                                     if cur and row['prev_years_avg_d30'] else None)
             comparison.append(row)
 
+        # ---- state assessment, so the page's wording adapts to the situation
+        # instead of asserting a drought forever.
+        ror_row = next(c for c in comparison if c['key'] == 'run_of_river')
+        dev = ror_row['deviation_pct']
+        cur_d30 = ror_row[str(year)]['d30']
+        prev_vals = [(row_y, ror_row[row_y]['d30']) for row_y in years
+                     if row_y != str(year) and ror_row[row_y]['d30']]
+        below_all = bool(prev_vals) and cur_d30 is not None and all(
+            cur_d30 < v for _, v in prev_vals)
+        above_all = bool(prev_vals) and cur_d30 is not None and all(
+            cur_d30 > v for _, v in prev_vals)
+        rank = (sorted([v for _, v in prev_vals] + [cur_d30], reverse=True).index(cur_d30) + 1
+                if cur_d30 is not None else None)
+        if dev is None:
+            level = 'unknown'
+        elif dev <= -30:
+            level = 'severe'
+        elif dev <= -15:
+            level = 'stressed'
+        elif dev < 15:
+            level = 'normal'
+        else:
+            level = 'wet'
+        assessment = {
+            'level': level,
+            'deviation_pct': dev,
+            'lowest_of_record': below_all,
+            'highest_of_record': above_all,
+            'rank_of_years': rank,
+            'years_compared': len(prev_vals) + 1,
+            'first_year': years[0] if years else None,
+        }
+
         # ---- daily series, current year (for the live chart)
         daily = q("""
             WITH g AS (
@@ -379,16 +412,25 @@ def hydro_drought():
         """)
 
         # ---- which plants are picking up the slack (A73 per-plant data)
-        plants = q("""
-            SELECT plant, psr_type,
-                   ROUND(AVG(CASE WHEN substr(timestamp,1,4)=? THEN value_mw END),1) cur_mw,
-                   ROUND(AVG(CASE WHEN substr(timestamp,1,4)=? THEN value_mw END),1) prev_mw
-            FROM plant_generation
-            WHERE substr(timestamp,6,2) IN ('06','07')
-              AND substr(timestamp,1,4) IN (?,?)
-            GROUP BY plant, psr_type HAVING cur_mw > 1 OR prev_mw > 1
-            ORDER BY cur_mw DESC
-        """, (str(year), str(year - 1), str(year), str(year - 1)))
+        # Rolling 60-day window ending at the latest available A73 day (~5 day
+        # lag), compared with the same calendar window one year earlier. No
+        # hardcoded months, so this stays meaningful in every season.
+        p_end = q("SELECT substr(MAX(timestamp),1,10) d FROM plant_generation")[0]['d']
+        plants, p_start, p_prev_start, p_prev_end = [], None, None, None
+        if p_end:
+            p_start = q("SELECT date(?, '-60 day') d", (p_end,))[0]['d']
+            p_prev_start = q("SELECT date(?, '-1 year') d", (p_start,))[0]['d']
+            p_prev_end = q("SELECT date(?, '-1 year') d", (p_end,))[0]['d']
+            plants = q("""
+                SELECT plant, psr_type,
+                       ROUND(AVG(CASE WHEN timestamp>=? AND timestamp<? THEN value_mw END),1) cur_mw,
+                       ROUND(AVG(CASE WHEN timestamp>=? AND timestamp<? THEN value_mw END),1) prev_mw
+                FROM plant_generation
+                WHERE (timestamp>=? AND timestamp<?) OR (timestamp>=? AND timestamp<?)
+                GROUP BY plant, psr_type HAVING cur_mw > 1 OR prev_mw > 1
+                ORDER BY cur_mw DESC
+            """, (p_start, p_end + 'T23:59', p_prev_start, p_prev_end + 'T23:59',
+                  p_start, p_end + 'T23:59', p_prev_start, p_prev_end + 'T23:59'))
         for p in plants:
             p['change_pct'] = (round((p['cur_mw'] / p['prev_mw'] - 1) * 100, 1)
                                if p['cur_mw'] is not None and p['prev_mw'] else None)
@@ -406,8 +448,12 @@ def hydro_drought():
             'storage_deviation_pct': (round((latest_store['stored_gwh'] / storage_norm - 1) * 100, 1)
                                       if latest_store and storage_norm else None),
             'market_monthly': market,
+            'assessment': assessment,
             'price_monthly': price_monthly,
-            'plants_jun_jul': plants,
+            'plants': plants,
+            'plants_jun_jul': plants,  # deprecated alias
+            'plants_window': {'start': p_start, 'end': p_end,
+                              'prev_start': p_prev_start, 'prev_end': p_prev_end},
             'note': ('Run-of-river = Danube/Inn/Drau chain (~5.6 GW). Reservoir storage from '
                      'ENTSO-E A72 (weekly, published with ~2-3 week lag).'),
         }
@@ -415,6 +461,73 @@ def hydro_drought():
     now = time.time()
     key = 'hydrodrought'
     if key in _cache and now - _cache[key][0] < 600:
+        return jsonify(_cache[key][1])
+    data = compute()
+    _cache[key] = (now, data)
+    return jsonify(data)
+
+
+@analytics_bp.route('/api/analytics/pulse')
+def pulse():
+    """Tiny live snapshot for the map page's teaser pill (fast, 5 min cache).
+
+    Everything is derived from the latest data in the DB; no hardcoded years or
+    seasons, so the teaser stays correct in every situation.
+    """
+    ROR = 'Hydro Run-of-river and poundage'
+    RENEW = ('Solar', 'Wind Onshore', 'Biomass', ROR,
+             'Hydro Water Reservoir', 'Other renewable', 'Geothermal')
+
+    def compute():
+        latest = q("SELECT MAX(timestamp) t FROM generation")[0]['t']
+        if not latest:
+            return {'ok': False}
+        day, year = latest[:10], int(latest[:4])
+        md = latest[5:10]
+
+        price = q("""SELECT ROUND(price_eur_mwh,1) p, timestamp FROM prices
+                     ORDER BY timestamp DESC LIMIT 1""")
+        # renewable share of the most recent complete generation timestamp
+        mix = q(f"""SELECT SUM(value_mw) total,
+                          SUM(CASE WHEN psr_type IN ({','.join('?' * len(RENEW))})
+                                   THEN value_mw ELSE 0 END) renew
+                   FROM generation WHERE timestamp = ?""", (*RENEW, latest))
+        share = None
+        if mix and mix[0]['total']:
+            share = round(mix[0]['renew'] / mix[0]['total'] * 100)
+
+        def ror_window(y):
+            end = f'{y}-{md}'
+            start = q("SELECT date(?, '-30 day') d", (end,))[0]['d']
+            return q("""SELECT ROUND(AVG(value_mw),1) mw FROM generation
+                        WHERE psr_type=? AND timestamp>=? AND timestamp<?""",
+                     (ROR, start, end + 'T23:59'))[0]['mw']
+
+        first_year = int(q("SELECT MIN(substr(timestamp,1,4)) y FROM generation")[0]['y'])
+        cur = ror_window(year)
+        prev = [v for v in (ror_window(y) for y in range(first_year, year)) if v]
+        norm = sum(prev) / len(prev) if prev else None
+        dev = round((cur / norm - 1) * 100, 1) if cur and norm else None
+        level = ('unknown' if dev is None else
+                 'severe' if dev <= -30 else
+                 'stressed' if dev <= -15 else
+                 'wet' if dev >= 15 else 'normal')
+
+        return {
+            'ok': True,
+            'as_of': latest,
+            'day': day,
+            'price_eur_mwh': price[0]['p'] if price else None,
+            'price_as_of': price[0]['timestamp'] if price else None,
+            'renewable_share_pct': share,
+            'hydro_deviation_pct': dev,
+            'hydro_level': level,
+            'hydro_ror_mw': cur,
+        }
+
+    now = time.time()
+    key = 'pulse'
+    if key in _cache and now - _cache[key][0] < 300:
         return jsonify(_cache[key][1])
     data = compute()
     _cache[key] = (now, data)

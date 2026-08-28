@@ -25,6 +25,24 @@ AUSTRIA_BZ = '10YAT-APG------L'
 # Plausibility ceiling for a single cross-border flow value (MW).
 # Austria's total interconnection capacity is well below this.
 MAX_BORDER_MW = 10000
+# Plausibility ceiling per generation psr_type (MW). ENTSO-E occasionally
+# publishes corrupt spikes (seen: 20 GW run-of-river, 6.3 million MW "Solar
+# Consumption"). Ceilings are ~2x the installed fleet, so real records pass.
+MAX_GEN_MW = {
+    'Solar': 15000,
+    'Wind Onshore': 10000,
+    'Hydro Run-of-river and poundage': 8000,
+    'Hydro Water Reservoir': 10000,
+    'Hydro Pumped Storage': 10000,
+    'Fossil Gas': 8000,
+}
+MAX_GEN_MW_DEFAULT = 20000
+
+
+def gen_value_plausible(psr_type, val):
+    """True if a generation/consumption value is within the plausible range."""
+    base = psr_type[:-len(' Consumption')] if psr_type.endswith(' Consumption') else psr_type
+    return 0 <= val <= MAX_GEN_MW.get(base, MAX_GEN_MW_DEFAULT)
 
 # Country codes for cross-border
 COUNTRY_CODES = {
@@ -197,6 +215,9 @@ def store_generation(df):
         
         for ts, val in df[col].items():
             if pd.notna(val) and val >= 0:  # Only store non-negative values
+                if not gen_value_plausible(str(psr_type), float(val)):
+                    print(f"Skipping implausible generation {psr_type} {ts}: {val}")
+                    continue
                 try:
                     conn.execute('''
                         INSERT OR REPLACE INTO generation (timestamp, psr_type, value_mw, fetched_at)

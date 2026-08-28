@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Strommarkt-Analytics Österreich | Live-Daten aus der ENTSO-E-Historie seit 2023</title>
-<meta name="description" content="Live-Marktanalysen für den österreichischen Strommarkt: Dürre-Monitor der Wasserkraft, Speicherfüllstände, negative Preise, Solar-Kannibalisierung, Capture Rates, Batteriespeicher-Arbitrage, Duck Curve und Importabhängigkeit. ENTSO-E-Daten seit 2023, alle 5 Minuten aktualisiert.">
+<meta name="description" content="Live-Marktanalysen für den österreichischen Strommarkt: Wasserkraft- und Dürre-Monitor, Speicherfüllstände, negative Preise, Solar-Kannibalisierung, Capture Rates, Batteriespeicher-Arbitrage, Duck Curve und Importabhängigkeit. ENTSO-E-Daten seit 2023, alle 5 Minuten aktualisiert.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://austria-power.exe.xyz/analytics">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://austria-power.exe.xyz/analytics">
 <meta property="og:title" content="Strommarkt-Analytics Österreich | Live-Daten seit 2023">
-<meta property="og:description" content="Dürre-Monitor der Wasserkraft, Speicherfüllstände, negative Preise, Capture Rates und Speicher-Arbitrage am österreichischen Strommarkt — live.">
+<meta property="og:description" content="Wasserkraft- und Dürre-Monitor, Speicherfüllstände, negative Preise, Capture Rates und Speicher-Arbitrage am österreichischen Strommarkt — live.">
 <meta property="og:image" content="https://austria-power.exe.xyz/static/og-analytics.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -18,7 +18,7 @@
 <meta property="og:site_name" content="Windkraft Österreich">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Strommarkt-Analytics Österreich">
-<meta name="twitter:description" content="Live-ENTSO-E-Marktdaten: Dürre-Monitor Wasserkraft, negative Preise, Capture Rates, Speicher-Arbitrage.">
+<meta name="twitter:description" content="Live-ENTSO-E-Marktdaten: Wasserkraft-Monitor, negative Preise, Capture Rates, Speicher-Arbitrage.">
 <meta name="twitter:image" content="https://austria-power.exe.xyz/static/og-analytics.png">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,6 +50,7 @@ body { font-family:'Inter','Segoe UI',system-ui,sans-serif; background:var(--bg)
 .kpi:hover { border-color:rgba(0,212,170,.35); }
 .kpi .val { font-size:1.7rem; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
 .kpi .val.warn { color:var(--danger); }
+.kpi .val.up { color:var(--accent); }
 .kpi .lbl { color:var(--text-dim); font-size:.82rem; margin-top:4px; }
 .kpi .sub { color:var(--text-faint); font-size:.75rem; margin-top:2px; }
 .card { background:var(--surface); border-radius:12px; padding:22px; margin-bottom:26px; border:1px solid var(--border); }
@@ -86,34 +87,34 @@ td.up { color:var(--danger); font-weight:600; } td.down { color:var(--accent); f
   <div class="kpi-row" id="kpis"><div class="loading">Lade Daten…</div></div>
 
   <div class="card alert" id="droughtCard">
-    <div class="badge">🔴 Live-Monitor · Dürre &amp; Hitzewelle</div>
-    <h2>Wasserkraft im Dürre-Stress</h2>
-    <p class="desc">Österreichs Laufwasserkraft (Donau-, Inn- und Drau-Kette, ~5,6&nbsp;GW) liefert derzeit deutlich weniger als in allen Vorjahren. Verglichen wird das rollierende 30-Tage-Mittel mit dem gleichen Kalenderfenster der Vorjahre. <span id="droughtAsOf" class="muted"></span></p>
+    <div class="badge" id="droughtBadge">🔴 Live-Monitor · Wasserkraft</div>
+    <h2 id="droughtTitle">Wasserkraft-Monitor</h2>
+    <p class="desc"><span id="droughtLede">Österreichs Laufwasserkraft (Donau-, Inn- und Drau-Kette, ~5,6&nbsp;GW) im Vergleich zu den Vorjahren.</span> Verglichen wird das rollierende 30-Tage-Mittel mit dem gleichen Kalenderfenster der Vorjahre. <span id="droughtAsOf" class="muted"></span></p>
     <div class="kpi-row" id="droughtKpis"><div class="loading">Lade Daten…</div></div>
     <div class="chart-wrap"><canvas id="hydroMonthChart"></canvas></div>
   </div>
 
   <div class="card">
     <h2>Speicherfüllstand der Alpenspeicher (ENTSO-E A72)</h2>
-    <p class="desc">Gespeicherte Energie in den österreichischen Jahres- und Saisonspeichern (Kaprun, Malta, Kops, Zillertal …), Wochenwerte, nach Kalendertag übereinandergelegt. Der Schmelzwasser-Aufbau verläuft heuer flacher als üblich — die Speicher erreichen ihren Sommergipfel unter dem Normalniveau. <span class="muted">Die A72-Publikation hat 2–3 Wochen Verzug.</span></p>
+    <p class="desc">Gespeicherte Energie in den österreichischen Jahres- und Saisonspeichern (Kaprun, Malta, Kops, Zillertal …), Wochenwerte, nach Kalendertag übereinandergelegt. <span id="storageNote"></span> <span class="muted">Die A72-Publikation hat 2–3 Wochen Verzug.</span></p>
     <div class="chart-wrap"><canvas id="storageChart"></canvas></div>
   </div>
 
   <div class="card">
-    <h2>Marktfolgen: Laufwasser ↓, Preis ↑, Importe ↑</h2>
-    <p class="desc">Tageswerte des laufenden Jahres: Laufwasser-Erzeugung, Nettoimport-Saldo und Day-Ahead-Durchschnittspreis. Fehlende Wasserkraft wird durch Importe, Pumpspeicher und Gas ersetzt — mit direkter Preiswirkung.</p>
+    <h2 id="marketTitle">Marktfolgen: Laufwasser, Preis und Importe im Jahresverlauf</h2>
+    <p class="desc">Tageswerte des laufenden Jahres: Laufwasser-Erzeugung, Nettoimport-Saldo und Day-Ahead-Durchschnittspreis. <span id="marketNote">Fehlende Wasserkraft wird durch Importe, Pumpspeicher und Gas ersetzt — mit direkter Preiswirkung.</span></p>
     <div class="chart-wrap"><canvas id="droughtMarketChart"></canvas></div>
   </div>
 
   <div class="card">
-    <h2>Wer springt ein? Kraftwerksblöcke Jun–Jul im Jahresvergleich</h2>
-    <p class="desc">Einzelblock-Erzeugung (ENTSO-E A73) für Juni/Juli gegenüber dem Vorjahr. Gaskraft und Pumpspeicher fahren die Abendspitze, die das Laufwasser nicht mehr füllt.</p>
+    <h2 id="plantTitle">Wer springt ein? Kraftwerksblöcke im Jahresvergleich</h2>
+    <p class="desc">Einzelblock-Erzeugung (ENTSO-E A73) im rollierenden 60-Tage-Fenster gegenüber demselben Zeitraum des Vorjahres. <span id="plantWindow" class="muted"></span></p>
     <div class="table-wrap"><table id="plantTable"><thead><tr><th>Block</th><th>Typ</th><th>Ø MW aktuell</th><th>Ø MW Vorjahr</th><th>Δ</th></tr></thead><tbody><tr><td colspan="5" class="loading">Lade Daten…</td></tr></tbody></table></div>
   </div>
 
   <div class="card">
-    <h2>Negative Strompreise nehmen dramatisch zu</h2>
-    <p class="desc">Stunden mit negativen Day-Ahead-Preisen pro Monat. Der Solarausbau (<span id="solarGrowth">Mittags-Peak seit 2023 vervielfacht</span>) drückt die Preise an sonnigen Tagen unter null — Erzeuger zahlen fürs Einspeisen.</p>
+    <h2>Negative Strompreise: Stunden unter null</h2>
+    <p class="desc">Stunden mit negativen Day-Ahead-Preisen pro Monat. <span id="negNote"></span> Der Solarausbau (<span id="solarGrowth">Mittags-Peak seit 2023 vervielfacht</span>) drückt die Preise an sonnigen Tagen unter null — Erzeuger zahlen fürs Einspeisen.</p>
     <div class="chart-wrap"><canvas id="negChart"></canvas></div>
   </div>
 
@@ -124,8 +125,8 @@ td.up { color:var(--danger); font-weight:600; } td.down { color:var(--accent); f
   </div>
 
   <div class="card">
-    <h2>Solar-Kannibalisierung: Capture Rate im Sinkflug</h2>
-    <p class="desc">Die Capture Rate zeigt, welchen Anteil des Durchschnittspreises Solar/Wind tatsächlich am Markt erlösen (erzeugungsgewichteter Preis ÷ Baseload-Preis). <span id="captureNote"></span> Wer mittags einspeist, verdient kaum noch etwas. Wind bleibt nahe 100%.</p>
+    <h2>Solar-Kannibalisierung: Capture Rate von Solar und Wind</h2>
+    <p class="desc">Die Capture Rate zeigt, welchen Anteil des Durchschnittspreises Solar/Wind tatsächlich am Markt erlösen (erzeugungsgewichteter Preis ÷ Baseload-Preis). <span id="captureNote"></span></p>
     <div class="chart-wrap"><canvas id="captureChart"></canvas></div>
   </div>
 
@@ -142,19 +143,19 @@ td.up { color:var(--danger); font-weight:600; } td.down { color:var(--accent); f
 
   <div class="card">
     <h2>Duck Curve: Residuallast im Sommer</h2>
-    <p class="desc">Durchschnittlicher Tagesverlauf (Apr–Sep) der Residuallast (Last minus Solar &amp; Wind) je Jahr. Das Mittagstal wird jedes Jahr tiefer — die Flexibilitätsanforderung an Wasserkraft, Speicher und Import/Export steigt.</p>
+    <p class="desc">Durchschnittlicher Tagesverlauf (Apr–Sep) der Residuallast (Last minus Solar &amp; Wind) je Jahr. Je tiefer das Mittagstal, desto höher die Flexibilitätsanforderung an Wasserkraft, Speicher und Import/Export.</p>
     <div class="chart-wrap"><canvas id="duckChart"></canvas></div>
   </div>
 
   <div class="card">
     <h2>Preisprofil im Tagesverlauf (Apr–Sep)</h2>
-    <p class="desc">Durchschnittlicher Day-Ahead-Preis nach Tageszeit. Das Muster kippt: Mittags früher am teuersten, heute am billigsten. Abendspitze (19–21 Uhr) wird immer ausgeprägter.</p>
+    <p class="desc">Durchschnittlicher Day-Ahead-Preis nach Tageszeit. Das Muster kippt: Mittags früher am teuersten, zuletzt am billigsten — die Abendspitze (19–21 Uhr) wird ausgeprägter.</p>
     <div class="chart-wrap"><canvas id="priceProfileChart"></canvas></div>
   </div>
 
   <div class="card">
     <h2>Erzeugung vs. Verbrauch: Erneuerbaren-Deckung</h2>
-    <p class="desc">Monatliche Erzeugung nach Kategorie vs. Last. Im Sommer decken Erneuerbare zeitweise &gt;99% der Last, im Winter bleibt Österreich auf Gas und Importe angewiesen.</p>
+    <p class="desc">Monatliche Erzeugung nach Kategorie vs. Last. In sonnen- und wasserreichen Monaten decken Erneuerbare zeitweise mehr als die gesamte Last, im Winter bleibt Österreich auf Gas und Importe angewiesen.</p>
     <div class="chart-wrap"><canvas id="balanceChart"></canvas></div>
   </div>
 </div>
@@ -190,15 +191,54 @@ async function initDrought(){
 
   const byKey = Object.fromEntries(d.comparison.map(c=>[c.key,c]));
   const ror = byKey.run_of_river, res = byKey.reservoir;
+
+  // ---- adaptive wording: the page must not claim a drought forever
+  const a = d.assessment || {};
+  const S = {
+    severe:   {badge:'🔴 Live-Monitor · Wasserkraft im Dürre-Stress', title:'Wasserkraft im Dürre-Stress', cls:'alert',
+               lede:`Österreichs Laufwasserkraft (Donau-, Inn- und Drau-Kette, ~5,6&nbsp;GW) liefert derzeit deutlich weniger als üblich.`},
+    stressed: {badge:'🟠 Live-Monitor · Wasserkraft unter Normal', title:'Wasserkraft unter dem Normalniveau', cls:'alert',
+               lede:`Österreichs Laufwasserkraft (Donau-, Inn- und Drau-Kette, ~5,6&nbsp;GW) liegt spürbar unter dem Niveau der Vorjahre.`},
+    normal:   {badge:'🟢 Live-Monitor · Wasserkraft im Normalbereich', title:'Wasserkraft im Normalbereich', cls:'',
+               lede:`Österreichs Laufwasserkraft (Donau-, Inn- und Drau-Kette, ~5,6&nbsp;GW) liegt derzeit im Bereich der Vorjahre.`},
+    wet:      {badge:'🔵 Live-Monitor · Wasserreiche Phase', title:'Wasserkraft über dem Normalniveau', cls:'',
+               lede:`Österreichs Laufwasserkraft (Donau-, Inn- und Drau-Kette, ~5,6&nbsp;GW) liefert derzeit deutlich mehr als in den Vorjahren.`},
+    unknown:  {badge:'⚪ Live-Monitor · Wasserkraft', title:'Wasserkraft-Monitor', cls:'',
+               lede:`Österreichs Laufwasserkraft (Donau-, Inn- und Drau-Kette, ~5,6&nbsp;GW) im Vergleich zu den Vorjahren.`}
+  }[a.level || 'unknown'];
+  const card = document.getElementById('droughtCard');
+  card.classList.toggle('alert', S.cls === 'alert');
+  document.getElementById('droughtBadge').textContent = S.badge;
+  document.getElementById('droughtTitle').textContent = S.title;
+  const rankNote = a.lowest_of_record ? ` Aktuell der niedrigste Wert seit Beginn der Reihe (${a.first_year}).`
+    : a.highest_of_record ? ` Aktuell der höchste Wert seit Beginn der Reihe (${a.first_year}).`
+    : (a.rank_of_years && a.years_compared) ? ` Rang ${a.rank_of_years} von ${a.years_compared} Jahren.` : '';
+  document.getElementById('droughtLede').innerHTML = S.lede + rankNote;
+
+  const marketNote = document.getElementById('marketNote');
+  if (marketNote) marketNote.textContent = (a.level === 'severe' || a.level === 'stressed')
+    ? 'Fehlende Wasserkraft wird durch Importe, Pumpspeicher und Gas ersetzt — mit direkter Preiswirkung.'
+    : 'Wasserkraft, Import/Export-Saldo und Preis bewegen sich gegenläufig: viel Wasser drückt Preise und Importbedarf.';
+
   // last *complete* day for the market KPI (today is partial)
   const complete = d.daily.filter(r=>r.ror_mw!=null && r.day < d.reference_day);
   const lastDay = complete.slice(-1)[0] || d.daily.slice(-1)[0] || {};
   const deDate = s => s ? `${s.slice(8,10)}.${s.slice(5,7)}.` : '';
+  const kpiCls = v => v == null ? '' : (v <= -10 ? 'warn' : (v >= 10 ? 'up' : ''));
   document.getElementById('droughtKpis').innerHTML = `
-    <div class="kpi"><div class="val warn">${pct(ror.deviation_pct)}</div><div class="lbl">Laufwasser, 30-Tage-Mittel</div><div class="sub">${fmt(ror[curYear].d30)} MW vs. ${fmt(ror.prev_years_avg_d30)} MW Vorjahresschnitt</div></div>
-    <div class="kpi"><div class="val warn">${pct(res.deviation_pct)}</div><div class="lbl">Speicherkraftwerke, 30-Tage-Mittel</div><div class="sub">${fmt(res[curYear].d30)} MW vs. ${fmt(res.prev_years_avg_d30)} MW</div></div>
-    <div class="kpi"><div class="val warn">${pct(d.storage_deviation_pct)}</div><div class="lbl">Speicherinhalt vs. Normal</div><div class="sub">${fmt(d.storage_latest && d.storage_latest.stored_gwh)} GWh (${deDate(d.storage_latest && d.storage_latest.day)}) · Normal ${fmt(d.storage_normal_gwh)} GWh</div></div>
-    <div class="kpi"><div class="val warn">${fmt(lastDay.net_import_mw)} MW</div><div class="lbl">Nettoimport ${deDate(lastDay.day)}</div><div class="sub">Ø Preis ${lastDay.price_eur_mwh ?? '–'} €/MWh · Laufwasser ${fmt(lastDay.ror_mw)} MW</div></div>`;
+    <div class="kpi"><div class="val ${kpiCls(ror.deviation_pct)}">${pct(ror.deviation_pct)}</div><div class="lbl">Laufwasser, 30-Tage-Mittel</div><div class="sub">${fmt(ror[curYear].d30)} MW vs. ${fmt(ror.prev_years_avg_d30)} MW Vorjahresschnitt</div></div>
+    <div class="kpi"><div class="val ${kpiCls(res.deviation_pct)}">${pct(res.deviation_pct)}</div><div class="lbl">Speicherkraftwerke, 30-Tage-Mittel</div><div class="sub">${fmt(res[curYear].d30)} MW vs. ${fmt(res.prev_years_avg_d30)} MW</div></div>
+    <div class="kpi"><div class="val ${kpiCls(d.storage_deviation_pct)}">${pct(d.storage_deviation_pct)}</div><div class="lbl">Speicherinhalt vs. Normal</div><div class="sub">${fmt(d.storage_latest && d.storage_latest.stored_gwh)} GWh (${deDate(d.storage_latest && d.storage_latest.day)}) · Normal ${fmt(d.storage_normal_gwh)} GWh</div></div>
+    <div class="kpi"><div class="val">${fmt(lastDay.net_import_mw)} MW</div><div class="lbl">Nettoimport ${deDate(lastDay.day)}</div><div class="sub">Ø Preis ${lastDay.price_eur_mwh ?? '–'} €/MWh · Laufwasser ${fmt(lastDay.ror_mw)} MW</div></div>`;
+
+  const sNote = document.getElementById('storageNote');
+  if (sNote) {
+    const sd = d.storage_deviation_pct;
+    sNote.textContent = sd == null ? ''
+      : sd <= -10 ? `Der Speicheraufbau verläuft heuer flacher als üblich — aktuell ${pct(sd)} gegenüber dem Mehrjahres-Normal.`
+      : sd >= 10 ? `Die Speicher liegen heuer über dem Mehrjahres-Normal (${pct(sd)}).`
+      : `Die Speicherfüllung liegt nahe am Mehrjahres-Normal (${pct(sd)}).`;
+  }
 
   // Monthly hydro output per year (ROR + reservoir stacked into one series each)
   const years = [...new Set(d.monthly.map(r=>r.year))];
@@ -242,7 +282,11 @@ async function initDrought(){
               y1:{position:'right', grid:{drawOnChartArea:false}, title:{display:true,text:'€/MWh'}}}}});
 
   // Plant table
-  const rows = d.plants_jun_jul.filter(p=>(p.cur_mw||0) >= 1 || (p.prev_mw||0) >= 1).slice(0,18);
+  const pw = d.plants_window || {};
+  const pwEl = document.getElementById('plantWindow');
+  if (pwEl && pw.start) pwEl.textContent =
+    `Fenster ${deDate(pw.start)}–${deDate(pw.end)}${pw.end?pw.end.slice(0,4):''} vs. ${deDate(pw.prev_start)}–${deDate(pw.prev_end)}${pw.prev_end?pw.prev_end.slice(0,4):''} (A73 hat ~5 Tage Verzug).`;
+  const rows = (d.plants || d.plants_jun_jul || []).filter(p=>(p.cur_mw||0) >= 1 || (p.prev_mw||0) >= 1).slice(0,18);
   document.querySelector('#plantTable tbody').innerHTML = rows.map(p=>`<tr>
       <td>${p.plant}</td><td class="muted">${p.psr_type}</td>
       <td>${p.cur_mw ?? '–'}</td><td>${p.prev_mw ?? '–'}</td>
@@ -279,7 +323,13 @@ async function init(){
     solarNote.textContent = `Spitzenleistung ${(solar23.peak_solar_mw/1000).toFixed(1)} GW (${FIRST_YEAR}) \u2192 ${(solar26.peak_solar_mw/1000).toFixed(1)} GW (${CUR_YEAR})`;
   const capNote = document.getElementById('captureNote');
   if (capNote && capLast.solar_capture_rate_pct != null)
-    capNote.textContent = `Solar erl\u00f6ste im ${capLast.month} nur noch ~${capLast.solar_capture_rate_pct}% des Durchschnittspreises, Wind bleibt nahe 100%.`;
+    capNote.textContent = `Solar erl\u00f6ste im ${capLast.month} ~${capLast.solar_capture_rate_pct}% des Durchschnittspreises, Wind ~${capLast.wind_capture_rate_pct}%.`;
+  const negNote = document.getElementById('negNote');
+  if (negNote && neg.yearly.length){
+    const first = neg.yearly[0], cur = neg.yearly[neg.yearly.length-1];
+    const perK = y => (y.neg_hours / y.total_hours * 1000).toLocaleString('de-AT',{maximumFractionDigits:1});
+    negNote.textContent = `Bisher ${cur.neg_hours} Stunden in ${cur.year} (${perK(cur)} je 1.000 Stunden) gegen\u00fcber ${first.neg_hours} Stunden ${first.year} (${perK(first)} je 1.000).`;
+  }
 
   // Negative prices monthly
   const nm = neg.monthly;
