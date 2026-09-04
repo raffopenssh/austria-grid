@@ -993,6 +993,7 @@ def _render_seo(title, description, canonical_path, content, keywords='', struct
         og_image=og_image or _og_image_for(),
         structured_data=json.dumps(structured_data or {}, ensure_ascii=False),
         content=content,
+        year=datetime.now().year,
     )
 
 
@@ -1030,6 +1031,46 @@ def quellen_page():
         'Datenquellen und Methodik der Windkraft-Netzkapazitätsanalyse für Österreich: '
         'IG Windkraft, E-Control, ENTSO-E, APG, OpenStreetMap und data.gv.at.',
         '/quellen', content,
+    )
+
+
+@app.route('/lizenz')
+def lizenz_page():
+    year = datetime.now().year
+    content = f"""
+    <div class="breadcrumb"><a href="/">Karte</a> › Lizenz</div>
+    <h1>Lizenz</h1>
+    <h2>Software</h2>
+    <p>Der Quellcode dieser Plattform steht unter der
+    <a href="https://opensource.org/licenses/MIT">MIT-Lizenz</a>.
+    © 2025–{year} Raffael Hickisch.</p>
+    <h2>Daten</h2>
+    <p>Die dargestellten Daten stammen von Dritten und unterliegen deren jeweiligen
+    Nutzungsbedingungen. Die MIT-Lizenz gilt <strong>nicht</strong> für diese Daten.</p>
+    <div class="list-grid">
+      <div class="list-item"><strong>OpenStreetMap</strong><br>© OpenStreetMap-Mitwirkende,
+        <a href="https://www.openstreetmap.org/copyright">ODbL 1.0</a></div>
+      <div class="list-item"><strong>CARTO</strong><br>Basemap-Kacheln,
+        <a href="https://carto.com/attributions">CARTO Attributions</a></div>
+      <div class="list-item"><strong>ENTSO-E Transparency</strong><br>
+        <a href="https://transparency.entsoe.eu/content/static_content/Static%20content/terms%20and%20conditions/terms%20and%20conditions.html">ENTSO-E Nutzungsbedingungen</a></div>
+      <div class="list-item"><strong>data.gv.at</strong><br>Bezirksgrenzen,
+        <a href="https://creativecommons.org/licenses/by/4.0/deed.de">CC BY 4.0</a></div>
+      <div class="list-item"><strong>E-Control Austria</strong><br>Netzkapazitäten, Nutzungsbedingungen von E-Control</div>
+      <div class="list-item"><strong>IG Windkraft</strong><br>Windpark-Daten, Rechte bei IG Windkraft</div>
+      <div class="list-item"><strong>APG / ONIP</strong><br>Übertragungsnetz, Rechte bei APG</div>
+      <div class="list-item"><strong>Austro Control · BEV (INSPIRE)</strong><br>Luftfahrthindernisse, Kataster – Rechte bei den jeweiligen Stellen</div>
+    </div>
+    <h2>Haftungsausschluss</h2>
+    <p>Alle Angaben ohne Gewähr. Die Software wird „wie besehen" ohne jegliche Gewährleistung
+    bereitgestellt. Für verbindliche Netzanschluss-Auskünfte wenden Sie sich an den zuständigen Netzbetreiber.</p>
+    <a class="cta-button" href="/quellen">Quellen &amp; Methodik</a>
+    """
+    return _render_seo(
+        'Lizenz | Windkraft Österreich Netzkapazität',
+        'Lizenzinformationen: MIT-Lizenz für den Quellcode, Datenlizenzen von OpenStreetMap (ODbL), '
+        'ENTSO-E, data.gv.at (CC BY 4.0) und weiteren Quellen.',
+        '/lizenz', content,
     )
 
 
@@ -1254,6 +1295,7 @@ def sitemap():
         {'loc': BASE_URL + '/bezirke', 'priority': '0.8', 'changefreq': 'weekly'},
         {'loc': BASE_URL + '/umspannwerke', 'priority': '0.8', 'changefreq': 'weekly'},
         {'loc': BASE_URL + '/quellen', 'priority': '0.5', 'changefreq': 'monthly'},
+        {'loc': BASE_URL + '/lizenz', 'priority': '0.3', 'changefreq': 'yearly'},
     ]
 
     for feature in bezirke['features']:

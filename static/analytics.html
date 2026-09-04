@@ -159,7 +159,7 @@ td.up { color:var(--danger); font-weight:600; } td.down { color:var(--accent); f
     <div class="chart-wrap"><canvas id="balanceChart"></canvas></div>
   </div>
 </div>
-<div class="footer">Datenquelle: ENTSO-E Transparency Platform · Preise = Day-Ahead (EPEX AT) · Analyse-API: <a href="/api/analytics/summary" style="color:#00d4aa">/api/analytics/*</a></div>
+<div class="footer">Datenquelle: ENTSO-E Transparency Platform · Preise = Day-Ahead (EPEX AT) · Analyse-API: <a href="/api/analytics/summary" style="color:#00d4aa">/api/analytics/*</a> · <a href="/lizenz" style="color:inherit">Lizenz</a></div>
 <script>
 const COLORS = new Proxy({2021:'#495a7c',2022:'#6b7fa8',2023:'#5c7cfa',2024:'#fcc419',2025:'#ff8787',2026:'#00d4aa'},
   {get:(t,k)=> t[k] || ['#00d4aa','#c084fc','#38bdf8','#f97316','#a3e635'][(+k||0)%5]});

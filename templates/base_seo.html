@@ -131,6 +131,8 @@
             color: #666;
             font-size: 0.85rem;
         }
+        footer a { color: #888; text-decoration: none; }
+        footer a:hover { color: #00d4aa; }
     </style>
 </head>
 <body>
@@ -138,8 +140,9 @@
         {{ content | safe }}
         
         <footer>
-            <p>© 2025 Windkraft Österreich Netzkapazität · 
+            <p>© 2025–{{ year }} Raffael Hickisch · 
                <a href="/quellen">Quellen & Methodik</a> · 
+               <a href="/lizenz">Lizenz</a> · 
                <a href="/sitemap.xml">Sitemap</a>
             </p>
             <p>Daten: IG Windkraft, E-Control Austria, APG, data.gv.at</p>
