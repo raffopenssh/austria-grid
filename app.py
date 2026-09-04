@@ -1040,36 +1040,40 @@ def lizenz_page():
     content = f"""
     <div class="breadcrumb"><a href="/">Karte</a> › Lizenz</div>
     <h1>Lizenz</h1>
-    <h2>Software</h2>
-    <p>Der Quellcode dieser Plattform steht unter der
-    <a href="https://opensource.org/licenses/MIT">MIT-Lizenz</a>.
+    <p>Diese Plattform ist <strong>Open Source</strong>. Quellcode und Aufbereitung stehen unter der
+    <a href="https://opensource.org/licenses/MIT">MIT-Lizenz</a> – frei nutzbar, veränderbar und weitergebbar.
     © 2025–{year} Raffael Hickisch.</p>
-    <h2>Daten</h2>
-    <p>Die dargestellten Daten stammen von Dritten und unterliegen deren jeweiligen
-    Nutzungsbedingungen. Die MIT-Lizenz gilt <strong>nicht</strong> für diese Daten.</p>
+    <h2>Verwendete Daten</h2>
+    <p>Wir bauen auf offenen Daten auf und nennen alle Quellen, die wir verwenden:</p>
     <div class="list-grid">
-      <div class="list-item"><strong>OpenStreetMap</strong><br>© OpenStreetMap-Mitwirkende,
-        <a href="https://www.openstreetmap.org/copyright">ODbL 1.0</a></div>
-      <div class="list-item"><strong>CARTO</strong><br>Basemap-Kacheln,
-        <a href="https://carto.com/attributions">CARTO Attributions</a></div>
-      <div class="list-item"><strong>ENTSO-E Transparency</strong><br>
-        <a href="https://transparency.entsoe.eu/content/static_content/Static%20content/terms%20and%20conditions/terms%20and%20conditions.html">ENTSO-E Nutzungsbedingungen</a></div>
-      <div class="list-item"><strong>data.gv.at</strong><br>Bezirksgrenzen,
+      <div class="list-item"><strong>OpenStreetMap</strong><br>Leitungen &amp; Umspannwerke – © OpenStreetMap-Mitwirkende,
+        <a href="https://www.openstreetmap.org/copyright">ODbL</a></div>
+      <div class="list-item"><strong>CARTO</strong><br>Basemap-Kacheln –
+        <a href="https://carto.com/attributions">carto.com/attributions</a></div>
+      <div class="list-item"><strong>ENTSO-E Transparency Platform</strong><br>Erzeugung, Preise, Grenzflüsse –
+        <a href="https://transparency.entsoe.eu">transparency.entsoe.eu</a></div>
+      <div class="list-item"><strong>data.gv.at</strong><br>Bezirksgrenzen –
         <a href="https://creativecommons.org/licenses/by/4.0/deed.de">CC BY 4.0</a></div>
-      <div class="list-item"><strong>E-Control Austria</strong><br>Netzkapazitäten, Nutzungsbedingungen von E-Control</div>
-      <div class="list-item"><strong>IG Windkraft</strong><br>Windpark-Daten, Rechte bei IG Windkraft</div>
-      <div class="list-item"><strong>APG / ONIP</strong><br>Übertragungsnetz, Rechte bei APG</div>
-      <div class="list-item"><strong>Austro Control · BEV (INSPIRE)</strong><br>Luftfahrthindernisse, Kataster – Rechte bei den jeweiligen Stellen</div>
+      <div class="list-item"><strong>E-Control Austria</strong><br>Umspannwerke &amp; Netzkapazitäten –
+        <a href="https://www.e-control.at">e-control.at</a></div>
+      <div class="list-item"><strong>IG Windkraft</strong><br>Windparks &amp; installierte Leistung –
+        <a href="https://www.igwindkraft.at">igwindkraft.at</a></div>
+      <div class="list-item"><strong>APG / ONIP</strong><br>Übertragungsnetz 220/380 kV –
+        <a href="https://www.apg.at">apg.at</a></div>
+      <div class="list-item"><strong>Austro Control</strong><br>Luftfahrthindernisse –
+        <a href="https://www.austrocontrol.at">austrocontrol.at</a></div>
+      <div class="list-item"><strong>BEV Kataster (INSPIRE)</strong><br>Flurstücksdaten –
+        <a href="https://www.bev.gv.at">bev.gv.at</a></div>
     </div>
-    <h2>Haftungsausschluss</h2>
-    <p>Alle Angaben ohne Gewähr. Die Software wird „wie besehen" ohne jegliche Gewährleistung
-    bereitgestellt. Für verbindliche Netzanschluss-Auskünfte wenden Sie sich an den zuständigen Netzbetreiber.</p>
+    <h2>Hinweis</h2>
+    <p>Alle Angaben ohne Gewähr. Für verbindliche Netzanschluss-Auskünfte wenden Sie sich an den
+    zuständigen Netzbetreiber.</p>
     <a class="cta-button" href="/quellen">Quellen &amp; Methodik</a>
     """
     return _render_seo(
         'Lizenz | Windkraft Österreich Netzkapazität',
-        'Lizenzinformationen: MIT-Lizenz für den Quellcode, Datenlizenzen von OpenStreetMap (ODbL), '
-        'ENTSO-E, data.gv.at (CC BY 4.0) und weiteren Quellen.',
+        'Open Source unter MIT-Lizenz. Verwendete Daten: OpenStreetMap, ENTSO-E, data.gv.at, '
+        'E-Control, IG Windkraft, APG, Austro Control, BEV.',
         '/lizenz', content,
     )
 

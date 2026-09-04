@@ -22,8 +22,14 @@ SOFTWARE.
 
 ---
 
-The MIT License above applies to the source code of this project only.
-Third-party data served by this application remains subject to the terms of
-its respective providers (see /lizenz): OpenStreetMap (ODbL 1.0),
-ENTSO-E Transparency Platform (ENTSO-E terms), data.gv.at (CC BY 4.0),
-IG Windkraft, E-Control, APG/ONIP, Austro Control, BEV (INSPIRE).
+Data sources used by this project (with thanks):
+
+  OpenStreetMap contributors        https://www.openstreetmap.org/copyright
+  CARTO (basemap tiles)             https://carto.com/attributions
+  ENTSO-E Transparency Platform     https://transparency.entsoe.eu
+  data.gv.at (district boundaries)  https://www.data.gv.at
+  E-Control Austria                 https://www.e-control.at
+  IG Windkraft                      https://www.igwindkraft.at
+  APG / ONIP (transmission grid)    https://www.apg.at
+  Austro Control (obstacle data)    https://www.austrocontrol.at
+  BEV Kataster (INSPIRE)            https://www.bev.gv.at
